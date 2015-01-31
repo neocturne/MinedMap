@@ -24,21 +24,78 @@
 */
 
 
-#include "World/Region.hpp"
+#include "Region.hpp"
 
+#include <fstream>
 #include <iostream>
-#include <unistd.h>
 
 
-int main(int argc, char *argv[]) {
-	using namespace MinedMap;
+namespace MinedMap {
+namespace World {
 
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " region" << std::endl;
-		return 1;
+Region::ChunkMap Region::processHeader(const uint8_t header[4096]) {
+	ChunkMap map;
+
+	for (size_t z = 0; z < 32; z++) {
+		for (size_t x = 0; x < 32; x++) {
+			const uint8_t *p = &header[128*z + x*4];
+
+			size_t offset = (p[0] << 16) | (p[1] << 8) | p[2];
+
+			if (!offset)
+				continue;
+
+			size_t len = p[3];
+
+			map.emplace(offset, ChunkDesc(x, z, len));
+		}
 	}
 
-	World::Region region(argv[1]);
+	return map;
+}
 
-	return 0;
+Region::Region(const char *filename) {
+	std::ifstream file;
+	file.exceptions(std::ios::failbit | std::ios::badbit);
+	file.open(filename, std::ios::in | std::ios::binary);
+
+	ChunkMap chunkMap;
+
+	{
+		uint8_t header[4096];
+		file.read((char *)header, sizeof(header));
+
+		chunkMap = processHeader(header);
+	}
+
+	size_t i = 1, c = 0;
+	while (!file.eof()) {
+		auto it = chunkMap.find(i);
+		if (it == chunkMap.end()) {
+			file.ignore(4096);
+			i++;
+			continue;
+		}
+
+		size_t x, z, len;
+		std::tie(x, z, len) = it->second;
+
+		if (chunks[x][z])
+			throw std::invalid_argument("duplicate chunk");
+
+		uint8_t buffer[len * 4096];
+		file.read((char *)buffer, len * 4096);
+
+		chunks[x][z].reset(new Chunk(buffer, len * 4096));
+
+		std::cerr << "Read chunk (" << x << "," << z << ") of length " << len << std::endl;
+
+		i += len;
+		c++;
+	}
+
+	std::cerr << "Read " << c <<" of " << chunkMap.size() << " chunks" << std::endl;
+}
+
+}
 }

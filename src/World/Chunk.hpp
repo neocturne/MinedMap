@@ -24,21 +24,31 @@
 */
 
 
-#include "World/Region.hpp"
-
-#include <iostream>
-#include <unistd.h>
+#pragma once
 
 
-int main(int argc, char *argv[]) {
-	using namespace MinedMap;
+#include "../UniqueCPtr.hpp"
+#include "../NBT/Tag.hpp"
 
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " region" << std::endl;
-		return 1;
-	}
+#include <cstdint>
+#include <tuple>
 
-	World::Region region(argv[1]);
 
-	return 0;
+namespace MinedMap {
+namespace World {
+
+class Chunk {
+public:
+	static const size_t SIZE = 16;
+
+private:
+	static std::tuple<UniqueCPtr<uint8_t[]>, size_t> inflateChunk(uint8_t *data, size_t len);
+
+	std::shared_ptr<NBT::Tag> content;
+
+public:
+	Chunk(uint8_t *buffer, size_t buflen);
+};
+
+}
 }

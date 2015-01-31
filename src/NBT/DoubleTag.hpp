@@ -24,21 +24,36 @@
 */
 
 
-#include "World/Region.hpp"
+#pragma once
 
-#include <iostream>
-#include <unistd.h>
+#include "Tag.hpp"
 
 
-int main(int argc, char *argv[]) {
-	using namespace MinedMap;
+namespace MinedMap {
+namespace NBT {
 
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " region" << std::endl;
-		return 1;
+class DoubleTag : public Tag {
+private:
+	friend class Tag;
+
+	DoubleTag(Buffer *buffer) {
+		uint64_t value;
+
+		value = uint64_t(buffer->get()) << 56;
+		value |= uint64_t(buffer->get()) << 48;
+		value |= uint64_t(buffer->get()) << 40;
+		value |= uint64_t(buffer->get()) << 32;
+		value |= uint64_t(buffer->get()) << 24;
+		value |= uint64_t(buffer->get()) << 16;
+		value |= uint64_t(buffer->get()) << 8;
+		value |= uint64_t(buffer->get());
 	}
 
-	World::Region region(argv[1]);
+public:
+	virtual Type getType() const {
+		return Type::Double;
+	}
+};
 
-	return 0;
+}
 }

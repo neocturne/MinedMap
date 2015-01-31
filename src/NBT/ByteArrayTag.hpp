@@ -24,21 +24,39 @@
 */
 
 
-#include "World/Region.hpp"
+#pragma once
 
-#include <iostream>
-#include <unistd.h>
+#include "Tag.hpp"
+
+#include <vector>
 
 
-int main(int argc, char *argv[]) {
-	using namespace MinedMap;
+namespace MinedMap {
+namespace NBT {
 
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " region" << std::endl;
-		return 1;
+class ByteArrayTag : public Tag {
+private:
+	friend class Tag;
+
+	std::vector<uint8_t> value;
+
+	ByteArrayTag(Buffer *buffer) {
+		uint32_t len = uint32_t(buffer->get()) << 24;
+		len |= uint32_t(buffer->get()) << 16;
+		len |= uint32_t(buffer->get()) << 8;
+		len |= uint32_t(buffer->get());
+
+		value.resize(len);
+
+		for (uint32_t i = 0; i < len; i++)
+			value[i] = buffer->get();
 	}
 
-	World::Region region(argv[1]);
+public:
+	virtual Type getType() const {
+		return Type::ByteArray;
+	}
+};
 
-	return 0;
+}
 }

@@ -24,21 +24,14 @@
 */
 
 
-#include "World/Region.hpp"
+#pragma once
 
-#include <iostream>
-#include <unistd.h>
+#include <cstdlib>
+#include <memory>
 
 
-int main(int argc, char *argv[]) {
-	using namespace MinedMap;
-
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " region" << std::endl;
-		return 1;
-	}
-
-	World::Region region(argv[1]);
-
-	return 0;
-}
+template<typename T> class UniqueCPtr : public std::unique_ptr<T, void (*)(void *)> {
+public:
+	UniqueCPtr() : std::unique_ptr<T, void (*)(void *)>(nullptr, std::free) {}
+	template<typename T2> UniqueCPtr(T2 ptr) : std::unique_ptr<T, void (*)(void *)>(ptr, std::free) {}
+};

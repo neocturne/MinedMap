@@ -2,4 +2,8 @@ cmake_minimum_required(VERSION 2.8.3)
 project(MINEDMAP CXX)
 
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(ZLIB REQUIRED zlib)
+
+
 add_subdirectory(src)

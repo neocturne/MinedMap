@@ -24,21 +24,40 @@
 */
 
 
-#include "World/Region.hpp"
+#pragma once
 
-#include <iostream>
-#include <unistd.h>
+#include <cstdint>
+#include <stdexcept>
+#include <string>
 
 
-int main(int argc, char *argv[]) {
-	using namespace MinedMap;
+namespace MinedMap {
 
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " region" << std::endl;
-		return 1;
+class Buffer {
+private:
+	const uint8_t *data;
+	size_t len;
+
+public:
+	Buffer(const uint8_t *data0, size_t len0) : data(data0), len(len0) {}
+
+	uint8_t get() {
+		if (!len)
+			throw std::runtime_error("Buffer::get(): buffer underrun");
+
+		data++;
+		len--;
+		return data[-1];
 	}
 
-	World::Region region(argv[1]);
+	std::string getString(size_t n) {
+		if (n > len)
+			throw std::runtime_error("Buffer::get(): buffer underrun");
 
-	return 0;
+		data += n;
+		len -= n;
+		return std::string(reinterpret_cast<const char *>(data - n), n);
+	}
+};
+
 }

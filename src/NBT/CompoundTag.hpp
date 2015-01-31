@@ -24,21 +24,38 @@
 */
 
 
-#include "World/Region.hpp"
+#pragma once
 
-#include <iostream>
-#include <unistd.h>
+#include "Tag.hpp"
+
+#include <string>
+#include <unordered_map>
 
 
-int main(int argc, char *argv[]) {
-	using namespace MinedMap;
+namespace MinedMap {
+namespace NBT {
 
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " region" << std::endl;
-		return 1;
+class CompoundTag : public Tag {
+private:
+	friend class Tag;
+
+	std::unordered_map<std::string, std::shared_ptr<Tag>> value;
+
+	CompoundTag(Buffer *buffer) {
+		while (true) {
+			std::pair<std::string, std::shared_ptr<Tag>> v = Tag::readNamedTag(buffer);
+			if (v.second->getType() == Type::End)
+				break;
+
+			value.insert(std::move(v));
+		}
 	}
 
-	World::Region region(argv[1]);
+public:
+	virtual Type getType() const {
+		return Type::Compound;
+	}
+};
 
-	return 0;
+}
 }

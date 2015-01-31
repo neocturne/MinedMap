@@ -24,21 +24,34 @@
 */
 
 
-#include "World/Region.hpp"
+#pragma once
 
-#include <iostream>
-#include <unistd.h>
+#include "Tag.hpp"
 
 
-int main(int argc, char *argv[]) {
-	using namespace MinedMap;
+namespace MinedMap {
+namespace NBT {
 
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " region" << std::endl;
-		return 1;
+class ShortTag : public Tag {
+private:
+	friend class Tag;
+
+	uint16_t value;
+
+	ShortTag(Buffer *buffer) {
+		value = buffer->get() << 8;
+		value |= buffer->get();
 	}
 
-	World::Region region(argv[1]);
+public:
+	virtual Type getType() const {
+		return Type::Short;
+	}
 
-	return 0;
+	uint16_t getValue() const {
+		return value;
+	}
+};
+
+}
 }

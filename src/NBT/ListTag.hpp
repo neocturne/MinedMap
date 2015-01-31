@@ -24,21 +24,42 @@
 */
 
 
-#include "World/Region.hpp"
+#pragma once
 
-#include <iostream>
-#include <unistd.h>
+#include "Tag.hpp"
+
+#include <vector>
 
 
-int main(int argc, char *argv[]) {
-	using namespace MinedMap;
+namespace MinedMap {
+namespace NBT {
 
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " region" << std::endl;
-		return 1;
+class ListTag : public Tag {
+private:
+	friend class Tag;
+
+	std::vector<std::shared_ptr<Tag>> value;
+
+
+	ListTag(Buffer *buffer) {
+		Type type = static_cast<Type>(buffer->get());
+
+		uint32_t len = uint32_t(buffer->get()) << 24;
+		len |= uint32_t(buffer->get()) << 16;
+		len |= uint32_t(buffer->get()) << 8;
+		len |= uint32_t(buffer->get());
+
+		value.resize(len);
+
+		for (uint32_t i = 0; i < len; i++)
+			value[i] = Tag::readTag(type, buffer);
 	}
 
-	World::Region region(argv[1]);
+public:
+	virtual Type getType() const {
+		return Type::List;
+	}
+};
 
-	return 0;
+}
 }

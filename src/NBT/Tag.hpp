@@ -24,21 +24,42 @@
 */
 
 
-#include "World/Region.hpp"
+#pragma once
 
-#include <iostream>
-#include <unistd.h>
+#include <cstdint>
+#include <memory>
+
+#include "../Buffer.hpp"
 
 
-int main(int argc, char *argv[]) {
-	using namespace MinedMap;
+namespace MinedMap {
+namespace NBT {
 
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " region" << std::endl;
-		return 1;
-	}
+class Tag {
+public:
+	enum class Type {
+		End = 0,
+		Byte = 1,
+		Short = 2,
+		Int = 3,
+		Long = 4,
+		Float = 5,
+		Double = 6,
+		ByteArray = 7,
+		String = 8,
+		List = 9,
+		Compound = 10,
+		IntArray = 11,
+	};
 
-	World::Region region(argv[1]);
+	static std::shared_ptr<Tag> readTag(Type type, Buffer *buffer);
 
-	return 0;
+	static std::pair<std::string, std::shared_ptr<Tag>> readNamedTag(Buffer *buffer);
+
+	virtual Type getType() const = 0;
+
+	virtual ~Tag() {}
+};
+
+}
 }

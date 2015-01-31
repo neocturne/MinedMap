@@ -24,21 +24,41 @@
 */
 
 
-#include "World/Region.hpp"
+#pragma once
 
-#include <iostream>
-#include <unistd.h>
+#include "Chunk.hpp"
+
+#include <memory>
+#include <stdexcept>
+#include <tuple>
+#include <unordered_map>
 
 
-int main(int argc, char *argv[]) {
-	using namespace MinedMap;
+namespace MinedMap {
+namespace World {
 
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " region" << std::endl;
-		return 1;
+class Region {
+public:
+	static const size_t SIZE = 32;
+
+private:
+	typedef std::tuple<size_t, size_t, size_t> ChunkDesc;
+	typedef std::unordered_map<size_t, ChunkDesc> ChunkMap;
+
+	std::unique_ptr<Chunk> chunks[SIZE][SIZE];
+
+	static ChunkMap processHeader(const uint8_t header[4096]);
+
+public:
+	Region(const char *filename);
+
+	const Chunk * operator()(size_t x, size_t z) {
+		if (x >= SIZE || z >= SIZE)
+			throw std::range_error("Region(): bad coordinates");
+
+		return chunks[x][z].get();
 	}
+};
 
-	World::Region region(argv[1]);
-
-	return 0;
+}
 }
