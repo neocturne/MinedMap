@@ -105,6 +105,13 @@ void Chunk::analyzeChunk() {
 	sections = assertValue(level->get<NBT::ListTag<NBT::CompoundTag>>("Sections"));
 	maxY = (assertValue(sections->back()->get<NBT::ByteTag>("Y"))->getValue() + 1) * SIZE;
 
+
+	std::shared_ptr<const NBT::ByteArrayTag> biomeTag = assertValue(level->get<NBT::ByteArrayTag>("Biomes"));
+	if (biomeTag->getLength() != SIZE*SIZE)
+		throw std::invalid_argument("corrupt biome data");
+
+	biomes = biomeTag->getValue();
+
 	blockIDs.reset(new uint8_t[maxY * SIZE * SIZE]);
 	blockData.reset(new uint8_t[maxY * SIZE * SIZE / 2]);
 	blockSkyLight.reset(new uint8_t[maxY * SIZE * SIZE / 2]);
@@ -169,6 +176,8 @@ Chunk::Blocks Chunk::getTopLayer() const {
 				}
 
 				b.height = h;
+
+				b.biome = getBiomeAt(x, z);
 
 				done++;
 			}

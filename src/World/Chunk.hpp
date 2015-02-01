@@ -67,6 +67,7 @@ private:
 	std::unique_ptr<uint8_t[]> blockData;
 	std::unique_ptr<uint8_t[]> blockSkyLight;
 	std::unique_ptr<uint8_t[]> blockBlockLight;
+	const uint8_t *biomes;
 
 
 	size_t getIndex(size_t x, size_t y, size_t z) const {
@@ -99,6 +100,10 @@ private:
 
 	uint8_t getSkyLightAt(size_t x, size_t y, size_t z) const {
 		return getHalf(blockSkyLight.get(), x, y, z);
+	}
+
+	uint8_t getBiomeAt(size_t x, size_t z) const {
+		return biomes[z*SIZE + x];
 	}
 
 

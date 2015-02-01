@@ -32,7 +32,7 @@
 namespace MinedMap {
 namespace World {
 
-uint32_t Block::getColor(uint8_t biome) const {
+uint32_t Block::getColor() const {
 	const World::BlockType &t = World::BLOCK_TYPES[id];
 
 	if (!t.opaque)
