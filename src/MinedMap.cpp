@@ -24,7 +24,6 @@
 */
 
 
-#include "World/BlockType.hpp"
 #include "World/Region.hpp"
 #include "NBT/ListTag.hpp"
 

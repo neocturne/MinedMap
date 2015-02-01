@@ -26,18 +26,14 @@
 
 #pragma once
 
-#include <cstdint>
-
 namespace MinedMap {
-namespace World {
+namespace Resource {
 
-struct BlockType {
-	bool opaque;
-	bool green;
-	uint32_t colors[16];
+struct Biome {
+	float r, g, b;
 };
 
-extern const BlockType BLOCK_TYPES[256];
+extern const Biome BIOMES[256];
 
 }
 }

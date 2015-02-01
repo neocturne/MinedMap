@@ -25,15 +25,15 @@
 
 
 #include "Block.hpp"
-#include "BlockType.hpp"
-#include "Biome.hpp"
+#include "../Resource/BlockType.hpp"
+#include "../Resource/Biome.hpp"
 
 
 namespace MinedMap {
 namespace World {
 
 uint32_t Block::getColor() const {
-	const World::BlockType &t = World::BLOCK_TYPES[id];
+	const Resource::BlockType &t = Resource::BLOCK_TYPES[id];
 
 	if (!t.opaque)
 		return 0;
@@ -54,7 +54,7 @@ uint32_t Block::getColor() const {
 	b *= lightCoef * heightCoef;
 
 	if (t.green) {
-		const Biome &biomeDef = BIOMES[biome];
+		const Resource::Biome &biomeDef = Resource::BIOMES[biome];
 
 		r *= biomeDef.r;
 		g *= biomeDef.g;

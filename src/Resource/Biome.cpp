@@ -28,7 +28,7 @@
 
 
 namespace MinedMap {
-namespace World {
+namespace Resource {
 
 const Biome BIOMES[256] = {
 	/* 0 */ {0.25, 1, 0.25},

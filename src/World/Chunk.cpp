@@ -25,7 +25,7 @@
 
 
 #include "Chunk.hpp"
-#include "BlockType.hpp"
+#include "../Resource/BlockType.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -152,7 +152,7 @@ Chunk::Blocks Chunk::getTopLayer() const {
 					continue;
 
 				uint8_t id = getBlockAt(x, y, z);
-				if (!BLOCK_TYPES[id].opaque)
+				if (!Resource::BLOCK_TYPES[id].opaque)
 					continue;
 
 				Block &b = ret.blocks[x][z];
