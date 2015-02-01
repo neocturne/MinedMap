@@ -39,6 +39,20 @@
 namespace MinedMap {
 namespace World {
 
+Chunk::Chunk(Buffer buffer) {
+	size_t size = buffer.get32();
+
+	Buffer buffer2(buffer.get(size), size);
+
+	uint8_t format = buffer2.get8();
+	if (format != 2)
+		throw std::invalid_argument("unknown chunk format");
+
+	inflateChunk(buffer2);
+	parseChunk();
+	analyzeChunk();
+}
+
 void Chunk::inflateChunk(Buffer buffer) {
 	size_t outlen = 0;
 	uint8_t *output = nullptr;
@@ -97,11 +111,11 @@ void Chunk::analyzeChunk() {
 	}
 }
 
-uint8_t Chunk::getBlockAt(const std::shared_ptr<const NBT::CompoundTag> &section, size_t x, size_t y, size_t z) {
+uint8_t Chunk::getBlockAt(const std::shared_ptr<const NBT::CompoundTag> &section, size_t x, size_t y, size_t z) const {
 	return (*section->get<NBT::ByteArrayTag>("Blocks"))[getIndex(x, y, z)];
 }
 
-uint8_t Chunk::getDataAt(const std::shared_ptr<const NBT::CompoundTag> &section, size_t x, size_t y, size_t z) {
+uint8_t Chunk::getDataAt(const std::shared_ptr<const NBT::CompoundTag> &section, size_t x, size_t y, size_t z) const {
 	size_t i = getIndex(x, y, z);
 	uint8_t v = (*section->get<NBT::ByteArrayTag>("Data"))[i / 2];
 
@@ -111,18 +125,37 @@ uint8_t Chunk::getDataAt(const std::shared_ptr<const NBT::CompoundTag> &section,
 		return (v & 0xf);
 }
 
-Chunk::Chunk(Buffer buffer) {
-	size_t size = buffer.get32();
+Chunk::Blocks Chunk::getTopLayer() const {
+	size_t done = 0;
+	Blocks blocks = {};
 
-	Buffer buffer2(buffer.get(size), size);
+	for (auto it = sections->rbegin(); it != sections->rend(); ++it) {
+		if (done == SIZE*SIZE)
+			break;
 
-	uint8_t format = buffer2.get8();
-	if (format != 2)
-		throw std::invalid_argument("unknown chunk format");
+		for (ssize_t y = SIZE-1; y >= 0; y--) {
+			if (done == SIZE*SIZE)
+				break;
 
-	inflateChunk(buffer2);
-	parseChunk();
-	analyzeChunk();
+			for (size_t x = 0; x < SIZE; x++) {
+				for (size_t z = 0; z < SIZE; z++) {
+					if (blocks.blocks[x][z].id)
+						continue;
+
+					uint8_t block = getBlockAt(*it, x, y, z);
+					if (block) {
+						blocks.blocks[x][z].id = block;
+						blocks.blocks[x][z].data = getDataAt(*it, x, y, z);
+						done++;
+					}
+				}
+			}
+		}
+	}
+
+	std::cerr << "Done: " << done << std::endl;
+
+	return blocks;
 }
 
 }

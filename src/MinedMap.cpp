@@ -42,14 +42,7 @@ int main(int argc, char *argv[]) {
 	World::Region region(argv[1]);
 
 	const World::Chunk &chunk = *region(0, 0);
-
-	for (auto &entry : chunk.getSections()) {
-		std::cout << entry->getType() << ":" << std::endl;
-
-		for (auto &entry2 : *entry) {
-			std::cout << entry2.first << " " << entry2.second->getType() << std::endl;
-		}
-	}
+	World::Chunk::Blocks layer = chunk.getTopLayer();
 
 	return 0;
 }
