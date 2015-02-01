@@ -54,13 +54,15 @@ public:
 		return Type::Compound;
 	}
 
-	template<typename T>
-	std::shared_ptr<const T> get(const std::string &key) const {
-		return std::dynamic_pointer_cast<const T>(at(key));
+	template<typename T> std::shared_ptr<const T> get(const std::string &key) const {
+		auto it = find(key);
+		if (it == end())
+			return std::shared_ptr<const T>();
+
+		return std::dynamic_pointer_cast<const T>(it->second);
 	}
 
-	template<typename T, typename... Args>
-		std::shared_ptr<const T> get(const std::string &key, const Args &...args) const {
+	template<typename T, typename... Args> std::shared_ptr<const T> get(const std::string &key, const Args &...args) const {
 		std::shared_ptr<const CompoundTag> tag = get<CompoundTag>(key);
 		if (!tag)
 			return std::shared_ptr<const T>();
