@@ -35,11 +35,9 @@
 namespace MinedMap {
 namespace NBT {
 
-class CompoundTag : public Tag {
+class CompoundTag : public Tag, public std::unordered_map<std::string, std::shared_ptr<const Tag>> {
 private:
 	friend class Tag;
-
-	std::unordered_map<std::string, std::shared_ptr<const Tag>> values;
 
 	CompoundTag(Buffer *buffer) {
 		while (true) {
@@ -47,7 +45,7 @@ private:
 			if (v.second->getType() == Type::End)
 				break;
 
-			values.insert(std::move(v));
+			insert(std::move(v));
 		}
 	}
 
@@ -56,20 +54,18 @@ public:
 		return Type::Compound;
 	}
 
-	const std::unordered_map<std::string, std::shared_ptr<const Tag>> & getValues() const {
-		return values;
+	template<typename T>
+	std::shared_ptr<const T> get(const std::string &key) const {
+		return std::dynamic_pointer_cast<const T>(at(key));
 	}
 
-	const std::shared_ptr<const Tag> & get(const std::string &key) const {
-		return values.at(key);
-	}
-
-	template<typename... Args> const std::shared_ptr<const Tag> & get(const std::string &key, const Args &...args) const {
-		std::shared_ptr<const CompoundTag> tag = std::dynamic_pointer_cast<const CompoundTag>(get(key));
+	template<typename T, typename... Args>
+		std::shared_ptr<const T> get(const std::string &key, const Args &...args) const {
+		std::shared_ptr<const CompoundTag> tag = get<CompoundTag>(key);
 		if (!tag)
-			return std::shared_ptr<Tag>(nullptr);
+			return std::shared_ptr<const T>();
 
-		tag->get(args...);
+		return tag->get<T>(args...);
 	}
 };
 

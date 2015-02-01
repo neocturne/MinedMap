@@ -76,7 +76,7 @@ std::shared_ptr<const Tag> Tag::readTag(Type type, Buffer *buffer) {
 		return std::shared_ptr<StringTag>(new StringTag(buffer));
 
 	case Type::List:
-		return std::shared_ptr<ListTag>(new ListTag(buffer));
+		return readList(buffer);
 
 	case Type::Compound:
 		return std::shared_ptr<CompoundTag>(new CompoundTag(buffer));
@@ -85,7 +85,52 @@ std::shared_ptr<const Tag> Tag::readTag(Type type, Buffer *buffer) {
 		return std::shared_ptr<IntArrayTag>(new IntArrayTag(buffer));
 
 	default:
-		throw std::runtime_error("Tag::read: unknown tag type");
+		throw std::runtime_error("Tag::readTag: unknown tag type");
+	}
+}
+
+std::shared_ptr<const Tag> Tag::readList(Buffer *buffer) {
+	Type type = static_cast<Type>(buffer->get());
+
+	switch (type) {
+	case Type::End:
+		return std::shared_ptr<Tag>(new ListTag<EndTag>(type, buffer));
+
+	case Type::Byte:
+		return std::shared_ptr<Tag>(new ListTag<ByteTag>(type, buffer));
+
+	case Type::Short:
+		return std::shared_ptr<Tag>(new ListTag<ShortTag>(type, buffer));
+
+	case Type::Int:
+		return std::shared_ptr<Tag>(new ListTag<IntTag>(type, buffer));
+
+	case Type::Long:
+		return std::shared_ptr<Tag>(new ListTag<LongTag>(type, buffer));
+
+	case Type::Float:
+		return std::shared_ptr<Tag>(new ListTag<FloatTag>(type, buffer));
+
+	case Type::Double:
+		return std::shared_ptr<Tag>(new ListTag<DoubleTag>(type, buffer));
+
+	case Type::ByteArray:
+		return std::shared_ptr<Tag>(new ListTag<ByteArrayTag>(type, buffer));
+
+	case Type::String:
+		return std::shared_ptr<Tag>(new ListTag<StringTag>(type, buffer));
+
+	case Type::List:
+		return std::shared_ptr<Tag>(new ListTag<ListTagBase>(type, buffer));
+
+	case Type::Compound:
+		return std::shared_ptr<Tag>(new ListTag<CompoundTag>(type, buffer));
+
+	case Type::IntArray:
+		return std::shared_ptr<Tag>(new ListTag<IntArrayTag>(type, buffer));
+
+	default:
+		throw std::runtime_error("Tag::readList: unknown tag type");
 	}
 }
 

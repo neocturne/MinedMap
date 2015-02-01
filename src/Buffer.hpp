@@ -27,6 +27,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstring>
 #include <stdexcept>
 #include <string>
 
@@ -57,6 +58,15 @@ public:
 		data += n;
 		len -= n;
 		return std::string(reinterpret_cast<const char *>(data - n), n);
+	}
+
+	void getData(void *buf, size_t n) {
+		if (n > len)
+			throw std::runtime_error("Buffer::get(): buffer underrun");
+
+		data += n;
+		len -= n;
+		std::memcpy(buf, data - n, n);
 	}
 };
 

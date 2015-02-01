@@ -95,6 +95,10 @@ Chunk::Chunk(uint8_t *buffer, size_t buflen) {
 
 	if (!(*this) || tag.first != "")
 		throw std::invalid_argument("invalid root tag");
+
+	sections = (*this)->get<const NBT::ListTag<NBT::CompoundTag>>("Level", "Sections");
+	if (!sections)
+		throw std::invalid_argument("no sections found");
 }
 
 }

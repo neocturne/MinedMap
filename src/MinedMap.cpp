@@ -25,6 +25,7 @@
 
 
 #include "World/Region.hpp"
+#include "NBT/ListTag.hpp"
 
 #include <iostream>
 #include <unistd.h>
@@ -42,8 +43,12 @@ int main(int argc, char *argv[]) {
 
 	const World::Chunk &chunk = *region(0, 0);
 
-	for (auto &entry : std::dynamic_pointer_cast<const NBT::CompoundTag>(chunk->get("Level"))->getValues()) {
-		std::cout << entry.first << " " << entry.second->getType() << std::endl;
+	for (auto &entry : chunk.getSections()) {
+		std::cout << entry->getType() << ":" << std::endl;
+
+		for (auto &entry2 : *entry) {
+			std::cout << entry2.first << " " << entry2.second->getType() << std::endl;
+		}
 	}
 
 	return 0;

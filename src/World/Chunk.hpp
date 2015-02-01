@@ -29,6 +29,7 @@
 
 #include "../UniqueCPtr.hpp"
 #include "../NBT/CompoundTag.hpp"
+#include "../NBT/ListTag.hpp"
 
 #include <cstdint>
 #include <tuple>
@@ -44,8 +45,14 @@ public:
 private:
 	static std::pair<UniqueCPtr<uint8_t[]>, size_t> inflateChunk(uint8_t *data, size_t len);
 
+	std::shared_ptr<const NBT::ListTag<NBT::CompoundTag>> sections;
+
 public:
 	Chunk(uint8_t *buffer, size_t buflen);
+
+	const NBT::ListTag<NBT::CompoundTag> & getSections() const {
+		return *sections;
+	}
 };
 
 }

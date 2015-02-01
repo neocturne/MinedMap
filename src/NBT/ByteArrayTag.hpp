@@ -47,9 +47,7 @@ private:
 		len |= uint32_t(buffer->get());
 
 		value.resize(len);
-
-		for (uint32_t i = 0; i < len; i++)
-			value[i] = buffer->get();
+		buffer->getData(value.data(), len);
 	}
 
 public:

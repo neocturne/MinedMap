@@ -37,6 +37,9 @@ namespace MinedMap {
 namespace NBT {
 
 class Tag {
+private:
+	static std::shared_ptr<const Tag> readList(Buffer *buffer);
+
 public:
 	enum class Type {
 		End = 0,
@@ -54,7 +57,6 @@ public:
 	};
 
 	static std::shared_ptr<const Tag> readTag(Type type, Buffer *buffer);
-
 	static std::pair<std::string, std::shared_ptr<const Tag>> readNamedTag(Buffer *buffer);
 
 	virtual Type getType() const = 0;
