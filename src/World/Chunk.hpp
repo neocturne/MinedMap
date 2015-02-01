@@ -43,9 +43,14 @@ public:
 	static const size_t SIZE = 16;
 
 private:
+	size_t len;
 	UniqueCPtr<uint8_t[]> data;
 
-	static std::pair<UniqueCPtr<uint8_t[]>, size_t> inflateChunk(uint8_t *data, size_t len);
+	unsigned maxY;
+
+	void inflateChunk(uint8_t *data, size_t len);
+	void parseChunk();
+	void analyzeChunk();
 
 	std::shared_ptr<const NBT::ListTag<NBT::CompoundTag>> sections;
 

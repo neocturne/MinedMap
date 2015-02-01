@@ -25,6 +25,8 @@
 
 
 #include "Chunk.hpp"
+#include "../Util.hpp"
+#include "../NBT/ByteTag.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -36,7 +38,7 @@
 namespace MinedMap {
 namespace World {
 
-std::pair<UniqueCPtr<uint8_t[]>, size_t> Chunk::inflateChunk(uint8_t *data, size_t len) {
+void Chunk::inflateChunk(uint8_t *buffer, size_t buflen) {
 	size_t outlen = 0;
 	uint8_t *output = nullptr;
 
@@ -45,8 +47,8 @@ std::pair<UniqueCPtr<uint8_t[]>, size_t> Chunk::inflateChunk(uint8_t *data, size
 	if (ret != Z_OK)
 		throw std::runtime_error("inflateInit() failed");
 
-	stream.next_in = data;
-	stream.avail_in = len;
+	stream.next_in = buffer;
+	stream.avail_in = buflen;
 
 	while (stream.avail_in) {
 		outlen += 65536;
@@ -67,7 +69,28 @@ std::pair<UniqueCPtr<uint8_t[]>, size_t> Chunk::inflateChunk(uint8_t *data, size
 
 	inflateEnd(&stream);
 
-	return std::make_pair(UniqueCPtr<uint8_t[]>(output), stream.total_out);
+	len = stream.total_out;
+	data = UniqueCPtr<uint8_t[]>(output);
+}
+
+void Chunk::parseChunk() {
+	Buffer nbt(data.get(), len);
+	std::pair<std::string, std::shared_ptr<const NBT::Tag>> tag = NBT::Tag::readNamedTag(&nbt);
+
+	std::shared_ptr<const NBT::CompoundTag>::operator=(std::dynamic_pointer_cast<const NBT::CompoundTag>(tag.second));
+
+	if (!(*this) || tag.first != "")
+		throw std::invalid_argument("invalid root tag");
+
+	sections = (*this)->get<const NBT::ListTag<NBT::CompoundTag>>("Level", "Sections");
+	if (!sections)
+		throw std::invalid_argument("no sections found");
+}
+
+void Chunk::analyzeChunk() {
+	maxY = (assertValue(sections->back()->get<NBT::ByteTag>("Y"))->getValue() + 1) * SIZE;
+
+	std::cerr << "maxY: " << maxY << std::endl;
 }
 
 Chunk::Chunk(uint8_t *buffer, size_t buflen) {
@@ -82,22 +105,9 @@ Chunk::Chunk(uint8_t *buffer, size_t buflen) {
 	if (format != 2)
 		throw std::invalid_argument("unknown chunk format");
 
-	size_t len;
-	std::tie(data, len) = inflateChunk(buffer+5, size-1);
-
-	std::cerr << "Chunk has size " << size << " (" << len << " inflated)" << std::endl;
-
-	Buffer nbt(data.get(), len);
-	std::pair<std::string, std::shared_ptr<const NBT::Tag>> tag = NBT::Tag::readNamedTag(&nbt);
-
-	std::shared_ptr<const NBT::CompoundTag>::operator=(std::dynamic_pointer_cast<const NBT::CompoundTag>(tag.second));
-
-	if (!(*this) || tag.first != "")
-		throw std::invalid_argument("invalid root tag");
-
-	sections = (*this)->get<const NBT::ListTag<NBT::CompoundTag>>("Level", "Sections");
-	if (!sections)
-		throw std::invalid_argument("no sections found");
+	inflateChunk(buffer+5, size-1);
+	parseChunk();
+	analyzeChunk();
 }
 
 }
