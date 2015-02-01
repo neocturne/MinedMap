@@ -27,6 +27,7 @@
 #include "Chunk.hpp"
 #include "../Util.hpp"
 #include "../NBT/ByteTag.hpp"
+#include "../NBT/ByteArrayTag.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -82,15 +83,32 @@ void Chunk::parseChunk() {
 	if (!(*this) || tag.first != "")
 		throw std::invalid_argument("invalid root tag");
 
-	sections = (*this)->get<const NBT::ListTag<NBT::CompoundTag>>("Level", "Sections");
-	if (!sections)
-		throw std::invalid_argument("no sections found");
+	level = assertValue((*this)->get<NBT::CompoundTag>("Level"));
+	sections = assertValue(level->get<NBT::ListTag<NBT::CompoundTag>>("Sections"));
 }
 
 void Chunk::analyzeChunk() {
 	maxY = (assertValue(sections->back()->get<NBT::ByteTag>("Y"))->getValue() + 1) * SIZE;
 
-	std::cerr << "maxY: " << maxY << std::endl;
+	for (auto &section : *sections) {
+		if (assertValue(section->get<NBT::ByteArrayTag>("Blocks"))->getLength() != SIZE*SIZE*SIZE
+		    || assertValue(section->get<NBT::ByteArrayTag>("Data"))->getLength() != SIZE*SIZE*SIZE/2)
+			throw std::invalid_argument("corrupt chunk data");
+	}
+}
+
+uint8_t Chunk::getBlockAt(const std::shared_ptr<const NBT::CompoundTag> &section, size_t x, size_t y, size_t z) {
+	return (*section->get<NBT::ByteArrayTag>("Blocks"))[getIndex(x, y, z)];
+}
+
+uint8_t Chunk::getDataAt(const std::shared_ptr<const NBT::CompoundTag> &section, size_t x, size_t y, size_t z) {
+	size_t i = getIndex(x, y, z);
+	uint8_t v = (*section->get<NBT::ByteArrayTag>("Data"))[i / 2];
+
+	if (i % 2)
+		return (v >> 4);
+	else
+		return (v & 0xf);
 }
 
 Chunk::Chunk(uint8_t *buffer, size_t buflen) {

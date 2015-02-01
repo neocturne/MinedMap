@@ -46,13 +46,24 @@ private:
 	size_t len;
 	UniqueCPtr<uint8_t[]> data;
 
+	std::shared_ptr<const NBT::CompoundTag> level;
+	std::shared_ptr<const NBT::ListTag<NBT::CompoundTag>> sections;
+
 	unsigned maxY;
 
 	void inflateChunk(uint8_t *data, size_t len);
 	void parseChunk();
 	void analyzeChunk();
 
-	std::shared_ptr<const NBT::ListTag<NBT::CompoundTag>> sections;
+	size_t getIndex(size_t x, size_t y, size_t z) {
+		if (x >= SIZE || y >= SIZE || z >= SIZE)
+			throw std::range_error("Chunk::getIndex(): bad coordinates");
+
+		return 256*y + 16*z + x;
+	}
+
+	uint8_t getBlockAt(const std::shared_ptr<const NBT::CompoundTag> &section, size_t x, size_t y, size_t z);
+	uint8_t getDataAt(const std::shared_ptr<const NBT::CompoundTag> &section, size_t x, size_t y, size_t z);
 
 public:
 	Chunk(uint8_t *buffer, size_t buflen);
