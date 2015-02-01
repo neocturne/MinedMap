@@ -44,6 +44,8 @@ struct Block {
 	uint8_t biome;
 
 	Block() : id(0), data(0), height(0), blockLight(0), skyLight(0), biome(0) {}
+	Block(uint8_t id0, uint8_t data0, unsigned height0, uint8_t blockLight0, uint8_t skyLight0, uint8_t biome0)
+		: id(id0), data(data0), height(height0), blockLight(blockLight0), skyLight(skyLight0), biome(biome0) {}
 
 	uint32_t getColor() const;
 };

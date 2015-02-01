@@ -138,6 +138,28 @@ void Chunk::analyzeChunk() {
 	}
 }
 
+Block Chunk::getBlock(size_t x, size_t y, size_t z) const {
+	size_t y2 = y;
+	if (y2 < maxY-1)
+		y2++;
+
+	unsigned h;
+	for (h = y; h > 0; h--) {
+		uint8_t id2 = getBlockAt(x, h, z);
+		if (id2 != 8 && id2 != 9)
+			break;
+	}
+
+	return Block(
+		getBlockAt(x, y, z),
+		getDataAt(x, y, z),
+		h,
+		getBlockLightAt(x, y2, z),
+		getSkyLightAt(x, y2, z),
+		getBiomeAt(x, z)
+	);
+}
+
 Chunk::Blocks Chunk::getTopLayer() const {
 	size_t done = 0;
 	Blocks ret;
@@ -155,30 +177,7 @@ Chunk::Blocks Chunk::getTopLayer() const {
 				if (!Resource::BLOCK_TYPES[id].opaque)
 					continue;
 
-				Block &b = ret.blocks[x][z];
-
-				b.id = id;
-				b.data = getDataAt(x, y, z);
-
-				size_t y2 = y;
-				if (y2 < maxY-1)
-					y2++;
-
-				b.blockLight = getBlockLightAt(x, y2, z);
-				b.skyLight = getSkyLightAt(x, y2, z);
-
-
-				unsigned h;
-				for (h = y; h > 0; h--) {
-					uint8_t id2 = getBlockAt(x, h, z);
-					if (id2 != 8 && id2 != 9)
-						break;
-				}
-
-				b.height = h;
-
-				b.biome = getBiomeAt(x, z);
-
+				ret.blocks[x][z] = getBlock(x, y, z);
 				done++;
 			}
 		}

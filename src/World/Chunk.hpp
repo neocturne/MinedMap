@@ -122,6 +122,7 @@ public:
 		return *sections;
 	}
 
+	Block getBlock(size_t x, size_t y, size_t z) const;
 	Blocks getTopLayer() const;
 };
 
