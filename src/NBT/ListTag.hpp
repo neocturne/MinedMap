@@ -38,7 +38,7 @@ class ListTag : public Tag {
 private:
 	friend class Tag;
 
-	std::vector<std::shared_ptr<Tag>> value;
+	std::vector<std::shared_ptr<const Tag>> value;
 
 
 	ListTag(Buffer *buffer) {

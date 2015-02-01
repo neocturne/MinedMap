@@ -40,5 +40,11 @@ int main(int argc, char *argv[]) {
 
 	World::Region region(argv[1]);
 
+	const World::Chunk &chunk = *region(0, 0);
+
+	for (auto &entry : std::dynamic_pointer_cast<const NBT::CompoundTag>(chunk->get("Level"))->getValues()) {
+		std::cout << entry.first << " " << entry.second->getType() << std::endl;
+	}
+
 	return 0;
 }

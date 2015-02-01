@@ -28,6 +28,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <ostream>
 
 #include "../Buffer.hpp"
 
@@ -52,14 +53,16 @@ public:
 		IntArray = 11,
 	};
 
-	static std::shared_ptr<Tag> readTag(Type type, Buffer *buffer);
+	static std::shared_ptr<const Tag> readTag(Type type, Buffer *buffer);
 
-	static std::pair<std::string, std::shared_ptr<Tag>> readNamedTag(Buffer *buffer);
+	static std::pair<std::string, std::shared_ptr<const Tag>> readNamedTag(Buffer *buffer);
 
 	virtual Type getType() const = 0;
 
 	virtual ~Tag() {}
 };
+
+std::ostream& operator<<(std::ostream& os, Tag::Type type);
 
 }
 }

@@ -49,6 +49,10 @@ public:
 	virtual Type getType() const {
 		return Type::String;
 	}
+
+	const std::string & getValue() const {
+		return value;
+	}
 };
 
 }

@@ -46,7 +46,7 @@
 namespace MinedMap {
 namespace NBT {
 
-std::shared_ptr<Tag> Tag::readTag(Type type, Buffer *buffer) {
+std::shared_ptr<const Tag> Tag::readTag(Type type, Buffer *buffer) {
 	switch (type) {
 	case Type::End:
 		return std::shared_ptr<EndTag>(new EndTag());
@@ -89,7 +89,7 @@ std::shared_ptr<Tag> Tag::readTag(Type type, Buffer *buffer) {
 	}
 }
 
-std::pair<std::string, std::shared_ptr<Tag>> Tag::readNamedTag(Buffer *buffer) {
+std::pair<std::string, std::shared_ptr<const Tag>> Tag::readNamedTag(Buffer *buffer) {
 	Type type = static_cast<Type>(buffer->get());
 	if (type == Type::End)
 		return std::make_pair("", std::shared_ptr<EndTag>(new EndTag()));
@@ -99,6 +99,63 @@ std::pair<std::string, std::shared_ptr<Tag>> Tag::readNamedTag(Buffer *buffer) {
 	std::string name = buffer->getString(len);
 
 	return std::make_pair(name, readTag(type, buffer));
+}
+
+std::ostream& operator<<(std::ostream& os, Tag::Type type) {
+	switch (type) {
+	case Tag::Type::End:
+		os << "End";
+		break;
+
+	case Tag::Type::Byte:
+		os << "Byte";
+		break;
+
+	case Tag::Type::Short:
+		os << "Short";
+		break;
+
+	case Tag::Type::Int:
+		os << "Int";
+		break;
+
+	case Tag::Type::Long:
+		os << "Long";
+		break;
+
+	case Tag::Type::Float:
+		os << "Float";
+		break;
+
+	case Tag::Type::Double:
+		os << "Double";
+		break;
+
+	case Tag::Type::ByteArray:
+		os << "ByteArray";
+		break;
+
+	case Tag::Type::String:
+		os << "String";
+		break;
+
+	case Tag::Type::List:
+		os << "List";
+		break;
+
+	case Tag::Type::Compound:
+		os << "Compound";
+		break;
+
+	case Tag::Type::IntArray:
+		os << "IntArray";
+		break;
+
+	default:
+		os.setstate(std::ios_base::failbit);
+	}
+
+	return os;
 }
 
 }

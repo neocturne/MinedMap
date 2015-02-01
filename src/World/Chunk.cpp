@@ -36,7 +36,7 @@
 namespace MinedMap {
 namespace World {
 
-std::tuple<UniqueCPtr<uint8_t[]>, size_t> Chunk::inflateChunk(uint8_t *data, size_t len) {
+std::pair<UniqueCPtr<uint8_t[]>, size_t> Chunk::inflateChunk(uint8_t *data, size_t len) {
 	size_t outlen = 0;
 	uint8_t *output = nullptr;
 
@@ -67,7 +67,7 @@ std::tuple<UniqueCPtr<uint8_t[]>, size_t> Chunk::inflateChunk(uint8_t *data, siz
 
 	inflateEnd(&stream);
 
-	return std::make_tuple(UniqueCPtr<uint8_t[]>(output), stream.total_out);
+	return std::make_pair(UniqueCPtr<uint8_t[]>(output), stream.total_out);
 }
 
 Chunk::Chunk(uint8_t *buffer, size_t buflen) {
@@ -89,12 +89,12 @@ Chunk::Chunk(uint8_t *buffer, size_t buflen) {
 	std::cerr << "Chunk has size " << size << " (" << len << " inflated)" << std::endl;
 
 	Buffer nbt(data.get(), len);
+	std::pair<std::string, std::shared_ptr<const NBT::Tag>> tag = NBT::Tag::readNamedTag(&nbt);
 
-	std::pair<std::string, std::shared_ptr<NBT::Tag>> tag = NBT::Tag::readNamedTag(&nbt);
-	if (tag.first != "")
-		throw std::invalid_argument("non-empty root tag");
+	std::shared_ptr<const NBT::CompoundTag>::operator=(std::dynamic_pointer_cast<const NBT::CompoundTag>(tag.second));
 
-	content = std::move(tag.second);
+	if (!(*this) || tag.first != "")
+		throw std::invalid_argument("invalid root tag");
 }
 
 }

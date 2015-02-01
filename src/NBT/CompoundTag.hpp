@@ -39,21 +39,37 @@ class CompoundTag : public Tag {
 private:
 	friend class Tag;
 
-	std::unordered_map<std::string, std::shared_ptr<Tag>> value;
+	std::unordered_map<std::string, std::shared_ptr<const Tag>> values;
 
 	CompoundTag(Buffer *buffer) {
 		while (true) {
-			std::pair<std::string, std::shared_ptr<Tag>> v = Tag::readNamedTag(buffer);
+			std::pair<std::string, std::shared_ptr<const Tag>> v = Tag::readNamedTag(buffer);
 			if (v.second->getType() == Type::End)
 				break;
 
-			value.insert(std::move(v));
+			values.insert(std::move(v));
 		}
 	}
 
 public:
 	virtual Type getType() const {
 		return Type::Compound;
+	}
+
+	const std::unordered_map<std::string, std::shared_ptr<const Tag>> & getValues() const {
+		return values;
+	}
+
+	const std::shared_ptr<const Tag> & get(const std::string &key) const {
+		return values.at(key);
+	}
+
+	template<typename... Args> const std::shared_ptr<const Tag> & get(const std::string &key, const Args &...args) const {
+		std::shared_ptr<const CompoundTag> tag = std::dynamic_pointer_cast<const CompoundTag>(get(key));
+		if (!tag)
+			return std::shared_ptr<Tag>(nullptr);
+
+		tag->get(args...);
 	}
 };
 
