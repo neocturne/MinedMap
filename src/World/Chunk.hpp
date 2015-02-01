@@ -27,6 +27,7 @@
 #pragma once
 
 
+#include "../Buffer.hpp"
 #include "../UniqueCPtr.hpp"
 #include "../NBT/CompoundTag.hpp"
 #include "../NBT/ListTag.hpp"
@@ -51,7 +52,7 @@ private:
 
 	unsigned maxY;
 
-	void inflateChunk(uint8_t *data, size_t len);
+	void inflateChunk(Buffer buffer);
 	void parseChunk();
 	void analyzeChunk();
 
@@ -66,7 +67,7 @@ private:
 	uint8_t getDataAt(const std::shared_ptr<const NBT::CompoundTag> &section, size_t x, size_t y, size_t z);
 
 public:
-	Chunk(uint8_t *buffer, size_t buflen);
+	Chunk(Buffer buffer);
 
 	const NBT::ListTag<NBT::CompoundTag> & getSections() const {
 		return *sections;

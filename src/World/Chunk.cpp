@@ -39,7 +39,7 @@
 namespace MinedMap {
 namespace World {
 
-void Chunk::inflateChunk(uint8_t *buffer, size_t buflen) {
+void Chunk::inflateChunk(Buffer buffer) {
 	size_t outlen = 0;
 	uint8_t *output = nullptr;
 
@@ -48,8 +48,8 @@ void Chunk::inflateChunk(uint8_t *buffer, size_t buflen) {
 	if (ret != Z_OK)
 		throw std::runtime_error("inflateInit() failed");
 
-	stream.next_in = buffer;
-	stream.avail_in = buflen;
+	stream.avail_in = buffer.getRemaining();
+	stream.next_in = const_cast<uint8_t *>(buffer.get(stream.avail_in));
 
 	while (stream.avail_in) {
 		outlen += 65536;
@@ -111,19 +111,16 @@ uint8_t Chunk::getDataAt(const std::shared_ptr<const NBT::CompoundTag> &section,
 		return (v & 0xf);
 }
 
-Chunk::Chunk(uint8_t *buffer, size_t buflen) {
-	if (buflen < 5)
-		throw std::invalid_argument("short chunk");
+Chunk::Chunk(Buffer buffer) {
+	size_t size = buffer.get32();
 
-	size_t size = (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3];
-	if (size < 1 || size > (buflen - 4))
-		throw std::invalid_argument("invalid chunk size");
+	Buffer buffer2(buffer.get(size), size);
 
-	uint8_t format = buffer[4];
+	uint8_t format = buffer2.get8();
 	if (format != 2)
 		throw std::invalid_argument("unknown chunk format");
 
-	inflateChunk(buffer+5, size-1);
+	inflateChunk(buffer2);
 	parseChunk();
 	analyzeChunk();
 }

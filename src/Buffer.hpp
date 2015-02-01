@@ -56,6 +56,10 @@ public:
 
 	Buffer(const uint8_t *data0, size_t len0) : data(data0), len(len0) {}
 
+	size_t getRemaining() const {
+		return len;
+	}
+
 	const uint8_t * get(size_t n) {
 		if (n > len)
 			throw std::runtime_error("Buffer::get(): buffer underrun");

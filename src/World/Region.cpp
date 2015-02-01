@@ -86,7 +86,7 @@ Region::Region(const char *filename) {
 		uint8_t buffer[len * 4096];
 		file.read((char *)buffer, len * 4096);
 
-		chunks[x][z].reset(new Chunk(buffer, len * 4096));
+		chunks[x][z].reset(new Chunk(Buffer(buffer, len * 4096)));
 
 		i += len;
 		c++;
