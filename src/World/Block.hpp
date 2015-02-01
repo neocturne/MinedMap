@@ -35,6 +35,15 @@ namespace World {
 struct Block {
 	uint8_t id;
 	uint8_t data;
+
+	unsigned height;
+
+	uint8_t blockLight;
+	uint8_t skyLight;
+
+	Block() : id(0), data(0), height(0), blockLight(0), skyLight(0) {}
+
+	uint32_t getColor() const;
 };
 
 }

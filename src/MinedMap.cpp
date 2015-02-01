@@ -96,12 +96,8 @@ int main(int argc, char *argv[]) {
 			World::Chunk::Blocks layer = chunk->getTopLayer();
 
 			for (size_t x = 0; x < World::Chunk::SIZE; x++) {
-				for (size_t z = 0; z < World::Chunk::SIZE; z++) {
-					const World::BlockType &t = World::BLOCK_TYPES[layer.blocks[x][z].id];
-
-					if (t.opaque)
-						image[Z*World::Chunk::SIZE+z][X*World::Chunk::SIZE+x] = htonl((t.color << 8) | 0xff);
-				}
+				for (size_t z = 0; z < World::Chunk::SIZE; z++)
+					image[Z*World::Chunk::SIZE+z][X*World::Chunk::SIZE+x] = htonl(layer.blocks[x][z].getColor());
 			}
 		}
 	}

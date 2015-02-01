@@ -26,9 +26,6 @@
 
 #include "Chunk.hpp"
 #include "BlockType.hpp"
-#include "../Util.hpp"
-#include "../NBT/ByteTag.hpp"
-#include "../NBT/ByteArrayTag.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -92,69 +89,89 @@ void Chunk::inflateChunk(Buffer buffer) {
 void Chunk::parseChunk() {
 	Buffer nbt(data.get(), len);
 	std::pair<std::string, std::shared_ptr<const NBT::Tag>> tag = NBT::Tag::readNamedTag(&nbt);
-
-	std::shared_ptr<const NBT::CompoundTag>::operator=(std::dynamic_pointer_cast<const NBT::CompoundTag>(tag.second));
-
-	if (!(*this) || tag.first != "")
+	if (tag.first != "")
 		throw std::invalid_argument("invalid root tag");
 
-	level = assertValue((*this)->get<NBT::CompoundTag>("Level"));
-	sections = assertValue(level->get<NBT::ListTag<NBT::CompoundTag>>("Sections"));
+	root = assertValue(std::dynamic_pointer_cast<const NBT::CompoundTag>(tag.second));
+	level = assertValue(root->get<NBT::CompoundTag>("Level"));
 }
 
 void Chunk::analyzeChunk() {
-	maxY = (assertValue(sections->back()->get<NBT::ByteTag>("Y"))->getValue() + 1) * SIZE;
+	std::shared_ptr<const NBT::ByteTag> lightPopulatedTag = level->get<NBT::ByteTag>("LightPopulated");
+	if (!lightPopulatedTag && lightPopulatedTag->getValue())
+		throw std::invalid_argument("light data missing");
 
-	for (auto &section : *sections) {
-		if (assertValue(section->get<NBT::ByteArrayTag>("Blocks"))->getLength() != SIZE*SIZE*SIZE
-		    || assertValue(section->get<NBT::ByteArrayTag>("Data"))->getLength() != SIZE*SIZE*SIZE/2)
-			throw std::invalid_argument("corrupt chunk data");
-	}
-}
+	for (auto &section : *assertValue(level->get<NBT::ListTag<NBT::CompoundTag>>("Sections")))
+		sections.emplace_back(*section);
 
-uint8_t Chunk::getBlockAt(const std::shared_ptr<const NBT::CompoundTag> &section, size_t x, size_t y, size_t z) const {
-	return (*section->get<NBT::ByteArrayTag>("Blocks"))[getIndex(x, y, z)];
-}
+	maxY = sections.back().getY() + SIZE;
+	blocks.reset(new Block[maxY * SIZE * SIZE]);
 
-uint8_t Chunk::getDataAt(const std::shared_ptr<const NBT::CompoundTag> &section, size_t x, size_t y, size_t z) const {
-	size_t i = getIndex(x, y, z);
-	uint8_t v = (*section->get<NBT::ByteArrayTag>("Data"))[i / 2];
+	for (auto &section : sections) {
+		unsigned Y = section.getY();
 
-	if (i % 2)
-		return (v >> 4);
-	else
-		return (v & 0xf);
-}
+		for (size_t y = 0; y < SIZE; y++) {
+			for (size_t z = 0; z < SIZE; z++) {
+				for (size_t x = 0; x < SIZE; x++) {
+					Block &block = getBlock(x, Y+y, z);
 
-Chunk::Blocks Chunk::getTopLayer() const {
-	size_t done = 0;
-	Blocks blocks = {};
-
-	for (auto it = sections->rbegin(); it != sections->rend(); ++it) {
-		if (done == SIZE*SIZE)
-			break;
-
-		for (ssize_t y = SIZE-1; y >= 0; y--) {
-			if (done == SIZE*SIZE)
-				break;
-
-			for (size_t x = 0; x < SIZE; x++) {
-				for (size_t z = 0; z < SIZE; z++) {
-					if (blocks.blocks[x][z].id)
-						continue;
-
-					uint8_t block = getBlockAt(*it, x, y, z);
-					if (BLOCK_TYPES[block].opaque) {
-						blocks.blocks[x][z].id = block;
-						blocks.blocks[x][z].data = getDataAt(*it, x, y, z);
-						done++;
-					}
+					block.id = section.getBlockAt(x, y, z);
+					block.data = section.getDataAt(x, y, z);
+					block.blockLight = section.getBlockLightAt(x, y, z);
+					block.skyLight = section.getSkyLightAt(x, y, z);
 				}
 			}
 		}
 	}
+}
 
-	return blocks;
+Chunk::Blocks Chunk::getTopLayer() const {
+	size_t done = 0;
+	Blocks ret;
+
+	for (ssize_t y = maxY-1; y >= 0; y--) {
+		if (done == SIZE*SIZE)
+			break;
+
+		for (size_t z = 0; z < SIZE; z++) {
+			for (size_t x = 0; x < SIZE; x++) {
+				if (ret.blocks[x][z].id)
+					continue;
+
+				const Block &block = getBlock(x, y, z);
+				if (!BLOCK_TYPES[block.id].opaque)
+					continue;
+
+				Block &b = ret.blocks[x][z];
+
+				b.id = block.id;
+				b.data = block.data;
+
+				const Block *lightBlock;
+				if (y < maxY-1)
+					lightBlock = &getBlock(x, y+1, z);
+				else
+					lightBlock =  &block;
+
+				b.blockLight = lightBlock->blockLight;
+				b.skyLight = lightBlock->skyLight;
+
+
+				unsigned h;
+				for (h = y; h > 0; h--) {
+					const Block &block2 = getBlock(x, h, z);
+					if (block2.id != 8 && block2.id != 9)
+						break;
+				}
+
+				b.height = h;
+
+				done++;
+			}
+		}
+	}
+
+	return ret;
 }
 
 }

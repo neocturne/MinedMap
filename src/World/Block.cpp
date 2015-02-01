@@ -24,48 +24,34 @@
 */
 
 
-#pragma once
-
-#include "Tag.hpp"
-
-#include <vector>
+#include "Block.hpp"
+#include "BlockType.hpp"
 
 
 namespace MinedMap {
-namespace NBT {
+namespace World {
 
-class ByteArrayTag : public Tag {
-private:
-	friend class Tag;
+uint32_t Block::getColor() const {
+	const World::BlockType &t = World::BLOCK_TYPES[id];
 
-	uint32_t len;
-	const uint8_t *value;
+	if (!t.opaque)
+		return 0;
 
-	ByteArrayTag(Buffer *buffer) {
-		len = buffer->get32();
-		value = buffer->get(len);
-	}
+	uint8_t r = t.color >> 16;
+	uint8_t g = t.color >> 8;
+	uint8_t b = t.color;
 
-public:
-	virtual Type getType() const {
-		return Type::ByteArray;
-	}
+	uint8_t light = (blockLight > skyLight) ? blockLight : skyLight;
 
-	uint32_t getLength() const {
-		return len;
-	}
+	float lightCoef = light/30.0f + 0.5f;
+	float heightCoef = height/255.0f + 0.5f;
 
-	const uint8_t & get(size_t i) const {
-		return value[i];
-	}
+	r *= lightCoef * heightCoef;
+	g *= lightCoef * heightCoef;
+	b *= lightCoef * heightCoef;
 
-	uint8_t getHalf(size_t i) const {
-		if (i % 2)
-			return (value[i/2] >> 4);
-		else
-			return (value[i/2] & 0xf);
-	}
-};
+	return (r << 24) | (g << 16) | (b << 8) | 0xff;
+}
 
 }
 }
