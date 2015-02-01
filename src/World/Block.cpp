@@ -38,9 +38,11 @@ uint32_t Block::getColor() const {
 	if (!t.opaque)
 		return 0;
 
-	unsigned r = uint8_t(t.color >> 16);
-	unsigned g = uint8_t(t.color >> 8);
-	unsigned b = uint8_t(t.color);
+	uint32_t color = t.colors[data];
+
+	unsigned r = uint8_t(color >> 16);
+	unsigned g = uint8_t(color >> 8);
+	unsigned b = uint8_t(color);
 
 	uint8_t light = (blockLight > skyLight) ? blockLight : skyLight;
 
