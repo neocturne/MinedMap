@@ -24,25 +24,89 @@
 */
 
 
+#include "World/BlockType.hpp"
 #include "World/Region.hpp"
 #include "NBT/ListTag.hpp"
 
+#include <cerrno>
+#include <csetjmp>
+#include <cstdio>
 #include <iostream>
-#include <unistd.h>
+#include <system_error>
 
+#include <arpa/inet.h>
+#include <png.h>
+
+
+using namespace MinedMap;
+
+
+static void writePNG(const char *filename, const uint32_t data[World::Region::SIZE*World::Chunk::SIZE][World::Region::SIZE*World::Chunk::SIZE]) {
+	std::FILE *f = std::fopen(filename, "wb");
+	if (!f)
+		throw std::system_error(errno, std::generic_category(), "unable to open output file");
+
+	png_structp png_ptr = png_create_write_struct (PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+	if (!png_ptr)
+		throw std::runtime_error("unable to create PNG write struct");
+
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+	if (!info_ptr) {
+		png_destroy_write_struct(&png_ptr, nullptr);
+		throw std::runtime_error("unable to create PNG info struct");
+	}
+
+	if (setjmp(png_jmpbuf(png_ptr))) {
+		png_destroy_write_struct(&png_ptr, &info_ptr);
+		fclose(f);
+		throw std::runtime_error("unable to write PNG file");
+	}
+
+	png_init_io(png_ptr, f);
+
+	png_set_IHDR(png_ptr, info_ptr, World::Region::SIZE*World::Chunk::SIZE, World::Region::SIZE*World::Chunk::SIZE,
+		     8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+	uint8_t *row_pointers[World::Region::SIZE*World::Chunk::SIZE];
+	for (size_t i = 0; i < World::Region::SIZE*World::Chunk::SIZE; i++)
+		row_pointers[i] = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(data[i]));
+
+	png_set_rows(png_ptr, info_ptr, row_pointers);
+	png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+
+	std::fclose(f);
+}
 
 int main(int argc, char *argv[]) {
-	using namespace MinedMap;
-
-	if (argc < 2) {
-		std::cerr << "Usage: " << argv[0] << " region" << std::endl;
+	if (argc < 3) {
+		std::cerr << "Usage: " << argv[0] << " region output" << std::endl;
 		return 1;
 	}
 
 	World::Region region(argv[1]);
 
-	const World::Chunk &chunk = *region(0, 0);
-	World::Chunk::Blocks layer = chunk.getTopLayer();
+	uint32_t image[World::Region::SIZE*World::Chunk::SIZE][World::Region::SIZE*World::Chunk::SIZE] = {};
+
+	for (size_t X = 0; X < World::Region::SIZE; X++) {
+		for (size_t Z = 0; Z < World::Region::SIZE; Z++) {
+			const World::Chunk *chunk = region(X, Z);
+			if (!chunk)
+				continue;
+
+			World::Chunk::Blocks layer = chunk->getTopLayer();
+
+			for (size_t x = 0; x < World::Chunk::SIZE; x++) {
+				for (size_t z = 0; z < World::Chunk::SIZE; z++) {
+					const World::BlockType &t = World::BLOCK_TYPES[layer.blocks[x][z].id];
+
+					if (t.opaque)
+						image[Z*World::Chunk::SIZE+z][X*World::Chunk::SIZE+x] = htonl((t.color << 8) | 0xff);
+				}
+			}
+		}
+	}
+
+	writePNG(argv[2], image);
 
 	return 0;
 }

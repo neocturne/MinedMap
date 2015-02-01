@@ -25,6 +25,7 @@
 
 
 #include "Chunk.hpp"
+#include "BlockType.hpp"
 #include "../Util.hpp"
 #include "../NBT/ByteTag.hpp"
 #include "../NBT/ByteArrayTag.hpp"
@@ -143,7 +144,7 @@ Chunk::Blocks Chunk::getTopLayer() const {
 						continue;
 
 					uint8_t block = getBlockAt(*it, x, y, z);
-					if (block) {
+					if (BLOCK_TYPES[block].opaque) {
 						blocks.blocks[x][z].id = block;
 						blocks.blocks[x][z].data = getDataAt(*it, x, y, z);
 						done++;
@@ -152,8 +153,6 @@ Chunk::Blocks Chunk::getTopLayer() const {
 			}
 		}
 	}
-
-	std::cerr << "Done: " << done << std::endl;
 
 	return blocks;
 }
