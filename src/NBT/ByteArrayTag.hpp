@@ -55,15 +55,8 @@ public:
 		return len;
 	}
 
-	const uint8_t & get(size_t i) const {
-		return value[i];
-	}
-
-	uint8_t getHalf(size_t i) const {
-		if (i % 2)
-			return (value[i/2] >> 4);
-		else
-			return (value[i/2] & 0xf);
+	const uint8_t * getValue() const {
+		return value;
 	}
 };
 

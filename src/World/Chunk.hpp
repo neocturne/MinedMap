@@ -47,61 +47,10 @@ class Chunk {
 public:
 	static const size_t SIZE = 16;
 
-	class Section {
-	private:
-		static size_t getIndex(size_t x, size_t y, size_t z) {
-			if (x >= SIZE || y >= SIZE || z >= SIZE)
-				throw std::range_error("Chunk::getIndex(): bad coordinates");
-
-			return SIZE*SIZE*y + SIZE*z + x;
-		}
-
-		std::shared_ptr<const NBT::ByteArrayTag> blocks;
-		std::shared_ptr<const NBT::ByteArrayTag> data;
-
-		std::shared_ptr<const NBT::ByteArrayTag> blockLight;
-		std::shared_ptr<const NBT::ByteArrayTag> skyLight;
-
-		unsigned Y;
-
-	public:
-		Section(const NBT::CompoundTag &s) {
-			blocks = assertValue(s.get<NBT::ByteArrayTag>("Blocks"));
-			data = assertValue(s.get<NBT::ByteArrayTag>("Data"));
-			blockLight = assertValue(s.get<NBT::ByteArrayTag>("BlockLight"));
-			skyLight = assertValue(s.get<NBT::ByteArrayTag>("SkyLight"));
-
-			if (blocks->getLength() != SIZE*SIZE*SIZE || data->getLength() != SIZE*SIZE*SIZE/2
-			    || blockLight->getLength() != SIZE*SIZE*SIZE/2 || skyLight->getLength() != SIZE*SIZE*SIZE/2)
-				throw std::invalid_argument("corrupt chunk data");
-
-			Y = assertValue(s.get<NBT::ByteTag>("Y"))->getValue() * SIZE;
-		}
-
-		uint8_t getBlockAt(size_t x, size_t y, size_t z) const {
-			return blocks->get(getIndex(x, y, z));
-		}
-
-		uint8_t getDataAt(size_t x, size_t y, size_t z) const {
-			return data->getHalf(getIndex(x, y, z));
-		}
-
-		uint8_t getBlockLightAt(size_t x, size_t y, size_t z) const {
-			return blockLight->getHalf(getIndex(x, y, z));
-		}
-
-		uint8_t getSkyLightAt(size_t x, size_t y, size_t z) const {
-			return skyLight->getHalf(getIndex(x, y, z));
-		}
-
-		unsigned getY() const {
-			return Y;
-		}
-	};
-
 	struct Blocks {
 		Block blocks[SIZE][SIZE];
 	};
+
 
 private:
 	size_t len;
@@ -109,20 +58,49 @@ private:
 
 	std::shared_ptr<const NBT::CompoundTag> root;
 	std::shared_ptr<const NBT::CompoundTag> level;
+	std::shared_ptr<const NBT::ListTag<NBT::CompoundTag>> sections;
 
-	std::vector<Section> sections;
 
 	unsigned maxY;
 
-	std::unique_ptr<Block[]> blocks;
+	std::unique_ptr<uint8_t[]> blockIDs;
+	std::unique_ptr<uint8_t[]> blockData;
+	std::unique_ptr<uint8_t[]> blockSkyLight;
+	std::unique_ptr<uint8_t[]> blockBlockLight;
 
-	Block & getBlock(size_t x, size_t y, size_t z) {
-		return blocks[SIZE*SIZE*y + SIZE*z + x];
+
+	size_t getIndex(size_t x, size_t y, size_t z) const {
+		if (x >= SIZE || y >= maxY || z >= SIZE)
+			throw std::range_error("Chunk::getIndex(): bad coordinates");
+
+		return SIZE*SIZE*y + SIZE*z + x;
 	}
 
-	const Block & getBlock(size_t x, size_t y, size_t z) const {
-		return blocks[SIZE*SIZE*y + SIZE*z + x];
+	uint8_t getHalf(const uint8_t *v, size_t x, size_t y, size_t z) const {
+		size_t i = getIndex(x, y, z);
+
+		if (i % 2)
+			return (v[i/2] >> 4);
+		else
+			return (v[i/2] & 0xf);
 	}
+
+	uint8_t getBlockAt(size_t x, size_t y, size_t z) const {
+		return blockIDs[getIndex(x, y, z)];
+	}
+
+	uint8_t getDataAt(size_t x, size_t y, size_t z) const {
+		return getHalf(blockData.get(), x, y, z);
+	}
+
+	uint8_t getBlockLightAt(size_t x, size_t y, size_t z) const {
+		return getHalf(blockBlockLight.get(), x, y, z);
+	}
+
+	uint8_t getSkyLightAt(size_t x, size_t y, size_t z) const {
+		return getHalf(blockSkyLight.get(), x, y, z);
+	}
+
 
 	void inflateChunk(Buffer buffer);
 	void parseChunk();
@@ -135,8 +113,8 @@ public:
 		return *level;
 	}
 
-	const std::vector<Section> & getSections() const {
-		return sections;
+	const NBT::ListTag<NBT::CompoundTag> & getSections() const {
+		return *sections;
 	}
 
 	Blocks getTopLayer() const;

@@ -30,6 +30,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
+#include <cstring>
 
 #include <zlib.h>
 
@@ -101,27 +102,32 @@ void Chunk::analyzeChunk() {
 	if (!lightPopulatedTag && lightPopulatedTag->getValue())
 		throw std::invalid_argument("light data missing");
 
-	for (auto &section : *assertValue(level->get<NBT::ListTag<NBT::CompoundTag>>("Sections")))
-		sections.emplace_back(*section);
+	sections = assertValue(level->get<NBT::ListTag<NBT::CompoundTag>>("Sections"));
+	maxY = (assertValue(sections->back()->get<NBT::ByteTag>("Y"))->getValue() + 1) * SIZE;
 
-	maxY = sections.back().getY() + SIZE;
-	blocks.reset(new Block[maxY * SIZE * SIZE]);
+	blockIDs.reset(new uint8_t[maxY * SIZE * SIZE]);
+	blockData.reset(new uint8_t[maxY * SIZE * SIZE / 2]);
+	blockSkyLight.reset(new uint8_t[maxY * SIZE * SIZE / 2]);
+	blockBlockLight.reset(new uint8_t[maxY * SIZE * SIZE / 2]);
 
-	for (auto &section : sections) {
-		unsigned Y = section.getY();
+	std::memset(blockSkyLight.get(), 0xff, maxY * SIZE * SIZE / 2);
 
-		for (size_t y = 0; y < SIZE; y++) {
-			for (size_t z = 0; z < SIZE; z++) {
-				for (size_t x = 0; x < SIZE; x++) {
-					Block &block = getBlock(x, Y+y, z);
 
-					block.id = section.getBlockAt(x, y, z);
-					block.data = section.getDataAt(x, y, z);
-					block.blockLight = section.getBlockLightAt(x, y, z);
-					block.skyLight = section.getSkyLightAt(x, y, z);
-				}
-			}
-		}
+	for (auto &section : *sections) {
+		std::shared_ptr<const NBT::ByteArrayTag> blocks = assertValue(section->get<NBT::ByteArrayTag>("Blocks"));
+		std::shared_ptr<const NBT::ByteArrayTag> data = assertValue(section->get<NBT::ByteArrayTag>("Data"));
+		std::shared_ptr<const NBT::ByteArrayTag> blockLight = assertValue(section->get<NBT::ByteArrayTag>("BlockLight"));
+		std::shared_ptr<const NBT::ByteArrayTag> skyLight = assertValue(section->get<NBT::ByteArrayTag>("SkyLight"));
+		size_t Y = assertValue(section->get<NBT::ByteTag>("Y"))->getValue();
+
+		if (blocks->getLength() != SIZE*SIZE*SIZE || data->getLength() != SIZE*SIZE*SIZE/2
+		    || blockLight->getLength() != SIZE*SIZE*SIZE/2 || skyLight->getLength() != SIZE*SIZE*SIZE/2)
+			throw std::invalid_argument("corrupt chunk data");
+
+		std::memcpy(blockIDs.get() + Y*SIZE*SIZE*SIZE, blocks->getValue(), SIZE*SIZE*SIZE);
+		std::memcpy(blockData.get() + Y*SIZE*SIZE*SIZE/2, data->getValue(), SIZE*SIZE*SIZE/2);
+		std::memcpy(blockBlockLight.get() + Y*SIZE*SIZE*SIZE/2, blockLight->getValue(), SIZE*SIZE*SIZE/2);
+		std::memcpy(blockSkyLight.get() + Y*SIZE*SIZE*SIZE/2, skyLight->getValue(), SIZE*SIZE*SIZE/2);
 	}
 }
 
@@ -138,29 +144,27 @@ Chunk::Blocks Chunk::getTopLayer() const {
 				if (ret.blocks[x][z].id)
 					continue;
 
-				const Block &block = getBlock(x, y, z);
-				if (!BLOCK_TYPES[block.id].opaque)
+				uint8_t id = getBlockAt(x, y, z);
+				if (!BLOCK_TYPES[id].opaque)
 					continue;
 
 				Block &b = ret.blocks[x][z];
 
-				b.id = block.id;
-				b.data = block.data;
+				b.id = id;
+				b.data = getDataAt(x, y, z);
 
-				const Block *lightBlock;
-				if (y < maxY-1)
-					lightBlock = &getBlock(x, y+1, z);
-				else
-					lightBlock =  &block;
+				size_t y2 = y;
+				if (y2 < maxY-1)
+					y2++;
 
-				b.blockLight = lightBlock->blockLight;
-				b.skyLight = lightBlock->skyLight;
+				b.blockLight = getBlockLightAt(x, y2, z);
+				b.skyLight = getSkyLightAt(x, y2, z);
 
 
 				unsigned h;
 				for (h = y; h > 0; h--) {
-					const Block &block2 = getBlock(x, h, z);
-					if (block2.id != 8 && block2.id != 9)
+					uint8_t id2 = getBlockAt(x, h, z);
+					if (id2 != 8 && id2 != 9)
 						break;
 				}
 
