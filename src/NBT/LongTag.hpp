@@ -36,17 +36,10 @@ class LongTag : public Tag {
 private:
 	friend class Tag;
 
-	uint64_t value;
+	const uint8_t *ptr;
 
 	LongTag(Buffer *buffer) {
-		value = uint64_t(buffer->get()) << 56;
-		value |= uint64_t(buffer->get()) << 48;
-		value |= uint64_t(buffer->get()) << 40;
-		value |= uint64_t(buffer->get()) << 32;
-		value |= uint64_t(buffer->get()) << 24;
-		value |= uint64_t(buffer->get()) << 16;
-		value |= uint64_t(buffer->get()) << 8;
-		value |= uint64_t(buffer->get());
+		ptr = buffer->get(8);
 	}
 
 public:
@@ -55,7 +48,7 @@ public:
 	}
 
 	uint64_t getValue() const {
-		return value;
+		return Buffer::parse64(ptr);
 	}
 };
 

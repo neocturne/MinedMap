@@ -38,24 +38,12 @@ class IntArrayTag : public Tag {
 private:
 	friend class Tag;
 
-	std::vector<uint32_t> value;
+	uint32_t len;
+	const uint8_t *ptr;
 
 	IntArrayTag(Buffer *buffer) {
-		uint32_t len = uint32_t(buffer->get()) << 24;
-		len |= uint32_t(buffer->get()) << 16;
-		len |= uint32_t(buffer->get()) << 8;
-		len |= uint32_t(buffer->get());
-
-		value.resize(len);
-
-		for (uint32_t i = 0; i < len; i++) {
-			uint32_t v = uint32_t(buffer->get()) << 24;
-			v |= uint32_t(buffer->get()) << 16;
-			v |= uint32_t(buffer->get()) << 8;
-			v |= uint32_t(buffer->get());
-
-			value[i] = v;
-		}
+		len = buffer->get32();
+		ptr = buffer->get(4*len);
 	}
 
 public:

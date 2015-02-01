@@ -82,7 +82,6 @@ Chunk::Chunk(uint8_t *buffer, size_t buflen) {
 	if (format != 2)
 		throw std::invalid_argument("unknown chunk format");
 
-	UniqueCPtr<uint8_t[]> data;
 	size_t len;
 	std::tie(data, len) = inflateChunk(buffer+5, size-1);
 

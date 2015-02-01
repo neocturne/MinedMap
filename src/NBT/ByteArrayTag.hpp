@@ -38,21 +38,25 @@ class ByteArrayTag : public Tag {
 private:
 	friend class Tag;
 
-	std::vector<uint8_t> value;
+	uint32_t len;
+	const uint8_t *value;
 
 	ByteArrayTag(Buffer *buffer) {
-		uint32_t len = uint32_t(buffer->get()) << 24;
-		len |= uint32_t(buffer->get()) << 16;
-		len |= uint32_t(buffer->get()) << 8;
-		len |= uint32_t(buffer->get());
-
-		value.resize(len);
-		buffer->getData(value.data(), len);
+		len = buffer->get32();
+		value = buffer->get(len);
 	}
 
 public:
 	virtual Type getType() const {
 		return Type::ByteArray;
+	}
+
+	uint32_t getLength() const {
+		return len;
+	}
+
+	const uint8_t & operator[](size_t i) const {
+		return value[i];
 	}
 };
 

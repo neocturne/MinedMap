@@ -36,13 +36,10 @@ class IntTag : public Tag {
 private:
 	friend class Tag;
 
-	uint32_t value;
+	const uint8_t *ptr;
 
 	IntTag(Buffer *buffer) {
-		value = uint32_t(buffer->get()) << 24;
-		value |= uint32_t(buffer->get()) << 16;
-		value |= uint32_t(buffer->get()) << 8;
-		value |= uint32_t(buffer->get());
+		ptr = buffer->get(4);
 	}
 
 public:
@@ -51,7 +48,7 @@ public:
 	}
 
 	uint32_t getValue() const {
-		return value;
+		return Buffer::parse32(ptr);
 	}
 };
 

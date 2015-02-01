@@ -36,13 +36,10 @@ class FloatTag : public Tag {
 private:
 	friend class Tag;
 
-	FloatTag(Buffer *buffer) {
-		uint32_t value;
+	const uint8_t *ptr;
 
-		value = uint32_t(buffer->get()) << 24;
-		value |= uint32_t(buffer->get()) << 16;
-		value |= uint32_t(buffer->get()) << 8;
-		value |= uint32_t(buffer->get());
+	FloatTag(Buffer *buffer) {
+		ptr = buffer->get(4);
 	}
 
 public:

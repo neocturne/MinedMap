@@ -39,7 +39,7 @@ private:
 	uint8_t value;
 
 	ByteTag(Buffer *buffer) {
-		value = buffer->get();
+		value = buffer->get8();
 	}
 
 public:

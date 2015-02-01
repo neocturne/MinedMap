@@ -53,10 +53,7 @@ private:
 	Type type;
 
 	ListTag(Type type0, Buffer *buffer) : type(type0) {
-		uint32_t len = uint32_t(buffer->get()) << 24;
-		len |= uint32_t(buffer->get()) << 16;
-		len |= uint32_t(buffer->get()) << 8;
-		len |= uint32_t(buffer->get());
+		uint32_t len = buffer->get32();
 
 		this->resize(len);
 

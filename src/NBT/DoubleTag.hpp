@@ -36,17 +36,10 @@ class DoubleTag : public Tag {
 private:
 	friend class Tag;
 
-	DoubleTag(Buffer *buffer) {
-		uint64_t value;
+	const uint8_t *ptr;
 
-		value = uint64_t(buffer->get()) << 56;
-		value |= uint64_t(buffer->get()) << 48;
-		value |= uint64_t(buffer->get()) << 40;
-		value |= uint64_t(buffer->get()) << 32;
-		value |= uint64_t(buffer->get()) << 24;
-		value |= uint64_t(buffer->get()) << 16;
-		value |= uint64_t(buffer->get()) << 8;
-		value |= uint64_t(buffer->get());
+	DoubleTag(Buffer *buffer) {
+		ptr = buffer->get(8);
 	}
 
 public:

@@ -90,7 +90,7 @@ std::shared_ptr<const Tag> Tag::readTag(Type type, Buffer *buffer) {
 }
 
 std::shared_ptr<const Tag> Tag::readList(Buffer *buffer) {
-	Type type = static_cast<Type>(buffer->get());
+	Type type = static_cast<Type>(buffer->get8());
 
 	switch (type) {
 	case Type::End:
@@ -135,13 +135,12 @@ std::shared_ptr<const Tag> Tag::readList(Buffer *buffer) {
 }
 
 std::pair<std::string, std::shared_ptr<const Tag>> Tag::readNamedTag(Buffer *buffer) {
-	Type type = static_cast<Type>(buffer->get());
+	Type type = static_cast<Type>(buffer->get8());
 	if (type == Type::End)
 		return std::make_pair("", std::shared_ptr<EndTag>(new EndTag()));
 
-	uint16_t len = buffer->get() << 8;
-	len |= buffer->get();
-	std::string name = buffer->getString(len);
+	uint16_t len = buffer->get16();
+	std::string name(reinterpret_cast<const char*>(buffer->get(len)), len);
 
 	return std::make_pair(name, readTag(type, buffer));
 }

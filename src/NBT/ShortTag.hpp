@@ -36,11 +36,10 @@ class ShortTag : public Tag {
 private:
 	friend class Tag;
 
-	uint16_t value;
+	const uint8_t *ptr;
 
 	ShortTag(Buffer *buffer) {
-		value = buffer->get() << 8;
-		value |= buffer->get();
+		ptr = buffer->get(2);
 	}
 
 public:
@@ -49,7 +48,7 @@ public:
 	}
 
 	uint16_t getValue() const {
-		return value;
+		return Buffer::parse16(ptr);
 	}
 };
 

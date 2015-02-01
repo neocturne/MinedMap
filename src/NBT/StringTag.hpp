@@ -36,22 +36,17 @@ class StringTag : public Tag {
 private:
 	friend class Tag;
 
-	std::string value;
+	uint16_t len;
+	const uint8_t *ptr;
 
 	StringTag(Buffer *buffer) {
-		uint16_t len = buffer->get() << 8;
-		len |= buffer->get();
-
-		value = buffer->getString(len);
+		len = buffer->get16();
+		ptr = buffer->get(len);
 	}
 
 public:
 	virtual Type getType() const {
 		return Type::String;
-	}
-
-	const std::string & getValue() const {
-		return value;
 	}
 };
 
