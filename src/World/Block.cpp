@@ -26,20 +26,21 @@
 
 #include "Block.hpp"
 #include "BlockType.hpp"
+#include "Biome.hpp"
 
 
 namespace MinedMap {
 namespace World {
 
-uint32_t Block::getColor() const {
+uint32_t Block::getColor(uint8_t biome) const {
 	const World::BlockType &t = World::BLOCK_TYPES[id];
 
 	if (!t.opaque)
 		return 0;
 
-	uint8_t r = t.color >> 16;
-	uint8_t g = t.color >> 8;
-	uint8_t b = t.color;
+	unsigned r = uint8_t(t.color >> 16);
+	unsigned g = uint8_t(t.color >> 8);
+	unsigned b = uint8_t(t.color);
 
 	uint8_t light = (blockLight > skyLight) ? blockLight : skyLight;
 
@@ -49,6 +50,18 @@ uint32_t Block::getColor() const {
 	r *= lightCoef * heightCoef;
 	g *= lightCoef * heightCoef;
 	b *= lightCoef * heightCoef;
+
+	if (t.green) {
+		const Biome &biomeDef = BIOMES[biome];
+
+		r *= biomeDef.r;
+		g *= biomeDef.g;
+		b *= biomeDef.b;
+	}
+
+	if (r > 255) r = 255;
+	if (g > 255) g = 255;
+	if (b > 255) b = 255;
 
 	return (r << 24) | (g << 16) | (b << 8) | 0xff;
 }

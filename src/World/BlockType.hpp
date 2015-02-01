@@ -33,6 +33,7 @@ namespace World {
 
 struct BlockType {
 	bool opaque;
+	bool green;
 	uint32_t color;
 };
 

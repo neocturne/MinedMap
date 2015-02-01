@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 
 			for (size_t x = 0; x < World::Chunk::SIZE; x++) {
 				for (size_t z = 0; z < World::Chunk::SIZE; z++)
-					image[Z*World::Chunk::SIZE+z][X*World::Chunk::SIZE+x] = htonl(layer.blocks[x][z].getColor());
+					image[Z*World::Chunk::SIZE+z][X*World::Chunk::SIZE+x] = htonl(layer.blocks[x][z].getColor(0));
 			}
 		}
 	}
