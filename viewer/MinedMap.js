@@ -67,13 +67,13 @@ window.createMap = function () {
 
 		var map = L.map('map', {
 			center: [0, 0],
-			zoom: 1,
-			minZoom: 1,
-			maxZoom: 1,
+			zoom: 0,
+			minZoom: 0,
+			maxZoom: 0,
 			crs: L.CRS.Simple,
 			maxBounds: [
-				[-256*(info.info.maxZ+1), 256*info.info.minX],
-				[-256*info.info.minZ, 256*(info.info.maxX+1)],
+				[-512*(info.info.maxZ+1), 512*info.info.minX],
+				[-512*info.info.minZ, 512*(info.info.maxX+1)],
 			],
 		});
 
