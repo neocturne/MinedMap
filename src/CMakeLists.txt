@@ -3,6 +3,7 @@ link_directories(${ZLIB_LIBRARY_DIRS} ${LIBPNG_LIBRARY_DIRS})
 
 add_executable(MinedMap
   MinedMap.cpp
+  Info.cpp
   NBT/Tag.cpp
   Resource/Biome.cpp
   Resource/BlockType.cpp
