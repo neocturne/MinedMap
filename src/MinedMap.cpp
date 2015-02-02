@@ -117,17 +117,23 @@ static void doRegion(const std::string &input, const std::string &output) {
 
 	const std::string tmpfile = output + ".tmp";
 
-	uint32_t image[DIM][DIM] = {};
-	World::Region::visitChunks(input.c_str(), [&image] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image, X, Z, chunk); });
+	try {
+		uint32_t image[DIM][DIM] = {};
+		World::Region::visitChunks(input.c_str(), [&image] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image, X, Z, chunk); });
 
-	writePNG(tmpfile.c_str(), image);
+		writePNG(tmpfile.c_str(), image);
 
-	struct timespec times[2] = {instat.st_mtim, instat.st_mtim};
-	if (utimensat(AT_FDCWD, tmpfile.c_str(), times, 0) < 0)
-		std::fprintf(stderr, "Warning: failed to set utime on %s: %s\n", tmpfile.c_str(), std::strerror(errno));
+		struct timespec times[2] = {instat.st_mtim, instat.st_mtim};
+		if (utimensat(AT_FDCWD, tmpfile.c_str(), times, 0) < 0)
+			std::fprintf(stderr, "Warning: failed to set utime on %s: %s\n", tmpfile.c_str(), std::strerror(errno));
 
-	if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
-		std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
+		if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
+			std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
+			unlink(tmpfile.c_str());
+		}
+	}
+	catch (const std::exception& ex) {
+		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
 		unlink(tmpfile.c_str());
 	}
 }
