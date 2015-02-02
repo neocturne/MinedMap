@@ -5,6 +5,8 @@ add_executable(MinedMap
   MinedMap.cpp
   GZip.cpp
   Info.cpp
+  PNG.cpp
+
   NBT/Tag.cpp
   Resource/Biome.cpp
   Resource/BlockType.cpp

@@ -25,6 +25,7 @@
 
 
 #include "Info.hpp"
+#include "PNG.hpp"
 #include "World/Level.hpp"
 #include "World/Region.hpp"
 
@@ -34,15 +35,12 @@
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
-#include <set>
-#include <system_error>
 
 #include <sys/types.h>
 
 #include <arpa/inet.h>
 #include <dirent.h>
 #include <fcntl.h>
-#include <png.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -54,50 +52,13 @@ using namespace MinedMap;
 static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
 
 
-static void addChunk(uint32_t image[DIM][DIM], size_t X, size_t Z, const World::Chunk *chunk) {
+static void addChunk(uint32_t image[DIM*DIM], size_t X, size_t Z, const World::Chunk *chunk) {
 	World::Chunk::Blocks layer = chunk->getTopLayer();
 
 	for (size_t x = 0; x < World::Chunk::SIZE; x++) {
 		for (size_t z = 0; z < World::Chunk::SIZE; z++)
-			image[Z*World::Chunk::SIZE+z][X*World::Chunk::SIZE+x] = htonl(layer.blocks[x][z].getColor());
+			image[(Z*World::Chunk::SIZE+z)*DIM + X*World::Chunk::SIZE+x] = htonl(layer.blocks[x][z].getColor());
 	}
-}
-
-static void writePNG(const char *filename, const uint32_t data[DIM][DIM]) {
-	std::FILE *f = std::fopen(filename, "wb");
-	if (!f)
-		throw std::system_error(errno, std::generic_category(), "unable to open output file");
-
-	png_structp png_ptr = png_create_write_struct (PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
-	if (!png_ptr)
-		throw std::runtime_error("unable to create PNG write struct");
-
-	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (!info_ptr) {
-		png_destroy_write_struct(&png_ptr, nullptr);
-		throw std::runtime_error("unable to create PNG info struct");
-	}
-
-	if (setjmp(png_jmpbuf(png_ptr))) {
-		png_destroy_write_struct(&png_ptr, &info_ptr);
-		std::fclose(f);
-		throw std::runtime_error("unable to write PNG file");
-	}
-
-	png_init_io(png_ptr, f);
-
-	png_set_IHDR(png_ptr, info_ptr, DIM, DIM, 8, PNG_COLOR_TYPE_RGB_ALPHA,
-		     PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-
-	uint8_t *row_pointers[World::Region::SIZE*World::Chunk::SIZE];
-	for (size_t i = 0; i < World::Region::SIZE*World::Chunk::SIZE; i++)
-		row_pointers[i] = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(data[i]));
-
-	png_set_rows(png_ptr, info_ptr, row_pointers);
-	png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
-
-	png_destroy_write_struct(&png_ptr, &info_ptr);
-	std::fclose(f);
 }
 
 static void doRegion(const std::string &input, const std::string &output) {
@@ -121,10 +82,10 @@ static void doRegion(const std::string &input, const std::string &output) {
 	const std::string tmpfile = output + ".tmp";
 
 	try {
-		uint32_t image[DIM][DIM] = {};
+		uint32_t image[DIM*DIM] = {};
 		World::Region::visitChunks(input.c_str(), [&image] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image, X, Z, chunk); });
 
-		writePNG(tmpfile.c_str(), image);
+		writePNG(tmpfile.c_str(), image, DIM, DIM);
 
 		struct timespec times[2] = {instat.st_mtim, instat.st_mtim};
 		if (utimensat(AT_FDCWD, tmpfile.c_str(), times, 0) < 0)
