@@ -153,6 +153,52 @@ static bool checkFilename(const char *name, int *x, int *z) {
 
 }
 
+static void writeInfo(const std::string &filename, const std::set<std::pair<int, int>> &regions, int minX, int maxX, int minZ, int maxZ) {
+	const std::string tmpfile = filename + ".tmp";
+
+	FILE *f = fopen(tmpfile.c_str(), "w");
+	if (!f) {
+		std::fprintf(stderr, "Unable to open %s: %s\n", tmpfile.c_str(), std::strerror(errno));
+		return;
+	}
+
+	fprintf(f, "{\n");
+	fprintf(f, "  \"info\" : {\n");
+	fprintf(f, "    \"minX\" : %i,\n", minX);
+	fprintf(f, "    \"maxX\" : %i,\n", maxX);
+	fprintf(f, "    \"minZ\" : %i,\n", minZ);
+	fprintf(f, "    \"maxZ\" : %i\n", maxZ);
+	fprintf(f, "  },\n");
+	fprintf(f, "  \"regions\" : [\n");
+
+	for (int z = minZ; z <= maxZ; z++) {
+		fprintf(f, "    [");
+
+		for (int x = minX; x <= maxX; x++) {
+			fprintf(f, "%s", regions.count(std::make_pair(x, z)) ? "true" : "false");
+
+			if (x < maxX)
+				fprintf(f, ", ");
+		}
+
+		if (z < maxZ)
+			fprintf(f, "],\n");
+		else
+			fprintf(f, "]\n");
+	}
+
+	fprintf(f, "  ]\n");
+	fprintf(f, "}\n");
+
+	fclose(f);
+
+	if (std::rename(tmpfile.c_str(), filename.c_str()) < 0) {
+		std::fprintf(stderr, "Unable to save %s: %s\n", filename.c_str(), std::strerror(errno));
+		unlink(tmpfile.c_str());
+	}
+
+}
+
 int main(int argc, char *argv[]) {
 	if (argc < 3) {
 		std::fprintf(stderr, "Usage: %s <data directory> <output directory>\n", argv[0]);
@@ -191,6 +237,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	closedir(dir);
+
+	writeInfo(outputdir + "/info.json", regions, minX, maxX, minZ, maxZ);
 
 	return 0;
 }
