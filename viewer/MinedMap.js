@@ -74,7 +74,7 @@ window.createMap = function () {
 			center: [0, 0],
 			zoom: 0,
 			minZoom: 0,
-			maxZoom: 1,
+			maxZoom: 3,
 			crs: L.CRS.Simple,
 			maxBounds: [
 				[-512*(info.info.maxZ+1), 512*info.info.minX],
