@@ -33,7 +33,6 @@
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
-#include <regex>
 #include <system_error>
 
 #include <sys/types.h>
@@ -134,8 +133,6 @@ static void doRegion(const std::string &input, const std::string &output) {
 }
 
 int main(int argc, char *argv[]) {
-	static const std::regex re("r\\.(-?\\d+)\\.(-?\\d+)\\.mca");
-
 	if (argc < 3) {
 		std::fprintf(stderr, "Usage: %s <data directory> <output directory>\n", argv[0]);
 		return 1;
@@ -156,15 +153,19 @@ int main(int argc, char *argv[]) {
 
 	struct dirent *entry;
 	while ((entry = readdir(dir)) != nullptr) {
-		std::cmatch m;
-		if (std::regex_match(entry->d_name, m, re)) {
-			int x = std::atoi(m[1].str().c_str());
+		int x, z;
+		if (std::sscanf(entry->d_name, "r.%i.%i.mca", &x, &z) == 2) {
+			size_t l = strlen(entry->d_name) + 1;
+			char buf[l];
+			std::snprintf(buf, l, "r.%i.%i.mca", x, z);
+			if (std::memcmp(entry->d_name, buf, l))
+				continue;
+
 			if (x < minX)
 				minX = x;
 			if (x > maxX)
 				maxX = x;
 
-			int z = std::atoi(m[2].str().c_str());
 			if (z < minZ)
 				minZ = z;
 			if (z > maxZ)
