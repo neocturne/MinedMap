@@ -117,7 +117,10 @@ void Chunk::analyzeChunk() {
 	blockSkyLight.reset(new uint8_t[maxY * SIZE * SIZE / 2]);
 	blockBlockLight.reset(new uint8_t[maxY * SIZE * SIZE / 2]);
 
+	std::memset(blockIDs.get(), 0, maxY * SIZE * SIZE);
+	std::memset(blockData.get(), 0, maxY * SIZE * SIZE / 2);
 	std::memset(blockSkyLight.get(), 0xff, maxY * SIZE * SIZE / 2);
+	std::memset(blockBlockLight.get(), 0, maxY * SIZE * SIZE / 2);
 
 
 	for (auto &section : *sections) {
