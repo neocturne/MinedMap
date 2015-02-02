@@ -33,6 +33,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
+#include <set>
 #include <system_error>
 
 #include <sys/types.h>
@@ -138,6 +139,20 @@ static void doRegion(const std::string &input, const std::string &output) {
 	}
 }
 
+static bool checkFilename(const char *name, int *x, int *z) {
+	if (std::sscanf(name, "r.%i.%i.mca", x, z) != 2)
+		return false;
+
+	size_t l = strlen(name) + 1;
+	char buf[l];
+	std::snprintf(buf, l, "r.%i.%i.mca", *x, *z);
+	if (std::memcmp(name, buf, l))
+		return false;
+
+	return true;
+
+}
+
 int main(int argc, char *argv[]) {
 	if (argc < 3) {
 		std::fprintf(stderr, "Usage: %s <data directory> <output directory>\n", argv[0]);
@@ -155,32 +170,24 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
+	std::set<std::pair<int, int>> regions;
 	int minX = INT_MAX, maxX = INT_MIN, minZ = INT_MAX, maxZ = INT_MIN;
 
 	struct dirent *entry;
 	while ((entry = readdir(dir)) != nullptr) {
 		int x, z;
-		if (std::sscanf(entry->d_name, "r.%i.%i.mca", &x, &z) == 2) {
-			size_t l = strlen(entry->d_name) + 1;
-			char buf[l];
-			std::snprintf(buf, l, "r.%i.%i.mca", x, z);
-			if (std::memcmp(entry->d_name, buf, l))
-				continue;
+		if (!checkFilename(entry->d_name, &x, &z))
+			continue;
 
-			if (x < minX)
-				minX = x;
-			if (x > maxX)
-				maxX = x;
+		if (x < minX) minX = x;
+		if (x > maxX) maxX = x;
+		if (z < minZ) minZ = z;
+		if (z > maxZ) maxZ = z;
 
-			if (z < minZ)
-				minZ = z;
-			if (z > maxZ)
-				maxZ = z;
+		regions.insert(std::make_pair(x, z));
 
-			std::string name(entry->d_name);
-
-			doRegion(inputdir + "/" + name, outputdir + "/" + name.substr(0, name.length()-3) + "png");
-		}
+		std::string name(entry->d_name);
+		doRegion(inputdir + "/" + name, outputdir + "/" + name.substr(0, name.length()-3) + "png");
 	}
 
 	closedir(dir);
