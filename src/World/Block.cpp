@@ -44,14 +44,11 @@ uint32_t Block::getColor() const {
 	unsigned g = uint8_t(color >> 8);
 	unsigned b = uint8_t(color);
 
-	uint8_t light = (blockLight > skyLight) ? blockLight : skyLight;
-
-	float lightCoef = light/30.0f + 0.5f;
 	float heightCoef = height/255.0f + 0.5f;
 
-	r *= lightCoef * heightCoef;
-	g *= lightCoef * heightCoef;
-	b *= lightCoef * heightCoef;
+	r *= heightCoef;
+	g *= heightCoef;
+	b *= heightCoef;
 
 	if (t.green) {
 		const Resource::Biome &biomeDef = Resource::BIOMES[biome];
