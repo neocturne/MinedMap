@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>MinedMap</title>
+    <link rel="stylesheet" href="leaflet-0.8-dev/leaflet.css" />
+    <script src="leaflet-0.8-dev/leaflet.js"></script>
+    <script src="MinedMap.js"></script>
+
+    <style type="text/css">
+      #map {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+      }
+
+      body, .leaflet-container {
+        background: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script type="text/javascript">
+      createMap();
+    </script>
+  </body>
+</html>
