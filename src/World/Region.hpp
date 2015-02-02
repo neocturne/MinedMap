@@ -28,6 +28,7 @@
 
 #include "Chunk.hpp"
 
+#include <functional>
 #include <memory>
 #include <stdexcept>
 #include <tuple>
@@ -41,23 +42,18 @@ class Region {
 public:
 	static const size_t SIZE = 32;
 
+	typedef std::function<void (size_t, size_t, const Chunk *)> ChunkVisitor;
+
+	Region() = delete;
+
 private:
 	typedef std::tuple<size_t, size_t, size_t> ChunkDesc;
 	typedef std::unordered_map<size_t, ChunkDesc> ChunkMap;
 
-	std::unique_ptr<Chunk> chunks[SIZE][SIZE];
-
 	static ChunkMap processHeader(const uint8_t header[4096]);
 
 public:
-	Region(const char *filename);
-
-	const Chunk * operator()(size_t x, size_t z) {
-		if (x >= SIZE || z >= SIZE)
-			throw std::range_error("Region(): bad coordinates");
-
-		return chunks[x][z].get();
-	}
+	static void visitChunks(const char *filename, ChunkVisitor visitor);
 };
 
 }

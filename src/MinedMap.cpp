@@ -40,7 +40,19 @@
 using namespace MinedMap;
 
 
-static void writePNG(const char *filename, const uint32_t data[World::Region::SIZE*World::Chunk::SIZE][World::Region::SIZE*World::Chunk::SIZE]) {
+static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
+
+
+static void addChunk(uint32_t image[DIM][DIM], size_t X, size_t Z, const World::Chunk *chunk) {
+	World::Chunk::Blocks layer = chunk->getTopLayer();
+
+	for (size_t x = 0; x < World::Chunk::SIZE; x++) {
+		for (size_t z = 0; z < World::Chunk::SIZE; z++)
+			image[Z*World::Chunk::SIZE+z][X*World::Chunk::SIZE+x] = htonl(layer.blocks[x][z].getColor());
+	}
+}
+
+static void writePNG(const char *filename, const uint32_t data[DIM][DIM]) {
 	std::FILE *f = std::fopen(filename, "wb");
 	if (!f)
 		throw std::system_error(errno, std::generic_category(), "unable to open output file");
@@ -82,24 +94,9 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	World::Region region(argv[1]);
+	uint32_t image[DIM][DIM] = {};
 
-	uint32_t image[World::Region::SIZE*World::Chunk::SIZE][World::Region::SIZE*World::Chunk::SIZE] = {};
-
-	for (size_t X = 0; X < World::Region::SIZE; X++) {
-		for (size_t Z = 0; Z < World::Region::SIZE; Z++) {
-			const World::Chunk *chunk = region(X, Z);
-			if (!chunk)
-				continue;
-
-			World::Chunk::Blocks layer = chunk->getTopLayer();
-
-			for (size_t x = 0; x < World::Chunk::SIZE; x++) {
-				for (size_t z = 0; z < World::Chunk::SIZE; z++)
-					image[Z*World::Chunk::SIZE+z][X*World::Chunk::SIZE+x] = htonl(layer.blocks[x][z].getColor());
-			}
-		}
-	}
+	World::Region::visitChunks(argv[1], [&image] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image, X, Z, chunk); });
 
 	writePNG(argv[2], image);
 

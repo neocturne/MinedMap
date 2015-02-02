@@ -54,7 +54,7 @@ Region::ChunkMap Region::processHeader(const uint8_t header[4096]) {
 	return map;
 }
 
-Region::Region(const char *filename) {
+void Region::visitChunks(const char *filename, ChunkVisitor visitor) {
 	std::ifstream file;
 	file.exceptions(std::ios::failbit | std::ios::badbit);
 	file.open(filename, std::ios::in | std::ios::binary);
@@ -68,6 +68,8 @@ Region::Region(const char *filename) {
 		chunkMap = processHeader(header);
 	}
 
+	bool seen[SIZE][SIZE] = {};
+
 	size_t i = 1, c = 0;
 	while (!file.eof()) {
 		auto it = chunkMap.find(i);
@@ -80,16 +82,19 @@ Region::Region(const char *filename) {
 		size_t x, z, len;
 		std::tie(x, z, len) = it->second;
 
-		if (chunks[x][z])
+		if (seen[x][z])
 			throw std::invalid_argument("duplicate chunk");
+
+		seen[x][z] = true;
+		c++;
 
 		uint8_t buffer[len * 4096];
 		file.read((char *)buffer, len * 4096);
 
-		chunks[x][z].reset(new Chunk(Buffer(buffer, len * 4096)));
+		Chunk chunk(Buffer(buffer, len * 4096));
+		visitor(x, z, &chunk);
 
 		i += len;
-		c++;
 	}
 
 	if (c != chunkMap.size())
