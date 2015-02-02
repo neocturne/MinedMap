@@ -75,8 +75,8 @@ static void writePNG(const char *filename, const uint32_t data[DIM][DIM]) {
 
 	png_init_io(png_ptr, f);
 
-	png_set_IHDR(png_ptr, info_ptr, World::Region::SIZE*World::Chunk::SIZE, World::Region::SIZE*World::Chunk::SIZE,
-		     8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+	png_set_IHDR(png_ptr, info_ptr, DIM, DIM, 8, PNG_COLOR_TYPE_RGB_ALPHA,
+		     PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
 	uint8_t *row_pointers[World::Region::SIZE*World::Chunk::SIZE];
 	for (size_t i = 0; i < World::Region::SIZE*World::Chunk::SIZE; i++)
