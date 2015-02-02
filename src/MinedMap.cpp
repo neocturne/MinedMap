@@ -41,7 +41,11 @@
 
 #include <arpa/inet.h>
 #include <dirent.h>
+#include <fcntl.h>
 #include <png.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <unistd.h>
 
 
 using namespace MinedMap;
@@ -96,11 +100,38 @@ static void writePNG(const char *filename, const uint32_t data[DIM][DIM]) {
 }
 
 static void doRegion(const std::string &input, const std::string &output) {
+	struct stat instat, outstat;
+
+	if (stat(input.c_str(), &instat) < 0) {
+		std::fprintf(stderr, "Unable to stat %s: %s\n", input.c_str(), std::strerror(errno));
+		return;
+	}
+
+	if (stat(output.c_str(), &outstat) == 0) {
+		if (instat.st_mtim.tv_sec < outstat.st_mtim.tv_sec ||
+		    (instat.st_mtim.tv_sec == outstat.st_mtim.tv_sec && instat.st_mtim.tv_nsec <= outstat.st_mtim.tv_nsec)) {
+			    std::fprintf(stderr, "%s is up-to-date.\n", output.c_str());
+			    return;
+		    }
+	}
+
 	std::fprintf(stderr, "Generating %s from %s...\n", output.c_str(), input.c_str());
+
+	const std::string tmpfile = output + ".tmp";
 
 	uint32_t image[DIM][DIM] = {};
 	World::Region::visitChunks(input.c_str(), [&image] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image, X, Z, chunk); });
-	writePNG(output.c_str(), image);
+
+	writePNG(tmpfile.c_str(), image);
+
+	struct timespec times[2] = {instat.st_mtim, instat.st_mtim};
+	if (utimensat(AT_FDCWD, tmpfile.c_str(), times, 0) < 0)
+		std::fprintf(stderr, "Warning: failed to set utime on %s: %s\n", tmpfile.c_str(), std::strerror(errno));
+
+	if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
+		std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
+		unlink(tmpfile.c_str());
+	}
 }
 
 int main(int argc, char *argv[]) {
