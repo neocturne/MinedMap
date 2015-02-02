@@ -35,7 +35,12 @@ var MinedMapLayer = L.GridLayer.extend({
 	},
 
 	_getTileSize: function () {
-		return 512;
+		var map = this._map, zoom = map.getZoom();
+
+		if (zoom > 0)
+			return Math.round(map.getZoomScale(map.getZoom(), 0) * 512);
+		else
+			return 512;
 	},
 
 	_onTileRemove: function (e) {
@@ -69,7 +74,7 @@ window.createMap = function () {
 			center: [0, 0],
 			zoom: 0,
 			minZoom: 0,
-			maxZoom: 0,
+			maxZoom: 1,
 			crs: L.CRS.Simple,
 			maxBounds: [
 				[-512*(info.info.maxZ+1), 512*info.info.minX],
