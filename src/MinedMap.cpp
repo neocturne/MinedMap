@@ -80,7 +80,7 @@ static void writePNG(const char *filename, const uint32_t data[DIM][DIM]) {
 
 	if (setjmp(png_jmpbuf(png_ptr))) {
 		png_destroy_write_struct(&png_ptr, &info_ptr);
-		fclose(f);
+		std::fclose(f);
 		throw std::runtime_error("unable to write PNG file");
 	}
 
@@ -96,6 +96,7 @@ static void writePNG(const char *filename, const uint32_t data[DIM][DIM]) {
 	png_set_rows(png_ptr, info_ptr, row_pointers);
 	png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
 
+	png_destroy_write_struct(&png_ptr, &info_ptr);
 	std::fclose(f);
 }
 
