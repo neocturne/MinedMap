@@ -28,12 +28,19 @@
 #include "NBT/ListTag.hpp"
 
 #include <cerrno>
+#include <climits>
 #include <csetjmp>
 #include <cstdio>
+#include <cstring>
+#include <cstdlib>
 #include <iostream>
+#include <regex>
 #include <system_error>
 
+#include <sys/types.h>
+
 #include <arpa/inet.h>
+#include <dirent.h>
 #include <png.h>
 
 
@@ -88,17 +95,58 @@ static void writePNG(const char *filename, const uint32_t data[DIM][DIM]) {
 	std::fclose(f);
 }
 
+static void doRegion(const std::string &input, const std::string &output) {
+	std::fprintf(stderr, "Generating %s from %s...\n", output.c_str(), input.c_str());
+
+	uint32_t image[DIM][DIM] = {};
+	World::Region::visitChunks(input.c_str(), [&image] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image, X, Z, chunk); });
+	writePNG(output.c_str(), image);
+}
+
 int main(int argc, char *argv[]) {
+	static const std::regex re("r\\.(-?\\d+)\\.(-?\\d+)\\.mca");
+
 	if (argc < 3) {
-		std::cerr << "Usage: " << argv[0] << " region output" << std::endl;
+		std::fprintf(stderr, "Usage: %s <data directory> <output directory>\n", argv[0]);
 		return 1;
 	}
 
-	uint32_t image[DIM][DIM] = {};
+	std::string inputdir(argv[1]);
+	inputdir += "/region";
 
-	World::Region::visitChunks(argv[1], [&image] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image, X, Z, chunk); });
+	std::string outputdir(argv[2]);
 
-	writePNG(argv[2], image);
+	DIR *dir = opendir(inputdir.c_str());
+	if (!dir) {
+		std::fprintf(stderr, "Unable to read input directory: %s\n", std::strerror(errno));
+		return 1;
+	}
+
+	int minX = INT_MAX, maxX = INT_MIN, minZ = INT_MAX, maxZ = INT_MIN;
+
+	struct dirent *entry;
+	while ((entry = readdir(dir)) != nullptr) {
+		std::cmatch m;
+		if (std::regex_match(entry->d_name, m, re)) {
+			int x = std::atoi(m[1].str().c_str());
+			if (x < minX)
+				minX = x;
+			if (x > maxX)
+				maxX = x;
+
+			int z = std::atoi(m[2].str().c_str());
+			if (z < minZ)
+				minZ = z;
+			if (z > maxZ)
+				maxZ = z;
+
+			std::string name(entry->d_name);
+
+			doRegion(inputdir + "/" + name, outputdir + "/" + name.substr(0, name.length()-3) + "png");
+		}
+	}
+
+	closedir(dir);
 
 	return 0;
 }
