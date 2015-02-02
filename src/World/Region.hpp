@@ -53,7 +53,7 @@ private:
 	static ChunkMap processHeader(const uint8_t header[4096]);
 
 public:
-	static void visitChunks(const char *filename, ChunkVisitor visitor);
+	static void visitChunks(const char *filename, const ChunkVisitor &visitor);
 };
 
 }

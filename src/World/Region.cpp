@@ -54,7 +54,7 @@ Region::ChunkMap Region::processHeader(const uint8_t header[4096]) {
 	return map;
 }
 
-void Region::visitChunks(const char *filename, ChunkVisitor visitor) {
+void Region::visitChunks(const char *filename, const ChunkVisitor &visitor) {
 	std::ifstream file;
 	file.exceptions(std::ios::failbit | std::ios::badbit);
 	file.open(filename, std::ios::in | std::ios::binary);
