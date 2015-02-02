@@ -24,41 +24,42 @@
 */
 
 
-#pragma once
+#include "GZip.hpp"
 
-#include <climits>
-#include <cstdint>
-#include <set>
-#include <tuple>
-#include <utility>
+#include <system_error>
+#include <stdexcept>
+#include <zlib.h>
 
 
 namespace MinedMap {
 
-class Info {
-private:
-	std::set<std::pair<int, int>> regions;
-	int minX, maxX, minZ, maxZ;
+std::vector<uint8_t> readGZip(const char *filename) {
+	std::vector<uint8_t> buffer;
+	size_t len = 0;
 
-	int32_t spawnX, spawnZ;
+	gzFile f = gzopen(filename, "rb");
+	if (!f)
+		throw std::system_error(errno, std::generic_category(), "unable to open GZip file");
 
-public:
-	Info() : minX(INT_MAX), maxX(INT_MIN), minZ(INT_MAX), maxZ(INT_MIN), spawnX(0), spawnZ(0) {}
+	while (true) {
+		if ((buffer.size() - len) < 4096)
+			buffer.resize(buffer.size() + 4096);
 
-	void addRegion(int x, int z) {
-		regions.insert(std::make_pair(x, z));
+		int r = gzread(f, buffer.data()+len, buffer.size()-len);
+		if (r < 0)
+			throw std::system_error(errno, std::generic_category(), "error reading GZip file");
 
-		if (x < minX) minX = x;
-		if (x > maxX) maxX = x;
-		if (z < minZ) minZ = z;
-		if (z > maxZ) maxZ = z;
+		if (!r)
+			break;
+
+		len += r;
 	}
 
-	void setSpawn(const std::pair<int32_t, int32_t> &v) {
-		std::tie(spawnX, spawnZ) = v;
-	}
+	gzclose_r(f);
 
-	void writeJSON(const char *filename);
-};
+	buffer.resize(len);
+
+	return std::move(buffer);
+}
 
 }

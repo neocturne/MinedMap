@@ -68,7 +68,11 @@ void Info::writeJSON(const char *filename) {
 			fprintf(f, "]\n");
 	}
 
-	fprintf(f, "  ]\n");
+	fprintf(f, "  ],\n");
+	fprintf(f, "  \"spawn\" : {\n");
+	fprintf(f, "    \"x\" : %li,\n", (long)spawnX);
+	fprintf(f, "    \"z\" : %li\n", (long)spawnZ);
+	fprintf(f, "  }\n");
 	fprintf(f, "}\n");
 
 	fclose(f);

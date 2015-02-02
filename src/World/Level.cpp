@@ -24,41 +24,35 @@
 */
 
 
-#pragma once
+#include "Level.hpp"
+#include "../GZip.hpp"
+#include "../Util.hpp"
+#include "../NBT/IntTag.hpp"
 
-#include <climits>
-#include <cstdint>
-#include <set>
-#include <tuple>
-#include <utility>
+#include <iostream>
 
 
 namespace MinedMap {
+namespace World {
 
-class Info {
-private:
-	std::set<std::pair<int, int>> regions;
-	int minX, maxX, minZ, maxZ;
+Level::Level(const char *filename) {
+	std::vector<uint8_t> buffer = readGZip(filename);
 
-	int32_t spawnX, spawnZ;
+	Buffer nbt(buffer.data(), buffer.size());
+	std::pair<std::string, std::shared_ptr<const NBT::Tag>> tag = NBT::Tag::readNamedTag(&nbt);
+	if (tag.first != "")
+		throw std::invalid_argument("invalid root tag");
 
-public:
-	Info() : minX(INT_MAX), maxX(INT_MIN), minZ(INT_MAX), maxZ(INT_MIN), spawnX(0), spawnZ(0) {}
+	root = assertValue(std::dynamic_pointer_cast<const NBT::CompoundTag>(tag.second));
+	data = assertValue(root->get<NBT::CompoundTag>("Data"));
+}
 
-	void addRegion(int x, int z) {
-		regions.insert(std::make_pair(x, z));
+std::pair<int32_t, int32_t> Level::getSpawn() const {
+	int32_t x = assertValue(data->get<NBT::IntTag>("SpawnX"))->getValue();
+	int32_t z = assertValue(data->get<NBT::IntTag>("SpawnZ"))->getValue();
 
-		if (x < minX) minX = x;
-		if (x > maxX) maxX = x;
-		if (z < minZ) minZ = z;
-		if (z > maxZ) maxZ = z;
-	}
+	return std::make_pair(x, z);
+}
 
-	void setSpawn(const std::pair<int32_t, int32_t> &v) {
-		std::tie(spawnX, spawnZ) = v;
-	}
-
-	void writeJSON(const char *filename);
-};
-
+}
 }

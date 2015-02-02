@@ -25,6 +25,7 @@
 
 
 #include "Info.hpp"
+#include "World/Level.hpp"
 #include "World/Region.hpp"
 
 #include <cerrno>
@@ -160,11 +161,11 @@ int main(int argc, char *argv[]) {
 	}
 
 	std::string inputdir(argv[1]);
-	inputdir += "/region";
+	std::string regiondir = inputdir + "/region";
 
 	std::string outputdir(argv[2]);
 
-	DIR *dir = opendir(inputdir.c_str());
+	DIR *dir = opendir(regiondir.c_str());
 	if (!dir) {
 		std::fprintf(stderr, "Unable to read input directory: %s\n", std::strerror(errno));
 		return 1;
@@ -181,10 +182,13 @@ int main(int argc, char *argv[]) {
 		info.addRegion(x, z);
 
 		std::string name(entry->d_name);
-		doRegion(inputdir + "/" + name, outputdir + "/" + name.substr(0, name.length()-3) + "png");
+		doRegion(regiondir + "/" + name, outputdir + "/" + name.substr(0, name.length()-3) + "png");
 	}
 
 	closedir(dir);
+
+	World::Level level((inputdir + "/level.dat").c_str());
+	info.setSpawn(level.getSpawn());
 
 	info.writeJSON((outputdir + "/info.json").c_str());
 

@@ -26,39 +26,12 @@
 
 #pragma once
 
-#include <climits>
 #include <cstdint>
-#include <set>
-#include <tuple>
-#include <utility>
+#include <vector>
 
 
 namespace MinedMap {
 
-class Info {
-private:
-	std::set<std::pair<int, int>> regions;
-	int minX, maxX, minZ, maxZ;
-
-	int32_t spawnX, spawnZ;
-
-public:
-	Info() : minX(INT_MAX), maxX(INT_MIN), minZ(INT_MAX), maxZ(INT_MIN), spawnX(0), spawnZ(0) {}
-
-	void addRegion(int x, int z) {
-		regions.insert(std::make_pair(x, z));
-
-		if (x < minX) minX = x;
-		if (x > maxX) maxX = x;
-		if (z < minZ) minZ = z;
-		if (z > maxZ) maxZ = z;
-	}
-
-	void setSpawn(const std::pair<int32_t, int32_t> &v) {
-		std::tie(spawnX, spawnZ) = v;
-	}
-
-	void writeJSON(const char *filename);
-};
+std::vector<uint8_t> readGZip(const char *filename);
 
 }

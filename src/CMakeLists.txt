@@ -3,12 +3,14 @@ link_directories(${ZLIB_LIBRARY_DIRS} ${LIBPNG_LIBRARY_DIRS})
 
 add_executable(MinedMap
   MinedMap.cpp
+  GZip.cpp
   Info.cpp
   NBT/Tag.cpp
   Resource/Biome.cpp
   Resource/BlockType.cpp
   World/Block.cpp
   World/Chunk.cpp
+  World/Level.cpp
   World/Region.cpp
 )
 set_target_properties(MinedMap PROPERTIES COMPILE_FLAGS "-std=c++11 -Wall ${ZLIB_CFLAGS_OTHER} ${LIBPNG_CFLAGS_OTHER}")
