@@ -108,12 +108,12 @@ static void doRegion(const std::string &input, const std::string &output) {
 	if (stat(output.c_str(), &outstat) == 0) {
 		if (instat.st_mtim.tv_sec < outstat.st_mtim.tv_sec ||
 		    (instat.st_mtim.tv_sec == outstat.st_mtim.tv_sec && instat.st_mtim.tv_nsec <= outstat.st_mtim.tv_nsec)) {
-			    std::fprintf(stderr, "%s is up-to-date.\n", output.c_str());
+			    std::printf("%s is up-to-date.\n", output.c_str());
 			    return;
 		    }
 	}
 
-	std::fprintf(stderr, "Generating %s from %s...\n", output.c_str(), input.c_str());
+	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
 
 	const std::string tmpfile = output + ".tmp";
 
