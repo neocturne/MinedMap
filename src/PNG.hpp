@@ -33,9 +33,9 @@
 namespace MinedMap {
 namespace PNG {
 
-void write(const char *filename, const uint8_t *data, size_t width, size_t height);
-void read(const char *filename, uint8_t *data, size_t width, size_t height);
-void mipmap(const char *output, size_t width, size_t height, const char *nw, const char *ne, const char *sw, const char *se);
+void write(const char *filename, const uint8_t *data, size_t width, size_t height, bool colored);
+void read(const char *filename, uint8_t *data, size_t width, size_t height, bool colored);
+void mipmap(const char *output, size_t width, size_t height, bool colored, const char *nw, const char *ne, const char *sw, const char *se);
 
 }
 }

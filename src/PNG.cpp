@@ -37,7 +37,7 @@
 namespace MinedMap {
 namespace PNG {
 
-void write(const char *filename, const uint8_t *data, size_t width, size_t height) {
+void write(const char *filename, const uint8_t *data, size_t width, size_t height, bool colored) {
 	std::FILE *f = std::fopen(filename, "wb");
 	if (!f)
 		throw std::system_error(errno, std::generic_category(), "unable to open PNG file");
@@ -60,12 +60,12 @@ void write(const char *filename, const uint8_t *data, size_t width, size_t heigh
 
 	png_init_io(png_ptr, f);
 
-	png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB_ALPHA,
+	png_set_IHDR(png_ptr, info_ptr, width, height, 8, colored ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_GRAY_ALPHA,
 		     PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
 	uint8_t *row_pointers[height];
 	for (size_t i = 0; i < height; i++)
-		row_pointers[i] = const_cast<uint8_t*>(&data[4*i*width]);
+		row_pointers[i] = const_cast<uint8_t*>(&data[(colored ? 4 : 2)*i*width]);
 
 	png_set_rows(png_ptr, info_ptr, row_pointers);
 	png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, nullptr);
@@ -74,7 +74,7 @@ void write(const char *filename, const uint8_t *data, size_t width, size_t heigh
 	std::fclose(f);
 }
 
-void read(const char *filename, uint8_t *data, size_t width, size_t height) {
+void read(const char *filename, uint8_t *data, size_t width, size_t height, bool colored) {
 	std::FILE *f = std::fopen(filename, "rb");
 	if (!f)
 		throw std::system_error(errno, std::generic_category(), "unable to open PNG file");
@@ -108,44 +108,46 @@ void read(const char *filename, uint8_t *data, size_t width, size_t height) {
 	if (png_get_image_width(png_ptr, info_ptr) != width
 	    || png_get_image_height(png_ptr, info_ptr) != height
 	    || png_get_bit_depth(png_ptr, info_ptr) != 8
-	    || png_get_color_type(png_ptr, info_ptr) != PNG_COLOR_TYPE_RGB_ALPHA)
+	    || png_get_color_type(png_ptr, info_ptr) != (colored ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_GRAY_ALPHA))
 		longjmp(png_jmpbuf(png_ptr), 1);
 
 	uint8_t **row_pointers = png_get_rows(png_ptr, info_ptr);
 	for (size_t i = 0; i < height; i++)
-		std::memcpy(&data[4*i*width], row_pointers[i], 4*width);
+		std::memcpy(&data[(colored ? 4 : 2)*i*width], row_pointers[i], (colored ? 4 : 2)*width);
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 	std::fclose(f);
 }
 
-static void readScaled(uint8_t *data, size_t offset_w, size_t offset_h, const char *file, size_t width, size_t height) {
+static void readScaled(uint8_t *data, size_t offset_w, size_t offset_h, const char *file, size_t width, size_t height, bool colored) {
 	if (!file)
 		return;
 
+	size_t b = (colored ? 4 : 2);
+
 	uint8_t input[4*width*height];
-	read(file, input, width, height);
+	read(file, input, width, height, colored);
 
 	for (size_t h = 0; h < width/2; h++) {
 		for (size_t w = 0; w < width/2; w++) {
 			for (size_t c = 0; c < 4; c++) {
-				size_t i = 8*width*h + 8*w + c;
-				data[4*width*(offset_h+h) + 4*(offset_w+w) + c] = (input[i] + input[i+4] + input[i+4*width] + input[i+4*width+4])/4;
+				size_t i = 2*b*(width*h + w) + c;
+				data[b*(width*(offset_h+h) + offset_w+w) + c] = (input[i] + input[i+b] + input[i+b*width] + input[i+b*width+b])/4;
 			}
 		}
 	}
 }
 
-void mipmap(const char *output, size_t width, size_t height, const char *nw, const char *ne, const char *sw, const char *se) {
+void mipmap(const char *output, size_t width, size_t height, bool colored, const char *nw, const char *ne, const char *sw, const char *se) {
 	uint8_t data[4*width*height];
 	std::memset(data, 0, sizeof(data));
 
-	readScaled(data, 0, 0, nw, width, height);
-	readScaled(data, width/2, 0, ne, width, height);
-	readScaled(data, 0, height/2, sw, width, height);
-	readScaled(data, width/2, height/2, se, width, height);
+	readScaled(data, 0, 0, nw, width, height, colored);
+	readScaled(data, width/2, 0, ne, width, height, colored);
+	readScaled(data, 0, height/2, sw, width, height, colored);
+	readScaled(data, width/2, height/2, se, width, height, colored);
 
-	write(output, data, width, height);
+	write(output, data, width, height, true);
 }
 
 }

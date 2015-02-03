@@ -21,7 +21,7 @@ var MinedMapLayer = L.GridLayer.extend({
 		if (coords.x >= this._info.minX && coords.x <= this._info.maxX &&
 		    coords.y >= this._info.minZ && coords.y <= this._info.maxZ &&
 		    this._regions[coords.y-this._info.minZ][coords.x-this._info.minX])
-			tile.src = 'data/0/r.'+coords.x+'.'+coords.y+'.png';
+			tile.src = 'data/map/0/r.'+coords.x+'.'+coords.y+'.png';
 
 		return tile;
 	},
