@@ -139,7 +139,7 @@ static void readScaled(uint8_t *data, size_t offset_w, size_t offset_h, const ch
 }
 
 void mipmap(const char *output, size_t width, size_t height, bool colored, const char *nw, const char *ne, const char *sw, const char *se) {
-	uint8_t data[4*width*height];
+	uint8_t data[(colored ? 4 : 2)*width*height];
 	std::memset(data, 0, sizeof(data));
 
 	readScaled(data, 0, 0, nw, width, height, colored);
