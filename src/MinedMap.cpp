@@ -113,6 +113,7 @@ static void doRegion(const std::string &input, const std::string &output, const 
 	catch (const std::exception& ex) {
 		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
 		unlink(tmpfile.c_str());
+		unlink(tmpfile_light.c_str());
 	}
 }
 
