@@ -147,7 +147,7 @@ void mipmap(const char *output, size_t width, size_t height, bool colored, const
 	readScaled(data, 0, height/2, sw, width, height, colored);
 	readScaled(data, width/2, height/2, se, width, height, colored);
 
-	write(output, data, width, height, true);
+	write(output, data, width, height, colored);
 }
 
 }

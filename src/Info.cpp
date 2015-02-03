@@ -34,7 +34,7 @@
 
 namespace MinedMap {
 
-void Info::writeJSON(const char *filename) {
+void Info::writeJSON(const char *filename) const {
 	const std::string tmpfile = std::string(filename) + ".tmp";
 
 	FILE *f = fopen(tmpfile.c_str(), "w");
@@ -44,28 +44,43 @@ void Info::writeJSON(const char *filename) {
 	}
 
 	fprintf(f, "{\n");
-	fprintf(f, "  \"info\" : {\n");
-	fprintf(f, "    \"minX\" : %i,\n", minX);
-	fprintf(f, "    \"maxX\" : %i,\n", maxX);
-	fprintf(f, "    \"minZ\" : %i,\n", minZ);
-	fprintf(f, "    \"maxZ\" : %i\n", maxZ);
-	fprintf(f, "  },\n");
-	fprintf(f, "  \"regions\" : [\n");
+	fprintf(f, "  \"mipmaps\" : [\n");
 
-	for (int z = minZ; z <= maxZ; z++) {
-		fprintf(f, "    [");
+	for (size_t level = 0; level < regions.size(); level++) {
+		int minX, maxX, minZ, maxZ;
+		std::tie(minX, maxX, minZ, maxZ) = getBounds(level);
 
-		for (int x = minX; x <= maxX; x++) {
-			fprintf(f, "%s", regions.count(std::make_pair(x, z)) ? "true" : "false");
+		fprintf(f, "    {\n");
+		fprintf(f, "      \"info\" : {\n");
+		fprintf(f, "        \"minX\" : %i,\n", minX);
+		fprintf(f, "        \"maxX\" : %i,\n", maxX);
+		fprintf(f, "        \"minZ\" : %i,\n", minZ);
+		fprintf(f, "        \"maxZ\" : %i\n", maxZ);
+		fprintf(f, "      },\n");
+		fprintf(f, "      \"regions\" : [\n");
 
-			if (x < maxX)
-				fprintf(f, ", ");
+		for (int z = minZ; z <= maxZ; z++) {
+			fprintf(f, "        [");
+
+			for (int x = minX; x <= maxX; x++) {
+				fprintf(f, "%s", regions[level].count(std::make_pair(x, z)) ? "true" : "false");
+
+				if (x < maxX)
+					fprintf(f, ", ");
+			}
+
+			if (z < maxZ)
+				fprintf(f, "],\n");
+			else
+				fprintf(f, "]\n");
 		}
 
-		if (z < maxZ)
-			fprintf(f, "],\n");
+		fprintf(f, "      ]\n");
+
+		if (level < regions.size() - 1)
+			fprintf(f, "    },\n");
 		else
-			fprintf(f, "]\n");
+			fprintf(f, "    }\n");
 	}
 
 	fprintf(f, "  ],\n");

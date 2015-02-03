@@ -31,34 +31,52 @@
 #include <set>
 #include <tuple>
 #include <utility>
+#include <vector>
 
 
 namespace MinedMap {
 
 class Info {
 private:
-	std::set<std::pair<int, int>> regions;
-	int minX, maxX, minZ, maxZ;
+	std::vector<std::set<std::pair<int, int>>> regions;
+	std::vector<std::tuple<int, int, int, int>> bounds;
 
 	int32_t spawnX, spawnZ;
 
 public:
-	Info() : minX(INT_MAX), maxX(INT_MIN), minZ(INT_MAX), maxZ(INT_MIN), spawnX(0), spawnZ(0) {}
+	Info() : spawnX(0), spawnZ(0) {
+		addMipmapLevel();
+	}
 
-	void addRegion(int x, int z) {
-		regions.insert(std::make_pair(x, z));
+	std::tuple<int, int, int, int> getBounds(size_t level) const {
+		return bounds[level];
+	}
 
-		if (x < minX) minX = x;
-		if (x > maxX) maxX = x;
-		if (z < minZ) minZ = z;
-		if (z > maxZ) maxZ = z;
+	void addRegion(int x, int z, size_t level) {
+		regions[level].insert(std::make_pair(x, z));
+
+		std::tuple<int, int, int, int> &b = bounds[level];
+
+		if (x < std::get<0>(b)) std::get<0>(b) = x;
+		if (x > std::get<1>(b)) std::get<1>(b) = x;
+		if (z < std::get<2>(b)) std::get<2>(b) = z;
+		if (z > std::get<3>(b)) std::get<3>(b) = z;
+	}
+
+	void addMipmapLevel() {
+		regions.emplace_back();
+		bounds.emplace_back(INT_MAX, INT_MIN, INT_MAX, INT_MIN);
+	}
+
+	size_t getMipmapLevel() const {
+		return regions.size()-1;
 	}
 
 	void setSpawn(const std::pair<int32_t, int32_t> &v) {
 		std::tie(spawnX, spawnZ) = v;
 	}
 
-	void writeJSON(const char *filename);
+	void writeJSON(const char *filename) const;
 };
 
 }

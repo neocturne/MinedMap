@@ -35,6 +35,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 #include <system_error>
 
 #include <sys/types.h>
@@ -138,18 +139,26 @@ static void doRegion(const std::string &input, const std::string &output, const 
 	}
 }
 
+template<typename T>
+static std::string format(const T &v) {
+	std::ostringstream s;
+
+	s << v;
+	return s.str();
+}
+
+static std::string formatTileName(int x, int z, const std::string &ext) {
+	std::ostringstream s;
+
+	s << "r." << x << "." << z << "." << ext;
+	return s.str();
+}
+
 static bool checkFilename(const char *name, int *x, int *z) {
 	if (std::sscanf(name, "r.%i.%i.mca", x, z) != 2)
 		return false;
 
-	size_t l = strlen(name) + 1;
-	char buf[l];
-	std::snprintf(buf, l, "r.%i.%i.mca", *x, *z);
-	if (std::memcmp(name, buf, l))
-		return false;
-
-	return true;
-
+	return (std::string(name) == formatTileName(*x, *z, "mca"));
 }
 
 static void makeDir(const std::string &name) {
@@ -157,7 +166,94 @@ static void makeDir(const std::string &name) {
 		throw std::system_error(errno, std::generic_category(), "unable to create directory " + name);
 }
 
-static void makeMipmaps(const std::string &outputdir, const Info &info) {
+static bool makeMipmap(const std::string &dir, size_t level, size_t x, size_t z, bool colored) {
+	bool ret = false;
+
+	std::string indir = dir + "/" + format(level-1) + "/";
+	std::string outdir = dir + "/" + format(level) + "/";
+
+	const std::string nw_str = indir + formatTileName(x*2, z*2, "png");
+	const std::string ne_str = indir + formatTileName(x*2+1, z*2, "png");
+	const std::string sw_str = indir + formatTileName(x*2, z*2+1, "png");
+	const std::string se_str = indir + formatTileName(x*2+1, z*2+1, "png");
+
+	const char *nw = nw_str.c_str();
+	const char *ne = ne_str.c_str();
+	const char *sw = sw_str.c_str();
+	const char *se = se_str.c_str();
+
+	struct timespec t;
+	struct stat s;
+	size_t count = 0;
+	for (auto name : {&nw, &ne, &sw, &se}) {
+		if (stat(*name, &s) < 0) {
+			*name = nullptr;
+			continue;
+		}
+
+		if (!count || s.st_mtim > t)
+			t = s.st_mtim;
+
+		count++;
+	}
+
+	std::string output = outdir + formatTileName(x, z, "png");
+	if (stat(output.c_str(), &s) == 0) {
+		ret = true;
+
+		if (!count || t <= s.st_mtim)
+			return ret;
+	}
+
+	if (!count)
+		return ret;
+
+	const std::string tmpfile = output + ".tmp";
+
+	try {
+		PNG::mipmap(tmpfile.c_str(), DIM, DIM, colored, nw, ne, sw, se);
+
+		struct timespec times[2] = {t, t};
+		if (utimensat(AT_FDCWD, tmpfile.c_str(), times, 0) < 0)
+			std::fprintf(stderr, "Warning: failed to set utime on %s: %s\n", tmpfile.c_str(), std::strerror(errno));
+
+		if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
+			std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
+			unlink(tmpfile.c_str());
+		}
+	}
+	catch (const std::exception& ex) {
+		unlink(tmpfile.c_str());
+		throw;
+	}
+
+	return true;
+}
+
+static void makeMipmaps(const std::string &dir, Info *info) {
+	int minX, maxX, minZ, maxZ;
+	std::tie(minX, maxX, minZ, maxZ) = info->getBounds(0);
+
+	while (minX < -1 || maxX > 0 || minZ < -1 || maxZ > 0) {
+		info->addMipmapLevel();
+		size_t level = info->getMipmapLevel();
+		makeDir(dir + "/map/" + format(level));
+		makeDir(dir + "/light/" + format(level));
+
+		minX = (minX-1)/2;
+		maxX = maxX/2;
+		minZ = (minZ-1)/2;
+		maxZ = maxZ/2;
+
+		for (int x = minX; x <= maxX; x++) {
+			for (int z = minZ; z <= maxZ; z++) {
+				if (makeMipmap(dir + "/map", level, x, z, true))
+					info->addRegion(x, z, level);
+
+				makeMipmap(dir + "/light", level, x, z, false);
+			}
+		}
+	}
 }
 
 }
@@ -196,7 +292,7 @@ int main(int argc, char *argv[]) {
 		if (!checkFilename(entry->d_name, &x, &z))
 			continue;
 
-		info.addRegion(x, z);
+		info.addRegion(x, z, 0);
 
 		std::string name(entry->d_name), outname = name.substr(0, name.length()-3) + "png";
 		doRegion(regiondir + "/" + name, outputdir + "/map/0/" + outname, outputdir + "/light/0/" + outname);
@@ -207,7 +303,7 @@ int main(int argc, char *argv[]) {
 	World::Level level((inputdir + "/level.dat").c_str());
 	info.setSpawn(level.getSpawn());
 
-	makeMipmaps(outputdir, info);
+	makeMipmaps(outputdir, &info);
 
 	info.writeJSON((outputdir + "/info.json").c_str());
 
