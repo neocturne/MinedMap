@@ -29,6 +29,7 @@
 #include "../NBT/CompoundTag.hpp"
 
 #include <cstdint>
+#include <vector>
 
 
 namespace MinedMap {
@@ -36,6 +37,8 @@ namespace World {
 
 class Level {
 private:
+	std::vector<uint8_t> buffer;
+
 	std::shared_ptr<const NBT::CompoundTag> root;
 	std::shared_ptr<const NBT::CompoundTag> data;
 

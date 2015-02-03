@@ -29,14 +29,12 @@
 #include "../Util.hpp"
 #include "../NBT/IntTag.hpp"
 
-#include <iostream>
-
 
 namespace MinedMap {
 namespace World {
 
 Level::Level(const char *filename) {
-	std::vector<uint8_t> buffer = readGZip(filename);
+	buffer = readGZip(filename);
 
 	Buffer nbt(buffer.data(), buffer.size());
 	std::pair<std::string, std::shared_ptr<const NBT::Tag>> tag = NBT::Tag::readNamedTag(&nbt);
