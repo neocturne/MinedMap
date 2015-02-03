@@ -130,7 +130,7 @@ static void readScaled(uint8_t *data, size_t offset_w, size_t offset_h, const ch
 
 	for (size_t h = 0; h < width/2; h++) {
 		for (size_t w = 0; w < width/2; w++) {
-			for (size_t c = 0; c < 4; c++) {
+			for (size_t c = 0; c < b; c++) {
 				size_t i = 2*b*(width*h + w) + c;
 				data[b*(width*(offset_h+h) + offset_w+w) + c] = (input[i] + input[i+b] + input[i+b*width] + input[i+b*width+b])/4;
 			}
