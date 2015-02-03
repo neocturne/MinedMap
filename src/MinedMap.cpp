@@ -52,6 +52,27 @@ namespace MinedMap {
 static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
 
 
+static inline bool operator<(const struct timespec &t1, const struct timespec &t2) {
+	return (t1.tv_sec < t2.tv_sec || (t1.tv_sec == t2.tv_sec && t1.tv_nsec < t2.tv_nsec));
+}
+
+static inline bool operator<=(const struct timespec &t1, const struct timespec &t2) {
+	return (t1.tv_sec < t2.tv_sec || (t1.tv_sec == t2.tv_sec && t1.tv_nsec <= t2.tv_nsec));
+}
+
+static inline bool operator>(const struct timespec &t1, const struct timespec &t2) {
+	return (t1.tv_sec > t2.tv_sec || (t1.tv_sec == t2.tv_sec && t1.tv_nsec > t2.tv_nsec));
+}
+
+static inline bool operator>=(const struct timespec &t1, const struct timespec &t2) {
+	return (t1.tv_sec >= t2.tv_sec || (t1.tv_sec == t2.tv_sec && t1.tv_nsec >= t2.tv_nsec));
+}
+
+static inline bool operator==(const struct timespec &t1, const struct timespec &t2) {
+	return (t1.tv_sec == t2.tv_sec && t1.tv_nsec == t2.tv_nsec);
+}
+
+
 static void addChunk(uint32_t image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z, const World::Chunk *chunk) {
 	World::Chunk::Blocks layer = chunk->getTopLayer();
 
@@ -96,11 +117,10 @@ static void doRegion(const std::string &input, const std::string &output, const 
 	}
 
 	if (stat(output.c_str(), &outstat) == 0) {
-		if (instat.st_mtim.tv_sec < outstat.st_mtim.tv_sec ||
-		    (instat.st_mtim.tv_sec == outstat.st_mtim.tv_sec && instat.st_mtim.tv_nsec <= outstat.st_mtim.tv_nsec)) {
-			    std::printf("%s is up-to-date.\n", output.c_str());
-			    return;
-		    }
+		if (instat.st_mtim <= outstat.st_mtim) {
+			std::printf("%s is up-to-date.\n", output.c_str());
+			return;
+		}
 	}
 
 	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
