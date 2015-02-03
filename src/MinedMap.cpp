@@ -35,6 +35,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
+#include <system_error>
 
 #include <sys/types.h>
 
@@ -46,8 +47,7 @@
 #include <unistd.h>
 
 
-using namespace MinedMap;
-
+namespace MinedMap {
 
 static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
 
@@ -85,7 +85,7 @@ static void doRegion(const std::string &input, const std::string &output) {
 		uint32_t image[DIM*DIM] = {};
 		World::Region::visitChunks(input.c_str(), [&image] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image, X, Z, chunk); });
 
-		writePNG(tmpfile.c_str(), image, DIM, DIM);
+		PNG::write(tmpfile.c_str(), reinterpret_cast<const uint8_t*>(image), DIM, DIM);
 
 		struct timespec times[2] = {instat.st_mtim, instat.st_mtim};
 		if (utimensat(AT_FDCWD, tmpfile.c_str(), times, 0) < 0)
@@ -116,7 +116,21 @@ static bool checkFilename(const char *name, int *x, int *z) {
 
 }
 
+static void makeDir(const std::string &name) {
+	if (mkdir(name.c_str(), 0777) < 0 && errno != EEXIST)
+		throw std::system_error(errno, std::generic_category(), "unable to create directory " + name);
+}
+
+static void makeMipmaps(const std::string &outputdir, const Info &info) {
+}
+
+}
+
+
 int main(int argc, char *argv[]) {
+	using namespace MinedMap;
+
+
 	if (argc < 3) {
 		std::fprintf(stderr, "Usage: %s <data directory> <output directory>\n", argv[0]);
 		return 1;
@@ -126,6 +140,9 @@ int main(int argc, char *argv[]) {
 	std::string regiondir = inputdir + "/region";
 
 	std::string outputdir(argv[2]);
+	std::string regionoutdir = outputdir + "/0";
+
+	makeDir(regionoutdir);
 
 	DIR *dir = opendir(regiondir.c_str());
 	if (!dir) {
@@ -144,13 +161,15 @@ int main(int argc, char *argv[]) {
 		info.addRegion(x, z);
 
 		std::string name(entry->d_name);
-		doRegion(regiondir + "/" + name, outputdir + "/" + name.substr(0, name.length()-3) + "png");
+		doRegion(regiondir + "/" + name, regionoutdir + "/" + name.substr(0, name.length()-3) + "png");
 	}
 
 	closedir(dir);
 
 	World::Level level((inputdir + "/level.dat").c_str());
 	info.setSpawn(level.getSpawn());
+
+	makeMipmaps(outputdir, info);
 
 	info.writeJSON((outputdir + "/info.json").c_str());
 
