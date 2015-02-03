@@ -66,6 +66,27 @@ static void addChunk(uint32_t image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_
 	}
 }
 
+static void writeImage(const std::string &output, const uint8_t *data, bool colored, const struct timespec *t) {
+	const std::string tmpfile = output + ".tmp";
+
+	try {
+		PNG::write(tmpfile.c_str(), data, DIM, DIM, colored);
+
+		struct timespec times[2] = {*t, *t};
+		if (utimensat(AT_FDCWD, tmpfile.c_str(), times, 0) < 0)
+			std::fprintf(stderr, "Warning: failed to set utime on %s: %s\n", tmpfile.c_str(), std::strerror(errno));
+
+		if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
+			std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
+			unlink(tmpfile.c_str());
+		}
+	}
+	catch (const std::exception& ex) {
+		unlink(tmpfile.c_str());
+		throw;
+	}
+}
+
 static void doRegion(const std::string &input, const std::string &output, const std::string &output_light) {
 	struct stat instat, outstat;
 
@@ -84,36 +105,16 @@ static void doRegion(const std::string &input, const std::string &output, const 
 
 	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
 
-	const std::string tmpfile = output + ".tmp";
-	const std::string tmpfile_light = output_light + ".tmp";
-
 	try {
 		uint32_t image[DIM*DIM] = {};
 		uint8_t lightmap[2*DIM*DIM] = {};
 		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image, lightmap, X, Z, chunk); });
 
-		PNG::write(tmpfile.c_str(), reinterpret_cast<const uint8_t*>(image), DIM, DIM, true);
-		PNG::write(tmpfile_light.c_str(), lightmap, DIM, DIM, false);
-
-		struct timespec times[2] = {instat.st_mtim, instat.st_mtim};
-		if (utimensat(AT_FDCWD, tmpfile.c_str(), times, 0) < 0)
-			std::fprintf(stderr, "Warning: failed to set utime on %s: %s\n", tmpfile.c_str(), std::strerror(errno));
-		if (utimensat(AT_FDCWD, tmpfile_light.c_str(), times, 0) < 0)
-			std::fprintf(stderr, "Warning: failed to set utime on %s: %s\n", tmpfile_light.c_str(), std::strerror(errno));
-
-		if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
-			std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
-			unlink(tmpfile.c_str());
-		}
-		if (std::rename(tmpfile_light.c_str(), output_light.c_str()) < 0) {
-			std::fprintf(stderr, "Unable to save %s: %s\n", output_light.c_str(), std::strerror(errno));
-			unlink(tmpfile_light.c_str());
-		}
+		writeImage(output, reinterpret_cast<const uint8_t*>(image), true, &instat.st_mtim);
+		writeImage(output_light, lightmap, false, &instat.st_mtim);
 	}
 	catch (const std::exception& ex) {
 		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
-		unlink(tmpfile.c_str());
-		unlink(tmpfile_light.c_str());
 	}
 }
 
