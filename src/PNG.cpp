@@ -29,6 +29,7 @@
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <memory>
 #include <system_error>
 
 #include <png.h>
@@ -125,8 +126,8 @@ static void readScaled(uint8_t *data, size_t offset_w, size_t offset_h, const ch
 
 	size_t b = (colored ? 4 : 2);
 
-	uint8_t input[4*width*height];
-	read(file, input, width, height, colored);
+	std::unique_ptr<uint8_t[]> input(new uint8_t[b*width*height]);
+	read(file, input.get(), width, height, colored);
 
 	for (size_t h = 0; h < width/2; h++) {
 		for (size_t w = 0; w < width/2; w++) {
@@ -139,15 +140,16 @@ static void readScaled(uint8_t *data, size_t offset_w, size_t offset_h, const ch
 }
 
 void mipmap(const char *output, size_t width, size_t height, bool colored, const char *nw, const char *ne, const char *sw, const char *se) {
-	uint8_t data[(colored ? 4 : 2)*width*height];
-	std::memset(data, 0, sizeof(data));
+	size_t size = (colored ? 4 : 2)*width*height;
+	std::unique_ptr<uint8_t[]> data(new uint8_t[size]);
+	std::memset(data.get(), 0, size);
 
-	readScaled(data, 0, 0, nw, width, height, colored);
-	readScaled(data, width/2, 0, ne, width, height, colored);
-	readScaled(data, 0, height/2, sw, width, height, colored);
-	readScaled(data, width/2, height/2, se, width, height, colored);
+	readScaled(data.get(), 0, 0, nw, width, height, colored);
+	readScaled(data.get(), width/2, 0, ne, width, height, colored);
+	readScaled(data.get(), 0, height/2, sw, width, height, colored);
+	readScaled(data.get(), width/2, height/2, se, width, height, colored);
 
-	write(output, data, width, height, colored);
+	write(output, data.get(), width, height, colored);
 }
 
 }

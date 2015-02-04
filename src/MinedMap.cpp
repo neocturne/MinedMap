@@ -127,12 +127,16 @@ static void doRegion(const std::string &input, const std::string &output, const 
 	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
 
 	try {
-		uint32_t image[DIM*DIM] = {};
-		uint8_t lightmap[2*DIM*DIM] = {};
-		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image, lightmap, X, Z, chunk); });
+		std::unique_ptr<uint32_t[]> image(new uint32_t[DIM*DIM]);
+		std::memset(image.get(), 0, 4*DIM*DIM);
 
-		writeImage(output, reinterpret_cast<const uint8_t*>(image), true, &instat.st_mtim);
-		writeImage(output_light, lightmap, false, &instat.st_mtim);
+		std::unique_ptr<uint8_t[]> lightmap(new uint8_t[2*DIM*DIM]);
+		std::memset(lightmap.get(), 0, 2*DIM*DIM);
+
+		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image.get(), lightmap.get(), X, Z, chunk); });
+
+		writeImage(output, reinterpret_cast<const uint8_t*>(image.get()), true, &instat.st_mtim);
+		writeImage(output_light, lightmap.get(), false, &instat.st_mtim);
 	}
 	catch (const std::exception& ex) {
 		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
