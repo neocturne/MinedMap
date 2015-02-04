@@ -78,6 +78,25 @@ var MinedMapLayer = L.GridLayer.extend({
 });
 
 
+var CoordControl = L.Control.extend({
+	initialize: function () {
+		this.options.position = 'bottomleft';
+	},
+
+	onAdd: function (map) {
+		this._container = L.DomUtil.create('div', 'leaflet-control-attribution');
+
+		return this._container;
+	},
+
+	update: function (x, z) {
+		if (!this._map) { return; }
+
+		this._container.innerHTML = 'X: ' + x + '&nbsp;&nbsp;&nbsp;Z: ' + z;
+	}
+});
+
+
 window.createMap = function () {
 	var xhr = new XMLHttpRequest();
 	xhr.onload = function () {
@@ -107,6 +126,13 @@ window.createMap = function () {
 		};
 
 		L.control.layers({}, overlayMaps).addTo(map);
+
+		var coordControl = new CoordControl();
+		coordControl.addTo(map);
+
+		map.on('mousemove', function(e) {
+			coordControl.update(Math.round(e.latlng.lng), Math.round(-e.latlng.lat));
+		});
 	};
 
 	xhr.open('GET', 'data/info.json', true);
