@@ -31,7 +31,7 @@ var MinedMapLayer = L.GridLayer.extend({
 		    mipmap.regions[coords.y-mipmap.info.minZ][coords.x-mipmap.info.minX])
 			tile.src = 'data/'+this.layer+'/'+z+'/r.'+coords.x+'.'+coords.y+'.png';
 
-		if (coords.z >= 0)
+		if (z == 0)
 			L.DomUtil.addClass(tile, 'overzoomed');
 
 		return tile;
