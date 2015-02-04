@@ -26,6 +26,7 @@
 
 #include "Info.hpp"
 
+#include <cerrno>
 #include <cstdio>
 #include <cstring>
 #include <string>
