@@ -122,18 +122,25 @@ window.createMap = function () {
 		    mipmaps = res.mipmaps,
 		    spawn = res.spawn;
 
-		var args = parseHash(),
-		    zoom = parseInt(args['zoom']),
-		    x = parseFloat(args['x']),
-		    z = parseFloat(args['z']),
-		    light = parseInt(args['light']);
+		var x, z, zoom, light;
 
-		if (isNaN(zoom))
-			zoom = 0;
-		if (isNaN(x))
-			x = spawn.x;
-		if (isNaN(z))
-			z = spawn.z;
+		var updateParams = function () {
+			var args = parseHash();
+
+			zoom = parseInt(args['zoom']);
+			x = parseFloat(args['x']);
+			z = parseFloat(args['z']);
+			light = parseInt(args['light']);
+
+			if (isNaN(zoom))
+				zoom = 0;
+			if (isNaN(x))
+				x = spawn.x;
+			if (isNaN(z))
+				z = spawn.z;
+		};
+
+		updateParams();
 
 		var map = L.map('map', {
 			center: [-z, x],
@@ -169,14 +176,13 @@ window.createMap = function () {
 		});
 
 		var makeHash = function () {
-			var zoom = map.getZoom(),
-			    center = map.getCenter(),
-			    x = Math.round(center.lng),
-			    z = Math.round(-center.lat),
-			    ret = '#x='+x+'&z='+z+'&zoom='+zoom;
+			var ret = '#x='+x+'&z='+z;
+
+			if (zoom != 0)
+				ret += '&zoom='+zoom;
 
 			if (map.hasLayer(lightLayer))
-			    ret += '&light=1';
+				ret += '&light=1';
 
 			return ret;
 		};
@@ -185,30 +191,27 @@ window.createMap = function () {
 			window.location.hash = makeHash();
 		};
 
+		var refreshHash = function () {
+			zoom = map.getZoom();
+			center = map.getCenter();
+			x = Math.round(center.lng);
+			z = Math.round(-center.lat);
+
+			updateHash();
+		}
+
 		updateHash();
 
-		map.on('moveend', updateHash);
-		map.on('zoomend', updateHash);
-		map.on('layeradd', updateHash);
-		map.on('layerremove', updateHash);
+		map.on('moveend', refreshHash);
+		map.on('zoomend', refreshHash);
+		map.on('layeradd', refreshHash);
+		map.on('layerremove', refreshHash);
 
 		window.onhashchange = function () {
 			if (window.location.hash == makeHash())
 				return;
 
-			var args = parseHash(),
-			    center = map.getCenter(),
-			    zoom = parseInt(args['zoom']),
-			    x = parseFloat(args['x']),
-			    z = parseFloat(args['z']),
-			    light = parseInt(args['light']);
-
-			if (isNaN(zoom))
-				zoom = map.getZoom();
-			if (isNaN(x))
-				x = center.lng;
-			if (isNaN(z))
-				z = -center.lat;
+			updateParams();
 
 			map.setView([-z, x], zoom);
 
@@ -216,6 +219,8 @@ window.createMap = function () {
 				map.addLayer(lightLayer);
 			else
 				map.removeLayer(lightLayer);
+
+			updateHash();
 		};
 
 	};
