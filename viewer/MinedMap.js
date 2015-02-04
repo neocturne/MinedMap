@@ -97,6 +97,24 @@ var CoordControl = L.Control.extend({
 });
 
 
+var parseHash = function () {
+	var args = {};
+
+	if (window.location.hash) {
+		var parts = window.location.hash.substr(1).split('&');
+
+		for (var i = 0; i < parts.length; i++) {
+			var key_value = parts[i].split('=');
+			var key = key_value[0], value = key_value.slice(1).join('=');
+
+			args[key] = value;
+		}
+	}
+
+	return args;
+}
+
+
 window.createMap = function () {
 	var xhr = new XMLHttpRequest();
 	xhr.onload = function () {
@@ -104,9 +122,22 @@ window.createMap = function () {
 		    mipmaps = res.mipmaps,
 		    spawn = res.spawn;
 
+		var args = parseHash(),
+		    zoom = parseInt(args['zoom']),
+		    x = parseFloat(args['x']),
+		    z = parseFloat(args['z']),
+		    light = parseInt(args['light']);
+
+		if (isNaN(zoom))
+			zoom = 0;
+		if (isNaN(x))
+			x = spawn.x;
+		if (isNaN(z))
+			z = spawn.z;
+
 		var map = L.map('map', {
-			center: [-spawn.z, spawn.x],
-			zoom: 0,
+			center: [-z, x],
+			zoom: zoom,
 			minZoom: -(mipmaps.length-1),
 			maxZoom: 3,
 			crs: L.CRS.Simple,
@@ -121,6 +152,9 @@ window.createMap = function () {
 
 		mapLayer.addTo(map);
 
+		if (light)
+			map.addLayer(lightLayer);
+
 		var overlayMaps = {
 			"Illumination": lightLayer,
 		};
@@ -133,6 +167,55 @@ window.createMap = function () {
 		map.on('mousemove', function(e) {
 			coordControl.update(Math.round(e.latlng.lng), Math.round(-e.latlng.lat));
 		});
+
+		var makeHash = function () {
+			var zoom = map.getZoom(),
+			    center = map.getCenter(),
+			    x = Math.round(center.lng),
+			    z = Math.round(-center.lat),
+			    ret = '#x='+x+'&z='+z+'&zoom='+zoom;
+
+			if (map.hasLayer(lightLayer))
+			    ret += '&light=1';
+
+			return ret;
+		};
+
+		var updateHash = function () {
+			window.location.hash = makeHash();
+		};
+
+		map.on('moveend', updateHash);
+		map.on('zoomend', updateHash);
+		map.on('layeradd', updateHash);
+		map.on('layerremove', updateHash);
+
+		window.onhashchange = function () {
+			if (window.location.hash == makeHash())
+				return;
+
+			var args = parseHash(),
+			    center = map.getCenter(),
+			    zoom = parseInt(args['zoom']),
+			    x = parseFloat(args['x']),
+			    z = parseFloat(args['z']),
+			    light = parseInt(args['light']);
+
+			if (isNaN(zoom))
+				zoom = map.getZoom();
+			if (isNaN(x))
+				x = center.lng;
+			if (isNaN(z))
+				z = -center.lat;
+
+			map.setView([-z, x], zoom);
+
+			if (light)
+				map.addLayer(lightLayer);
+			else
+				map.removeLayer(lightLayer);
+		};
+
 	};
 
 	xhr.open('GET', 'data/info.json', true);
