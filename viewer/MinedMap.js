@@ -185,6 +185,8 @@ window.createMap = function () {
 			window.location.hash = makeHash();
 		};
 
+		updateHash();
+
 		map.on('moveend', updateHash);
 		map.on('zoomend', updateHash);
 		map.on('layeradd', updateHash);
