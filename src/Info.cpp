@@ -30,7 +30,6 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
-#include <unistd.h>
 
 
 namespace MinedMap {
@@ -38,64 +37,64 @@ namespace MinedMap {
 void Info::writeJSON(const char *filename) const {
 	const std::string tmpfile = std::string(filename) + ".tmp";
 
-	FILE *f = fopen(tmpfile.c_str(), "w");
+	FILE *f = std::fopen(tmpfile.c_str(), "w");
 	if (!f) {
 		std::fprintf(stderr, "Unable to open %s: %s\n", tmpfile.c_str(), std::strerror(errno));
 		return;
 	}
 
-	fprintf(f, "{\n");
-	fprintf(f, "  \"mipmaps\" : [\n");
+	std::fprintf(f, "{\n");
+	std::fprintf(f, "  \"mipmaps\" : [\n");
 
 	for (size_t level = 0; level < regions.size(); level++) {
 		int minX, maxX, minZ, maxZ;
 		std::tie(minX, maxX, minZ, maxZ) = getBounds(level);
 
-		fprintf(f, "    {\n");
-		fprintf(f, "      \"info\" : {\n");
-		fprintf(f, "        \"minX\" : %i,\n", minX);
-		fprintf(f, "        \"maxX\" : %i,\n", maxX);
-		fprintf(f, "        \"minZ\" : %i,\n", minZ);
-		fprintf(f, "        \"maxZ\" : %i\n", maxZ);
-		fprintf(f, "      },\n");
-		fprintf(f, "      \"regions\" : [\n");
+		std::fprintf(f, "    {\n");
+		std::fprintf(f, "      \"info\" : {\n");
+		std::fprintf(f, "        \"minX\" : %i,\n", minX);
+		std::fprintf(f, "        \"maxX\" : %i,\n", maxX);
+		std::fprintf(f, "        \"minZ\" : %i,\n", minZ);
+		std::fprintf(f, "        \"maxZ\" : %i\n", maxZ);
+		std::fprintf(f, "      },\n");
+		std::fprintf(f, "      \"regions\" : [\n");
 
 		for (int z = minZ; z <= maxZ; z++) {
-			fprintf(f, "        [");
+			std::fprintf(f, "        [");
 
 			for (int x = minX; x <= maxX; x++) {
-				fprintf(f, "%s", regions[level].count(std::make_pair(x, z)) ? "true" : "false");
+				std::fprintf(f, "%s", regions[level].count(std::make_pair(x, z)) ? "true" : "false");
 
 				if (x < maxX)
-					fprintf(f, ", ");
+					std::fprintf(f, ", ");
 			}
 
 			if (z < maxZ)
-				fprintf(f, "],\n");
+				std::fprintf(f, "],\n");
 			else
-				fprintf(f, "]\n");
+				std::fprintf(f, "]\n");
 		}
 
-		fprintf(f, "      ]\n");
+		std::fprintf(f, "      ]\n");
 
 		if (level < regions.size() - 1)
-			fprintf(f, "    },\n");
+			std::fprintf(f, "    },\n");
 		else
-			fprintf(f, "    }\n");
+			std::fprintf(f, "    }\n");
 	}
 
-	fprintf(f, "  ],\n");
-	fprintf(f, "  \"spawn\" : {\n");
-	fprintf(f, "    \"x\" : %li,\n", (long)spawnX);
-	fprintf(f, "    \"z\" : %li\n", (long)spawnZ);
-	fprintf(f, "  }\n");
-	fprintf(f, "}\n");
+	std::fprintf(f, "  ],\n");
+	std::fprintf(f, "  \"spawn\" : {\n");
+	std::fprintf(f, "    \"x\" : %li,\n", (long)spawnX);
+	std::fprintf(f, "    \"z\" : %li\n", (long)spawnZ);
+	std::fprintf(f, "  }\n");
+	std::fprintf(f, "}\n");
 
-	fclose(f);
+	std::fclose(f);
 
 	if (std::rename(tmpfile.c_str(), filename) < 0) {
 		std::fprintf(stderr, "Unable to save %s: %s\n", filename, std::strerror(errno));
-		unlink(tmpfile.c_str());
+		std::remove(tmpfile.c_str());
 	}
 }
 

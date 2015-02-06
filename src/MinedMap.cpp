@@ -45,7 +45,6 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-#include <unistd.h>
 
 
 namespace MinedMap {
@@ -100,11 +99,11 @@ static void writeImage(const std::string &output, const uint8_t *data, bool colo
 
 		if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
 			std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
-			unlink(tmpfile.c_str());
+			std::remove(tmpfile.c_str());
 		}
 	}
 	catch (const std::exception& ex) {
-		unlink(tmpfile.c_str());
+		std::remove(tmpfile.c_str());
 		throw;
 	}
 }
@@ -223,11 +222,11 @@ static bool makeMipmap(const std::string &dir, size_t level, size_t x, size_t z,
 
 		if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
 			std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
-			unlink(tmpfile.c_str());
+			std::remove(tmpfile.c_str());
 		}
 	}
 	catch (const std::exception& ex) {
-		unlink(tmpfile.c_str());
+		std::remove(tmpfile.c_str());
 		throw;
 	}
 
