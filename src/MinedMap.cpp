@@ -83,7 +83,7 @@ static void addChunk(uint32_t image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_
 			const World::Block &block = layer.blocks[x][z];
 
 			image[i] = htonl(block.getColor());
-			lightmap[2*i+1] = (1 - block.getBlockLight()/15.f)*128;
+			lightmap[2*i+1] = (1 - block.getBlockLight()/15.f)*192;
 		}
 	}
 }
