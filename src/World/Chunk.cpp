@@ -99,8 +99,7 @@ void Chunk::parseChunk() {
 
 void Chunk::analyzeChunk() {
 	std::shared_ptr<const NBT::ByteTag> lightPopulatedTag = level->get<NBT::ByteTag>("LightPopulated");
-	if (!(lightPopulatedTag && lightPopulatedTag->getValue()))
-		throw std::invalid_argument("light data missing");
+	bool lightPopulated = lightPopulatedTag && lightPopulatedTag->getValue();
 
 	sections = assertValue(level->get<NBT::ListTag<NBT::CompoundTag>>("Sections"));
 	maxY = (assertValue(sections->back()->get<NBT::ByteTag>("Y"))->getValue() + 1) * SIZE;
@@ -126,18 +125,24 @@ void Chunk::analyzeChunk() {
 	for (auto &section : *sections) {
 		std::shared_ptr<const NBT::ByteArrayTag> blocks = assertValue(section->get<NBT::ByteArrayTag>("Blocks"));
 		std::shared_ptr<const NBT::ByteArrayTag> data = assertValue(section->get<NBT::ByteArrayTag>("Data"));
-		std::shared_ptr<const NBT::ByteArrayTag> blockLight = assertValue(section->get<NBT::ByteArrayTag>("BlockLight"));
-		std::shared_ptr<const NBT::ByteArrayTag> skyLight = assertValue(section->get<NBT::ByteArrayTag>("SkyLight"));
 		size_t Y = assertValue(section->get<NBT::ByteTag>("Y"))->getValue();
 
-		if (blocks->getLength() != SIZE*SIZE*SIZE || data->getLength() != SIZE*SIZE*SIZE/2
-		    || blockLight->getLength() != SIZE*SIZE*SIZE/2 || skyLight->getLength() != SIZE*SIZE*SIZE/2)
+		if (blocks->getLength() != SIZE*SIZE*SIZE || data->getLength() != SIZE*SIZE*SIZE/2)
 			throw std::invalid_argument("corrupt chunk data");
+
+		if (lightPopulated) {
+			std::shared_ptr<const NBT::ByteArrayTag> blockLight = assertValue(section->get<NBT::ByteArrayTag>("BlockLight"));
+			std::shared_ptr<const NBT::ByteArrayTag> skyLight = assertValue(section->get<NBT::ByteArrayTag>("SkyLight"));
+
+			if (blockLight->getLength() != SIZE*SIZE*SIZE/2 || skyLight->getLength() != SIZE*SIZE*SIZE/2)
+				throw std::invalid_argument("corrupt chunk data");
+
+			std::memcpy(blockBlockLight.get() + Y*SIZE*SIZE*SIZE/2, blockLight->getValue(), SIZE*SIZE*SIZE/2);
+			std::memcpy(blockSkyLight.get() + Y*SIZE*SIZE*SIZE/2, skyLight->getValue(), SIZE*SIZE*SIZE/2);
+		}
 
 		std::memcpy(blockIDs.get() + Y*SIZE*SIZE*SIZE, blocks->getValue(), SIZE*SIZE*SIZE);
 		std::memcpy(blockData.get() + Y*SIZE*SIZE*SIZE/2, data->getValue(), SIZE*SIZE*SIZE/2);
-		std::memcpy(blockBlockLight.get() + Y*SIZE*SIZE*SIZE/2, blockLight->getValue(), SIZE*SIZE*SIZE/2);
-		std::memcpy(blockSkyLight.get() + Y*SIZE*SIZE*SIZE/2, skyLight->getValue(), SIZE*SIZE*SIZE/2);
 	}
 }
 
