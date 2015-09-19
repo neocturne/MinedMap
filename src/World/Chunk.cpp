@@ -99,7 +99,7 @@ void Chunk::parseChunk() {
 
 void Chunk::analyzeChunk() {
 	std::shared_ptr<const NBT::ByteTag> lightPopulatedTag = level->get<NBT::ByteTag>("LightPopulated");
-	if (!lightPopulatedTag && lightPopulatedTag->getValue())
+	if (!(lightPopulatedTag && lightPopulatedTag->getValue()))
 		throw std::invalid_argument("light data missing");
 
 	sections = assertValue(level->get<NBT::ListTag<NBT::CompoundTag>>("Sections"));
