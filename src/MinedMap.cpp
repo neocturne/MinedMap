@@ -30,6 +30,7 @@
 #include "World/Region.hpp"
 
 #include <cerrno>
+#include <cinttypes>
 #include <climits>
 #include <cstdio>
 #include <cstring>
@@ -44,33 +45,11 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <sys/time.h>
 
 
 namespace MinedMap {
 
 static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
-
-
-static inline bool operator<(const struct timespec &t1, const struct timespec &t2) {
-	return (t1.tv_sec < t2.tv_sec || (t1.tv_sec == t2.tv_sec && t1.tv_nsec < t2.tv_nsec));
-}
-
-static inline bool operator<=(const struct timespec &t1, const struct timespec &t2) {
-	return (t1.tv_sec < t2.tv_sec || (t1.tv_sec == t2.tv_sec && t1.tv_nsec <= t2.tv_nsec));
-}
-
-static inline bool operator>(const struct timespec &t1, const struct timespec &t2) {
-	return (t1.tv_sec > t2.tv_sec || (t1.tv_sec == t2.tv_sec && t1.tv_nsec > t2.tv_nsec));
-}
-
-static inline bool operator>=(const struct timespec &t1, const struct timespec &t2) {
-	return (t1.tv_sec > t2.tv_sec || (t1.tv_sec == t2.tv_sec && t1.tv_nsec >= t2.tv_nsec));
-}
-
-static inline bool operator==(const struct timespec &t1, const struct timespec &t2) {
-	return (t1.tv_sec == t2.tv_sec && t1.tv_nsec == t2.tv_nsec);
-}
 
 
 static void addChunk(uint32_t image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z, const World::Chunk *chunk) {
@@ -87,20 +66,38 @@ static void addChunk(uint32_t image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_
 	}
 }
 
-static void writeImage(const std::string &output, const uint8_t *data, bool colored, const struct timespec *t) {
+static int64_t readStamp(const std::string &filename) {
+	int64_t v = INT64_MIN;
+
+	std::FILE *f = std::fopen((filename + ".stamp").c_str(), "r");
+	if (f) {
+		std::fscanf(f, "%" SCNd64, &v);
+		std::fclose(f);
+	}
+
+	return v;
+}
+
+static void writeStamp(const std::string &filename, int64_t v) {
+	std::FILE *f = std::fopen((filename + ".stamp").c_str(), "w");
+	if (f) {
+		std::fprintf(f, "%" PRId64, v);
+		std::fclose(f);
+	}
+}
+
+static void writeImage(const std::string &output, const uint8_t *data, bool colored, int64_t t) {
 	const std::string tmpfile = output + ".tmp";
 
 	try {
 		PNG::write(tmpfile.c_str(), data, DIM, DIM, colored);
 
-		struct timespec times[2] = {*t, *t};
-		if (utimensat(AT_FDCWD, tmpfile.c_str(), times, 0) < 0)
-			std::fprintf(stderr, "Warning: failed to set utime on %s: %s\n", tmpfile.c_str(), std::strerror(errno));
-
 		if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
 			std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
 			std::remove(tmpfile.c_str());
 		}
+
+		writeStamp(output, t);
 	}
 	catch (const std::exception& ex) {
 		std::remove(tmpfile.c_str());
@@ -109,17 +106,27 @@ static void writeImage(const std::string &output, const uint8_t *data, bool colo
 }
 
 static void doRegion(const std::string &input, const std::string &output, const std::string &output_light) {
-	struct stat instat, outstat;
+	int64_t intime;
 
-	if (stat(input.c_str(), &instat) < 0) {
-		std::fprintf(stderr, "Unable to stat %s: %s\n", input.c_str(), std::strerror(errno));
-		return;
+	{
+		struct stat instat;
+
+		if (stat(input.c_str(), &instat) < 0) {
+			std::fprintf(stderr, "Unable to stat %s: %s\n", input.c_str(), std::strerror(errno));
+			return;
+		}
+
+		intime = (int64_t)instat.st_mtim.tv_sec * 1000000 + instat.st_mtim.tv_nsec / 1000;
 	}
 
-	if (stat(output.c_str(), &outstat) == 0) {
-		if (instat.st_mtim <= outstat.st_mtim) {
-			std::printf("%s is up-to-date.\n", output.c_str());
-			return;
+	{
+		struct stat s;
+		if (stat(output.c_str(), &s) == 0) {
+			int64_t outtime = readStamp(output);
+			if (intime <= outtime) {
+				std::printf("%s is up-to-date.\n", output.c_str());
+				return;
+			}
 		}
 	}
 
@@ -134,8 +141,8 @@ static void doRegion(const std::string &input, const std::string &output, const 
 
 		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image.get(), lightmap.get(), X, Z, chunk); });
 
-		writeImage(output, reinterpret_cast<const uint8_t*>(image.get()), true, &instat.st_mtim);
-		writeImage(output_light, lightmap.get(), false, &instat.st_mtim);
+		writeImage(output, reinterpret_cast<const uint8_t*>(image.get()), true, intime);
+		writeImage(output_light, lightmap.get(), false, intime);
 	}
 	catch (const std::exception& ex) {
 		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
@@ -185,27 +192,33 @@ static bool makeMipmap(const std::string &dir, size_t level, size_t x, size_t z,
 	const char *sw = sw_str.c_str();
 	const char *se = se_str.c_str();
 
-	struct timespec t;
-	struct stat s;
+	int64_t t = INT64_MIN;
 	size_t count = 0;
 	for (auto name : {&nw, &ne, &sw, &se}) {
+		struct stat s;
 		if (stat(*name, &s) < 0) {
 			*name = nullptr;
 			continue;
 		}
 
-		if (!count || s.st_mtim > t)
-			t = s.st_mtim;
+		int64_t t_part = readStamp(*name);
+		if (t_part > t)
+			t = t_part;
 
 		count++;
 	}
 
 	std::string output = outdir + formatTileName(x, z, "png");
-	if (stat(output.c_str(), &s) == 0) {
-		ret = true;
 
-		if (!count || t <= s.st_mtim)
-			return ret;
+	{
+		struct stat s;
+		if (stat(output.c_str(), &s) == 0) {
+			ret = true;
+
+			int64_t outtime = readStamp(output);
+			if (t <= outtime)
+				return ret;
+		}
 	}
 
 	if (!count)
@@ -216,14 +229,12 @@ static bool makeMipmap(const std::string &dir, size_t level, size_t x, size_t z,
 	try {
 		PNG::mipmap(tmpfile.c_str(), DIM, DIM, colored, nw, ne, sw, se);
 
-		struct timespec times[2] = {t, t};
-		if (utimensat(AT_FDCWD, tmpfile.c_str(), times, 0) < 0)
-			std::fprintf(stderr, "Warning: failed to set utime on %s: %s\n", tmpfile.c_str(), std::strerror(errno));
-
 		if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
 			std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
 			std::remove(tmpfile.c_str());
 		}
+
+		writeStamp(output, t);
 	}
 	catch (const std::exception& ex) {
 		std::remove(tmpfile.c_str());
