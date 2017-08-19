@@ -34,10 +34,10 @@ namespace Resource {
 struct BlockType {
 	bool opaque;
 	bool green;
-	uint32_t colors[16];
+	uint32_t color;
 };
 
-extern const BlockType BLOCK_TYPES[256];
+extern const BlockType BLOCK_TYPES[256][16];
 
 }
 }

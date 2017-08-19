@@ -33,16 +33,14 @@ namespace MinedMap {
 namespace World {
 
 uint32_t Block::getColor() const {
-	const Resource::BlockType &t = Resource::BLOCK_TYPES[id];
+	const Resource::BlockType &t = Resource::BLOCK_TYPES[id][data];
 
 	if (!t.opaque)
 		return 0;
 
-	uint32_t color = t.colors[data];
-
-	unsigned r = uint8_t(color >> 16);
-	unsigned g = uint8_t(color >> 8);
-	unsigned b = uint8_t(color);
+	unsigned r = uint8_t(t.color >> 16);
+	unsigned g = uint8_t(t.color >> 8);
+	unsigned b = uint8_t(t.color);
 
 	float heightCoef = height/255.0f + 0.5f;
 
