@@ -26,3 +26,13 @@ add_executable(nbtdump
 )
 set_target_properties(nbtdump PROPERTIES COMPILE_FLAGS "-std=c++11 -Wall")
 target_link_libraries(nbtdump ${ZLIB_LIBRARIES})
+
+add_executable(regiondump
+  regiondump.cpp
+  GZip.cpp
+  NBT/Tag.cpp
+  World/ChunkData.cpp
+  World/Region.cpp
+)
+set_target_properties(regiondump PROPERTIES COMPILE_FLAGS "-std=c++11 -Wall")
+target_link_libraries(regiondump ${ZLIB_LIBRARIES})
