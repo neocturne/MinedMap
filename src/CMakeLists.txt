@@ -12,6 +12,7 @@ add_executable(MinedMap
   Resource/BlockType.cpp
   World/Block.cpp
   World/Chunk.cpp
+  World/ChunkData.cpp
   World/Level.cpp
   World/Region.cpp
 )

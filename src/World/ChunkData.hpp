@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2018, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -26,34 +26,34 @@
 
 #pragma once
 
-#include "Chunk.hpp"
 
-#include <functional>
-#include <memory>
-#include <stdexcept>
-#include <tuple>
-#include <unordered_map>
+#include "../Buffer.hpp"
+#include "../UniqueCPtr.hpp"
+#include "../Util.hpp"
+#include "../NBT/CompoundTag.hpp"
+
+#include <cstdint>
 
 
 namespace MinedMap {
 namespace World {
 
-class Region {
-public:
-	static const size_t SIZE = 32;
-
-	typedef std::function<void (size_t, size_t, const ChunkData *)> ChunkVisitor;
-
-	Region() = delete;
-
+class ChunkData {
 private:
-	typedef std::tuple<size_t, size_t, size_t> ChunkDesc;
-	typedef std::unordered_map<size_t, ChunkDesc> ChunkMap;
+	size_t len;
+	UniqueCPtr<uint8_t[]> data;
 
-	static ChunkMap processHeader(const uint8_t header[4096]);
+	std::shared_ptr<const NBT::CompoundTag> root;
+
+	void inflateChunk(Buffer buffer);
+	void parseChunk();
 
 public:
-	static void visitChunks(const char *filename, const ChunkVisitor &visitor);
+	ChunkData(Buffer buffer);
+
+	const NBT::CompoundTag & getRoot() const {
+		return *root;
+	}
 };
 
 }

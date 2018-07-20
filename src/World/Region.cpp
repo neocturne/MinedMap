@@ -91,7 +91,7 @@ void Region::visitChunks(const char *filename, const ChunkVisitor &visitor) {
 		uint8_t buffer[len * 4096];
 		file.read((char *)buffer, len * 4096);
 
-		Chunk chunk(Buffer(buffer, len * 4096));
+		ChunkData chunk(Buffer(buffer, len * 4096));
 		visitor(x, z, &chunk);
 
 		i += len;

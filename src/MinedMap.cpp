@@ -52,8 +52,9 @@ namespace MinedMap {
 static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
 
 
-static void addChunk(uint32_t image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z, const World::Chunk *chunk) {
-	World::Chunk::Blocks layer = chunk->getTopLayer();
+static void addChunk(uint32_t image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z, const World::ChunkData *data) {
+	World::Chunk chunk(data);
+	World::Chunk::Blocks layer = chunk.getTopLayer();
 
 	for (size_t x = 0; x < World::Chunk::SIZE; x++) {
 		for (size_t z = 0; z < World::Chunk::SIZE; z++) {
@@ -139,7 +140,7 @@ static void doRegion(const std::string &input, const std::string &output, const 
 		std::unique_ptr<uint8_t[]> lightmap(new uint8_t[2*DIM*DIM]);
 		std::memset(lightmap.get(), 0, 2*DIM*DIM);
 
-		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::Chunk *chunk) { addChunk(image.get(), lightmap.get(), X, Z, chunk); });
+		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::ChunkData *chunk) { addChunk(image.get(), lightmap.get(), X, Z, chunk); });
 
 		writeImage(output, reinterpret_cast<const uint8_t*>(image.get()), true, intime);
 		writeImage(output_light, lightmap.get(), false, intime);

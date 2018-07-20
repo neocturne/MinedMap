@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2018, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,8 @@
 
 
 #include "Block.hpp"
-#include "../Buffer.hpp"
-#include "../UniqueCPtr.hpp"
+#include "ChunkData.hpp"
 #include "../Util.hpp"
-#include "../NBT/CompoundTag.hpp"
 #include "../NBT/ListTag.hpp"
 #include "../NBT/ByteTag.hpp"
 #include "../NBT/ByteArrayTag.hpp"
@@ -53,10 +51,6 @@ public:
 
 
 private:
-	size_t len;
-	UniqueCPtr<uint8_t[]> data;
-
-	std::shared_ptr<const NBT::CompoundTag> root;
 	std::shared_ptr<const NBT::CompoundTag> level;
 	std::shared_ptr<const NBT::ListTag<NBT::CompoundTag>> sections;
 
@@ -106,13 +100,8 @@ private:
 		return biomes[z*SIZE + x];
 	}
 
-
-	void inflateChunk(Buffer buffer);
-	void parseChunk();
-	void analyzeChunk();
-
 public:
-	Chunk(Buffer buffer);
+	Chunk(const ChunkData *data);
 
 	const NBT::CompoundTag & getLevel() const {
 		return *level;
