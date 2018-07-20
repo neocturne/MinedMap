@@ -50,6 +50,24 @@ public:
 	virtual Type getType() const {
 		return Type::IntArray;
 	}
+
+	virtual void print(std::ostream& os, const std::string &indent) const {
+		os << "(" << len << ") [" << std::endl;
+
+		std::string inner = indent + "  ";
+
+		for (size_t i = 0; i < len; i++) {
+			uint32_t v = Buffer::parse32(&ptr[4*i]);
+
+			os << inner
+			   << v << " / "
+			   << (int32_t)v << " / "
+			   << std::hex << "0x" << v << std::dec
+			   << std::endl;
+		}
+
+		os << indent << "]";
+	}
 };
 
 }

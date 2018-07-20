@@ -60,11 +60,18 @@ public:
 	static std::pair<std::string, std::shared_ptr<const Tag>> readNamedTag(Buffer *buffer);
 
 	virtual Type getType() const = 0;
+	virtual void print(std::ostream& os, const std::string &indent) const = 0;
 
 	virtual ~Tag() {}
 };
 
 std::ostream& operator<<(std::ostream& os, Tag::Type type);
+
+static inline std::ostream& operator<<(std::ostream& os, const Tag &tag) {
+	os << tag.getType() << " ";
+	tag.print(os, "");
+	return os;
+}
 
 }
 }

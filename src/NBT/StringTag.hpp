@@ -48,6 +48,10 @@ public:
 	virtual Type getType() const {
 		return Type::String;
 	}
+
+	virtual void print(std::ostream& os, const std::string &) const {
+		os << "\"" << std::string(reinterpret_cast<const char *>(ptr), len) << "\"";
+	}
 };
 
 }

@@ -54,6 +54,20 @@ public:
 		return Type::Compound;
 	}
 
+	virtual void print(std::ostream& os, const std::string &indent) const {
+		os << "{" << std::endl;
+
+		std::string inner = indent + "  ";
+
+		for (const auto &item : *this) {
+			os << inner << item.first << ": " << item.second->getType() << " ";
+			item.second->print(os, inner);
+			os << std::endl;
+		}
+
+		os << indent << "}";
+	}
+
 	template<typename T> std::shared_ptr<const T> get(const std::string &key) const {
 		auto it = find(key);
 		if (it == end())

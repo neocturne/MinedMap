@@ -42,6 +42,9 @@ public:
 	virtual Type getType() const {
 		return Type::End;
 	}
+
+	virtual void print(std::ostream&, const std::string &) const {
+	}
 };
 
 }

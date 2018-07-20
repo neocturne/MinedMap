@@ -65,6 +65,20 @@ public:
 	virtual Type getSubtype() const {
 		return type;
 	}
+
+	virtual void print(std::ostream& os, const std::string &indent) const {
+		os << getSubtype() << " [" << std::endl;
+
+		std::string inner = indent + "  ";
+
+		for (const auto &item : *this) {
+			os << inner;
+			item->print(os, inner);
+			os << std::endl;
+		}
+
+		os << indent << "]";
+	}
 };
 
 }

@@ -17,3 +17,11 @@ add_executable(MinedMap
 )
 set_target_properties(MinedMap PROPERTIES COMPILE_FLAGS "-std=c++11 -Wall")
 target_link_libraries(MinedMap ${ZLIB_LIBRARIES} ${PNG_LIBRARIES})
+
+add_executable(nbtdump
+  nbtdump.cpp
+  GZip.cpp
+  NBT/Tag.cpp
+)
+set_target_properties(nbtdump PROPERTIES COMPILE_FLAGS "-std=c++11 -Wall")
+target_link_libraries(nbtdump ${ZLIB_LIBRARIES})

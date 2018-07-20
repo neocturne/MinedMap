@@ -47,6 +47,12 @@ public:
 		return Type::Long;
 	}
 
+	virtual void print(std::ostream& os, const std::string &) const {
+		os << getValue() << " / "
+		   << (int64_t)getValue() << " / "
+		   << std::hex << "0x" << getValue() << std::dec;
+	}
+
 	uint64_t getValue() const {
 		return Buffer::parse64(ptr);
 	}

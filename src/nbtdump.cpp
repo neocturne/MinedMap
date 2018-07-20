@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2018, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,39 +24,32 @@
 */
 
 
-#pragma once
+#include "Buffer.hpp"
+#include "GZip.hpp"
+#include "Util.hpp"
+#include "NBT/Tag.hpp"
 
-#include "Tag.hpp"
+#include <cstdio>
+#include <iostream>
+#include <stdexcept>
 
 
-namespace MinedMap {
-namespace NBT {
+int main(int argc, char *argv[]) {
+	using namespace MinedMap;
 
-class DoubleTag : public Tag {
-private:
-	friend class Tag;
-
-	const uint8_t *ptr;
-
-	DoubleTag(Buffer *buffer) {
-		ptr = buffer->get(8);
+	if (argc != 2) {
+		std::fprintf(stderr, "Usage: %s <nbtfile>\n", argv[0]);
+		return 1;
 	}
 
-public:
-	virtual Type getType() const {
-		return Type::Double;
-	}
+	std::vector<uint8_t> buffer = readGZip(argv[1]);
 
-	virtual void print(std::ostream& os, const std::string &) const {
-		union {
-			uint64_t i;
-			double d;
-		};
+	Buffer nbt(buffer.data(), buffer.size());
+	std::pair<std::string, std::shared_ptr<const NBT::Tag>> tag = NBT::Tag::readNamedTag(&nbt);
+	if (tag.first != "")
+		throw std::invalid_argument("invalid root tag");
 
-		i = Buffer::parse64(ptr);
-		os << d;
-	}
-};
+	std::cout << *tag.second << std::endl;
 
-}
+	return 0;
 }

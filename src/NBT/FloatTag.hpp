@@ -46,6 +46,16 @@ public:
 	virtual Type getType() const {
 		return Type::Float;
 	}
+
+	virtual void print(std::ostream& os, const std::string &) const {
+		union {
+			uint32_t i;
+			float f;
+		};
+
+		i = Buffer::parse32(ptr);
+		os << f;
+	}
 };
 
 }

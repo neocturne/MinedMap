@@ -51,6 +51,24 @@ public:
 		return Type::ByteArray;
 	}
 
+	virtual void print(std::ostream& os, const std::string &indent) const {
+		os << "(" << len << ") [" << std::endl;
+
+		std::string inner = indent + "  ";
+
+		for (size_t i = 0; i < len; i++) {
+			uint8_t v = value[i];
+
+			os << inner
+			   << (unsigned)v << " / "
+			   << (int)(int8_t)v << " / "
+			   << std::hex << "0x" << (unsigned)v << std::dec
+			   << std::endl;
+		}
+
+		os << indent << "]";
+	}
+
 	uint32_t getLength() const {
 		return len;
 	}

@@ -47,6 +47,12 @@ public:
 		return Type::Byte;
 	}
 
+	virtual void print(std::ostream& os, const std::string &) const {
+		os << (unsigned)getValue() << " / "
+		   << (int)(int8_t)getValue() << " / "
+		   << std::hex << "0x" << (unsigned)getValue() << std::dec;
+	}
+
 	uint8_t getValue() const {
 		return value;
 	}

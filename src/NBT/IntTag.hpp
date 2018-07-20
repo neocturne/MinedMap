@@ -47,6 +47,12 @@ public:
 		return Type::Int;
 	}
 
+	virtual void print(std::ostream& os, const std::string &) const {
+		os << getValue() << " / "
+		   << (int32_t)getValue() << " / "
+		   << std::hex << "0x" << getValue() << std::dec;
+	}
+
 	uint32_t getValue() const {
 		return Buffer::parse32(ptr);
 	}
