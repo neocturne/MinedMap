@@ -38,6 +38,7 @@
 #include "ListTag.hpp"
 #include "CompoundTag.hpp"
 #include "IntArrayTag.hpp"
+#include "LongArrayTag.hpp"
 
 
 #include <stdexcept>
@@ -84,6 +85,9 @@ std::shared_ptr<const Tag> Tag::readTag(Type type, Buffer *buffer) {
 	case Type::IntArray:
 		return std::shared_ptr<IntArrayTag>(new IntArrayTag(buffer));
 
+	case Type::LongArray:
+		return std::shared_ptr<LongArrayTag>(new LongArrayTag(buffer));
+
 	default:
 		throw std::runtime_error("Tag::readTag: unknown tag type");
 	}
@@ -128,6 +132,9 @@ std::shared_ptr<const Tag> Tag::readList(Buffer *buffer) {
 
 	case Type::IntArray:
 		return std::shared_ptr<Tag>(new ListTag<IntArrayTag>(type, buffer));
+
+	case Type::LongArray:
+		return std::shared_ptr<Tag>(new ListTag<LongArrayTag>(type, buffer));
 
 	default:
 		throw std::runtime_error("Tag::readList: unknown tag type");
@@ -193,6 +200,10 @@ std::ostream& operator<<(std::ostream& os, Tag::Type type) {
 
 	case Tag::Type::IntArray:
 		os << "IntArray";
+		break;
+
+	case Tag::Type::LongArray:
+		os << "LongArray";
 		break;
 
 	default:

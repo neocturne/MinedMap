@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2018, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -26,53 +26,49 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <ostream>
+#include "Tag.hpp"
 
-#include "../Buffer.hpp"
+#include <vector>
 
 
 namespace MinedMap {
 namespace NBT {
 
-class Tag {
+class LongArrayTag : public Tag {
 private:
-	static std::shared_ptr<const Tag> readList(Buffer *buffer);
+	friend class Tag;
+
+	uint32_t len;
+	const uint8_t *ptr;
+
+	LongArrayTag(Buffer *buffer) {
+		len = buffer->get32();
+		ptr = buffer->get(8*len);
+	}
 
 public:
-	enum class Type {
-		End = 0,
-		Byte = 1,
-		Short = 2,
-		Int = 3,
-		Long = 4,
-		Float = 5,
-		Double = 6,
-		ByteArray = 7,
-		String = 8,
-		List = 9,
-		Compound = 10,
-		IntArray = 11,
-		LongArray = 12,
-	};
+	virtual Type getType() const {
+		return Type::LongArray;
+	}
 
-	static std::shared_ptr<const Tag> readTag(Type type, Buffer *buffer);
-	static std::pair<std::string, std::shared_ptr<const Tag>> readNamedTag(Buffer *buffer);
+	virtual void print(std::ostream& os, const std::string &indent) const {
+		os << "(" << len << ") [" << std::endl;
 
-	virtual Type getType() const = 0;
-	virtual void print(std::ostream& os, const std::string &indent) const = 0;
+		std::string inner = indent + "  ";
 
-	virtual ~Tag() {}
+		for (size_t i = 0; i < len; i++) {
+			uint64_t v = Buffer::parse64(&ptr[4*i]);
+
+			os << inner
+			   << v << " / "
+			   << (int64_t)v << " / "
+			   << std::hex << "0x" << v << std::dec
+			   << std::endl;
+		}
+
+		os << indent << "]";
+	}
 };
-
-std::ostream& operator<<(std::ostream& os, Tag::Type type);
-
-static inline std::ostream& operator<<(std::ostream& os, const Tag &tag) {
-	os << tag.getType() << " ";
-	tag.print(os, "");
-	return os;
-}
 
 }
 }
