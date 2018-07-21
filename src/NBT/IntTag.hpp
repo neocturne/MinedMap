@@ -34,15 +34,13 @@ namespace NBT {
 
 class IntTag : public Tag {
 private:
-	friend class Tag;
-
 	const uint8_t *ptr;
 
+public:
 	IntTag(Buffer *buffer) {
 		ptr = buffer->get(4);
 	}
 
-public:
 	virtual Type getType() const {
 		return Type::Int;
 	}

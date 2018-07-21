@@ -34,15 +34,13 @@ namespace NBT {
 
 class ByteTag : public Tag {
 private:
-	friend class Tag;
-
 	uint8_t value;
 
+public:
 	ByteTag(Buffer *buffer) {
 		value = buffer->get8();
 	}
 
-public:
 	virtual Type getType() const {
 		return Type::Byte;
 	}

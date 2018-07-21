@@ -34,15 +34,13 @@ namespace NBT {
 
 class ShortTag : public Tag {
 private:
-	friend class Tag;
-
 	const uint8_t *ptr;
 
+public:
 	ShortTag(Buffer *buffer) {
 		ptr = buffer->get(2);
 	}
 
-public:
 	virtual Type getType() const {
 		return Type::Short;
 	}

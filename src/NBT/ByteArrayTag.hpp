@@ -36,17 +36,14 @@ namespace NBT {
 
 class ByteArrayTag : public Tag {
 private:
-	friend class Tag;
-
 	uint32_t len;
 	const uint8_t *value;
 
+public:
 	ByteArrayTag(Buffer *buffer) {
 		len = buffer->get32();
 		value = buffer->get(len);
 	}
-
-public:
 	virtual Type getType() const {
 		return Type::ByteArray;
 	}

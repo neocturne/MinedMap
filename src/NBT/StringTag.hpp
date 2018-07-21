@@ -34,17 +34,15 @@ namespace NBT {
 
 class StringTag : public Tag {
 private:
-	friend class Tag;
-
 	uint16_t len;
 	const uint8_t *ptr;
 
+public:
 	StringTag(Buffer *buffer) {
 		len = buffer->get16();
 		ptr = buffer->get(len);
 	}
 
-public:
 	virtual Type getType() const {
 		return Type::String;
 	}

@@ -36,9 +36,7 @@ namespace MinedMap {
 namespace NBT {
 
 class CompoundTag : public Tag, public std::unordered_map<std::string, std::shared_ptr<const Tag>> {
-private:
-	friend class Tag;
-
+public:
 	CompoundTag(Buffer *buffer) {
 		while (true) {
 			std::pair<std::string, std::shared_ptr<const Tag>> v = Tag::readNamedTag(buffer);
@@ -49,7 +47,6 @@ private:
 		}
 	}
 
-public:
 	virtual Type getType() const {
 		return Type::Compound;
 	}

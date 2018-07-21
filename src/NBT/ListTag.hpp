@@ -48,10 +48,9 @@ public:
 template<typename T>
 class ListTag : public ListTagBase, public std::vector<std::shared_ptr<const T>> {
 private:
-	friend class Tag;
-
 	Type type;
 
+public:
 	ListTag(Type type0, Buffer *buffer) : type(type0) {
 		uint32_t len = buffer->get32();
 
@@ -61,7 +60,6 @@ private:
 			(*this)[i] = std::static_pointer_cast<const T>(Tag::readTag(type, buffer));
 	}
 
-public:
 	virtual Type getSubtype() const {
 		return type;
 	}

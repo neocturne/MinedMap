@@ -33,12 +33,9 @@ namespace MinedMap {
 namespace NBT {
 
 class EndTag : public Tag {
-private:
-	friend class Tag;
-
+public:
 	EndTag() {}
 
-public:
 	virtual Type getType() const {
 		return Type::End;
 	}

@@ -33,16 +33,13 @@ namespace MinedMap {
 namespace NBT {
 
 class FloatTag : public Tag {
-private:
-	friend class Tag;
-
 	const uint8_t *ptr;
 
+public:
 	FloatTag(Buffer *buffer) {
 		ptr = buffer->get(4);
 	}
 
-public:
 	virtual Type getType() const {
 		return Type::Float;
 	}

@@ -36,17 +36,15 @@ namespace NBT {
 
 class LongArrayTag : public Tag {
 private:
-	friend class Tag;
-
 	uint32_t len;
 	const uint8_t *ptr;
 
+public:
 	LongArrayTag(Buffer *buffer) {
 		len = buffer->get32();
 		ptr = buffer->get(8*len);
 	}
 
-public:
 	virtual Type getType() const {
 		return Type::LongArray;
 	}
