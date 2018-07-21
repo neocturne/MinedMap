@@ -44,8 +44,9 @@ Chunk::Chunk(const ChunkData *data) {
 	std::shared_ptr<const NBT::ByteTag> lightPopulatedTag = level->get<NBT::ByteTag>("LightPopulated");
 	bool lightPopulated = lightPopulatedTag && lightPopulatedTag->getValue();
 
-	sections = assertValue(level->get<NBT::ListTag<NBT::CompoundTag>>("Sections"));
-	maxY = (assertValue(sections->back()->get<NBT::ByteTag>("Y"))->getValue() + 1) * SIZE;
+	sections = assertValue(level->get<NBT::ListTag>("Sections"));
+	const NBT::CompoundTag *lastSection = assertValue(dynamic_cast<const NBT::CompoundTag *>(sections->back().get()));
+	maxY = (assertValue(lastSection->get<NBT::ByteTag>("Y"))->getValue() + 1) * SIZE;
 
 
 	std::shared_ptr<const NBT::ByteArrayTag> biomeTag = assertValue(level->get<NBT::ByteArrayTag>("Biomes"));
@@ -65,7 +66,8 @@ Chunk::Chunk(const ChunkData *data) {
 	std::memset(blockBlockLight.get(), 0, maxY * SIZE * SIZE / 2);
 
 
-	for (auto &section : *sections) {
+	for (auto &sectionTag : *sections) {
+		const NBT::CompoundTag *section = assertValue(dynamic_cast<const NBT::CompoundTag *>(sectionTag.get()));
 		std::shared_ptr<const NBT::ByteArrayTag> blocks = assertValue(section->get<NBT::ByteArrayTag>("Blocks"));
 		std::shared_ptr<const NBT::ByteArrayTag> data = assertValue(section->get<NBT::ByteArrayTag>("Data"));
 		size_t Y = assertValue(section->get<NBT::ByteTag>("Y"))->getValue();

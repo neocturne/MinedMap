@@ -34,10 +34,13 @@ namespace NBT {
 
 class EndTag : public Tag {
 public:
-	EndTag() {}
+	static const MakeType<EndTag> Type;
 
-	virtual Type getType() const {
-		return Type::End;
+
+	EndTag(Buffer *) {}
+
+	virtual const TagType & getType() const {
+		return Type;
 	}
 
 	virtual void print(std::ostream&, const std::string &) const {

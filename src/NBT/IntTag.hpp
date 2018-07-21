@@ -37,12 +37,15 @@ private:
 	const uint8_t *ptr;
 
 public:
+	static const MakeType<IntTag> Type;
+
+
 	IntTag(Buffer *buffer) {
 		ptr = buffer->get(4);
 	}
 
-	virtual Type getType() const {
-		return Type::Int;
+	virtual const TagType & getType() const {
+		return Type;
 	}
 
 	virtual void print(std::ostream& os, const std::string &) const {

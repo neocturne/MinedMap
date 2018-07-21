@@ -41,176 +41,50 @@
 #include "LongArrayTag.hpp"
 
 
-#include <stdexcept>
-
-
 namespace MinedMap {
 namespace NBT {
 
-std::shared_ptr<const Tag> Tag::readTag(Type type, Buffer *buffer) {
-	switch (type) {
-	case Type::End:
-		return std::make_shared<EndTag>();
+const Tag::MakeType<EndTag> EndTag::Type("End");
+const Tag::MakeType<ByteTag> ByteTag::Type("Byte");
+const Tag::MakeType<ShortTag> ShortTag::Type("Short");
+const Tag::MakeType<IntTag> IntTag::Type("Int");
+const Tag::MakeType<LongTag> LongTag::Type("Long");
+const Tag::MakeType<FloatTag> FloatTag::Type("Float");
+const Tag::MakeType<DoubleTag> DoubleTag::Type("Double");
+const Tag::MakeType<ByteArrayTag> ByteArrayTag::Type("ByteArray");
+const Tag::MakeType<StringTag> StringTag::Type("String");
+const Tag::MakeType<ListTag> ListTag::Type("List");
+const Tag::MakeType<CompoundTag> CompoundTag::Type("Compound");
+const Tag::MakeType<IntArrayTag> IntArrayTag::Type("IntArray");
+const Tag::MakeType<LongArrayTag> LongArrayTag::Type("LongArray");
 
-	case Type::Byte:
-		return std::make_shared<ByteTag>(buffer);
 
-	case Type::Short:
-		return std::make_shared<ShortTag>(buffer);
+const std::vector<const TagType *> Tag::types = {
+	&EndTag::Type,
+	&ByteTag::Type,
+	&ShortTag::Type,
+	&IntTag::Type,
+	&LongTag::Type,
+	&FloatTag::Type,
+	&DoubleTag::Type,
+	&ByteArrayTag::Type,
+	&StringTag::Type,
+	&ListTag::Type,
+	&CompoundTag::Type,
+	&IntArrayTag::Type,
+	&LongArrayTag::Type,
+};
 
-	case Type::Int:
-		return std::make_shared<IntTag>(buffer);
-
-	case Type::Long:
-		return std::make_shared<LongTag>(buffer);
-
-	case Type::Float:
-		return std::make_shared<FloatTag>(buffer);
-
-	case Type::Double:
-		return std::make_shared<DoubleTag>(buffer);
-
-	case Type::ByteArray:
-		return std::make_shared<ByteArrayTag>(buffer);
-
-	case Type::String:
-		return std::make_shared<StringTag>(buffer);
-
-	case Type::List:
-		return readList(buffer);
-
-	case Type::Compound:
-		return std::make_shared<CompoundTag>(buffer);
-
-	case Type::IntArray:
-		return std::make_shared<IntArrayTag>(buffer);
-
-	case Type::LongArray:
-		return std::make_shared<LongArrayTag>(buffer);
-
-	default:
-		throw std::runtime_error("Tag::readTag: unknown tag type");
-	}
-}
-
-std::shared_ptr<const Tag> Tag::readList(Buffer *buffer) {
-	Type type = static_cast<Type>(buffer->get8());
-
-	switch (type) {
-	case Type::End:
-		return std::make_shared<ListTag<EndTag>>(type, buffer);
-
-	case Type::Byte:
-		return std::make_shared<ListTag<ByteTag>>(type, buffer);
-
-	case Type::Short:
-		return std::make_shared<ListTag<ShortTag>>(type, buffer);
-
-	case Type::Int:
-		return std::make_shared<ListTag<IntTag>>(type, buffer);
-
-	case Type::Long:
-		return std::make_shared<ListTag<LongTag>>(type, buffer);
-
-	case Type::Float:
-		return std::make_shared<ListTag<FloatTag>>(type, buffer);
-
-	case Type::Double:
-		return std::make_shared<ListTag<DoubleTag>>(type, buffer);
-
-	case Type::ByteArray:
-		return std::make_shared<ListTag<ByteArrayTag>>(type, buffer);
-
-	case Type::String:
-		return std::make_shared<ListTag<StringTag>>(type, buffer);
-
-	case Type::List:
-		return std::make_shared<ListTag<ListTagBase>>(type, buffer);
-
-	case Type::Compound:
-		return std::make_shared<ListTag<CompoundTag>>(type, buffer);
-
-	case Type::IntArray:
-		return std::make_shared<ListTag<IntArrayTag>>(type, buffer);
-
-	case Type::LongArray:
-		return std::make_shared<ListTag<LongArrayTag>>(type, buffer);
-
-	default:
-		throw std::runtime_error("Tag::readList: unknown tag type");
-	}
-}
 
 std::pair<std::string, std::shared_ptr<const Tag>> Tag::readNamedTag(Buffer *buffer) {
-	Type type = static_cast<Type>(buffer->get8());
-	if (type == Type::End)
-		return std::make_pair("", std::shared_ptr<EndTag>(new EndTag()));
+	const TagType &type = getTypeById(buffer->get8());
+	if (type == EndTag::Type)
+		return std::make_pair("", std::make_shared<EndTag>(buffer));
 
 	uint16_t len = buffer->get16();
 	std::string name(reinterpret_cast<const char*>(buffer->get(len)), len);
 
-	return std::make_pair(name, readTag(type, buffer));
-}
-
-std::ostream& operator<<(std::ostream& os, Tag::Type type) {
-	switch (type) {
-	case Tag::Type::End:
-		os << "End";
-		break;
-
-	case Tag::Type::Byte:
-		os << "Byte";
-		break;
-
-	case Tag::Type::Short:
-		os << "Short";
-		break;
-
-	case Tag::Type::Int:
-		os << "Int";
-		break;
-
-	case Tag::Type::Long:
-		os << "Long";
-		break;
-
-	case Tag::Type::Float:
-		os << "Float";
-		break;
-
-	case Tag::Type::Double:
-		os << "Double";
-		break;
-
-	case Tag::Type::ByteArray:
-		os << "ByteArray";
-		break;
-
-	case Tag::Type::String:
-		os << "String";
-		break;
-
-	case Tag::Type::List:
-		os << "List";
-		break;
-
-	case Tag::Type::Compound:
-		os << "Compound";
-		break;
-
-	case Tag::Type::IntArray:
-		os << "IntArray";
-		break;
-
-	case Tag::Type::LongArray:
-		os << "LongArray";
-		break;
-
-	default:
-		os.setstate(std::ios_base::failbit);
-	}
-
-	return os;
+	return std::make_pair(name, type.read(buffer));
 }
 
 }

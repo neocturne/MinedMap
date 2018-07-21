@@ -52,7 +52,7 @@ public:
 
 private:
 	std::shared_ptr<const NBT::CompoundTag> level;
-	std::shared_ptr<const NBT::ListTag<NBT::CompoundTag>> sections;
+	std::shared_ptr<const NBT::ListTag> sections;
 
 
 	unsigned maxY;
@@ -107,7 +107,7 @@ public:
 		return *level;
 	}
 
-	const NBT::ListTag<NBT::CompoundTag> & getSections() const {
+	const NBT::ListTag & getSections() const {
 		return *sections;
 	}
 

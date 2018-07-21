@@ -37,12 +37,15 @@ private:
 	uint8_t value;
 
 public:
+	static const MakeType<ByteTag> Type;
+
+
 	ByteTag(Buffer *buffer) {
 		value = buffer->get8();
 	}
 
-	virtual Type getType() const {
-		return Type::Byte;
+	virtual const TagType & getType() const {
+		return Type;
 	}
 
 	virtual void print(std::ostream& os, const std::string &) const {

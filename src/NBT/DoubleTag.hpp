@@ -37,12 +37,15 @@ private:
 	const uint8_t *ptr;
 
 public:
+	static const MakeType<DoubleTag> Type;
+
+
 	DoubleTag(Buffer *buffer) {
 		ptr = buffer->get(8);
 	}
 
-	virtual Type getType() const {
-		return Type::Double;
+	virtual const TagType & getType() const {
+		return Type;
 	}
 
 	virtual void print(std::ostream& os, const std::string &) const {

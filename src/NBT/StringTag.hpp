@@ -38,13 +38,16 @@ private:
 	const uint8_t *ptr;
 
 public:
+	static const MakeType<StringTag> Type;
+
+
 	StringTag(Buffer *buffer) {
 		len = buffer->get16();
 		ptr = buffer->get(len);
 	}
 
-	virtual Type getType() const {
-		return Type::String;
+	virtual const TagType & getType() const {
+		return Type;
 	}
 
 	virtual void print(std::ostream& os, const std::string &) const {

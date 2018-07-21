@@ -40,13 +40,16 @@ private:
 	const uint8_t *ptr;
 
 public:
+	static const MakeType<IntArrayTag> Type;
+
+
 	IntArrayTag(Buffer *buffer) {
 		len = buffer->get32();
 		ptr = buffer->get(4*len);
 	}
 
-	virtual Type getType() const {
-		return Type::IntArray;
+	virtual const TagType & getType() const {
+		return Type;
 	}
 
 	virtual void print(std::ostream& os, const std::string &indent) const {

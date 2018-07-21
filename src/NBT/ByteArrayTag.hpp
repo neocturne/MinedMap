@@ -40,12 +40,16 @@ private:
 	const uint8_t *value;
 
 public:
+	static const MakeType<ByteArrayTag> Type;
+
+
 	ByteArrayTag(Buffer *buffer) {
 		len = buffer->get32();
 		value = buffer->get(len);
 	}
-	virtual Type getType() const {
-		return Type::ByteArray;
+
+	virtual const TagType & getType() const {
+		return Type;
 	}
 
 	virtual void print(std::ostream& os, const std::string &indent) const {

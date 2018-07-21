@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include "EndTag.hpp"
 #include "Tag.hpp"
 
 #include <string>
@@ -37,18 +38,21 @@ namespace NBT {
 
 class CompoundTag : public Tag, public std::unordered_map<std::string, std::shared_ptr<const Tag>> {
 public:
+	static const MakeType<CompoundTag> Type;
+
+
 	CompoundTag(Buffer *buffer) {
 		while (true) {
 			std::pair<std::string, std::shared_ptr<const Tag>> v = Tag::readNamedTag(buffer);
-			if (v.second->getType() == Type::End)
+			if (v.second->getType() == EndTag::Type)
 				break;
 
 			insert(std::move(v));
 		}
 	}
 
-	virtual Type getType() const {
-		return Type::Compound;
+	virtual const TagType & getType() const {
+		return Type;
 	}
 
 	virtual void print(std::ostream& os, const std::string &indent) const {

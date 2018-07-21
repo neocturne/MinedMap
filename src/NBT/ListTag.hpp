@@ -34,34 +34,29 @@
 namespace MinedMap {
 namespace NBT {
 
-
-class ListTagBase : public Tag {
-public:
-	virtual Type getType() const {
-		return Type::List;
-	}
-
-	virtual Type getSubtype() const = 0;
-};
-
-
-template<typename T>
-class ListTag : public ListTagBase, public std::vector<std::shared_ptr<const T>> {
+class ListTag : public Tag, public std::vector<std::shared_ptr<const Tag>> {
 private:
-	Type type;
+	const TagType *subtype;
 
 public:
-	ListTag(Type type0, Buffer *buffer) : type(type0) {
+	static const MakeType<ListTag> Type;
+
+
+	ListTag(Buffer *buffer) {
+		subtype = &getTypeById(buffer->get8());
+
 		uint32_t len = buffer->get32();
 
-		this->resize(len);
-
 		for (uint32_t i = 0; i < len; i++)
-			(*this)[i] = std::static_pointer_cast<const T>(Tag::readTag(type, buffer));
+			push_back(subtype->read(buffer));
 	}
 
-	virtual Type getSubtype() const {
-		return type;
+	virtual const TagType & getType() const {
+		return Type;
+	}
+
+	virtual const TagType & getSubtype() const {
+		return *subtype;
 	}
 
 	virtual void print(std::ostream& os, const std::string &indent) const {

@@ -36,12 +36,15 @@ class FloatTag : public Tag {
 	const uint8_t *ptr;
 
 public:
+	static const MakeType<FloatTag> Type;
+
+
 	FloatTag(Buffer *buffer) {
 		ptr = buffer->get(4);
 	}
 
-	virtual Type getType() const {
-		return Type::Float;
+	virtual const TagType & getType() const {
+		return Type;
 	}
 
 	virtual void print(std::ostream& os, const std::string &) const {

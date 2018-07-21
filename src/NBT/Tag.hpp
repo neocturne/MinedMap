@@ -29,6 +29,7 @@
 #include <cstdint>
 #include <memory>
 #include <ostream>
+#include <vector>
 
 #include "../Buffer.hpp"
 
@@ -36,37 +37,61 @@
 namespace MinedMap {
 namespace NBT {
 
+class Tag;
+
+class TagType {
+public:
+	TagType() = default;
+	TagType(const TagType&) = delete;
+	TagType & operator=(const TagType&) = delete;
+
+	virtual const char * getName() const = 0;
+	virtual std::shared_ptr<const Tag> read(Buffer *buffer) const = 0;
+
+	bool operator==(const TagType &type) const {
+		return this == &type;
+	}
+};
+
 class Tag {
 private:
-	static std::shared_ptr<const Tag> readList(Buffer *buffer);
+	static const std::vector<const TagType *> types;
 
-public:
-	enum class Type {
-		End = 0,
-		Byte = 1,
-		Short = 2,
-		Int = 3,
-		Long = 4,
-		Float = 5,
-		Double = 6,
-		ByteArray = 7,
-		String = 8,
-		List = 9,
-		Compound = 10,
-		IntArray = 11,
-		LongArray = 12,
+protected:
+	template<typename T>
+	class MakeType : public TagType {
+	private:
+		const char *name;
+
+	public:
+		MakeType(const char *name0) : name(name0) {}
+
+		virtual const char * getName() const {
+			return name;
+		}
+
+		virtual std::shared_ptr<const Tag> read(Buffer *buffer) const {
+			return std::make_shared<T>(buffer);
+		}
 	};
 
-	static std::shared_ptr<const Tag> readTag(Type type, Buffer *buffer);
+
+	static const TagType & getTypeById(uint8_t id) {
+		return *types.at(id);
+	}
+
+public:
 	static std::pair<std::string, std::shared_ptr<const Tag>> readNamedTag(Buffer *buffer);
 
-	virtual Type getType() const = 0;
+	virtual const TagType & getType() const = 0;
 	virtual void print(std::ostream& os, const std::string &indent) const = 0;
 
 	virtual ~Tag() {}
 };
 
-std::ostream& operator<<(std::ostream& os, Tag::Type type);
+static inline std::ostream& operator<<(std::ostream& os, const TagType &type) {
+	return os << type.getName();
+}
 
 static inline std::ostream& operator<<(std::ostream& os, const Tag &tag) {
 	os << tag.getType() << " ";
