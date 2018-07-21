@@ -68,6 +68,14 @@ public:
 
 		os << indent << "]";
 	}
+
+	uint32_t getLength() const {
+		return len;
+	}
+
+	const uint8_t * getPointer() const {
+		return ptr;
+	}
 };
 
 }
