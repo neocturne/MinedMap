@@ -76,14 +76,6 @@ public:
 
 		return std::dynamic_pointer_cast<const T>(it->second);
 	}
-
-	template<typename T, typename... Args> std::shared_ptr<const T> get(const std::string &key, const Args &...args) const {
-		std::shared_ptr<const CompoundTag> tag = get<CompoundTag>(key);
-		if (!tag)
-			return std::shared_ptr<const T>();
-
-		return tag->get<T>(args...);
-	}
 };
 
 }
