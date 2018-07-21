@@ -50,43 +50,43 @@ namespace NBT {
 std::shared_ptr<const Tag> Tag::readTag(Type type, Buffer *buffer) {
 	switch (type) {
 	case Type::End:
-		return std::shared_ptr<EndTag>(new EndTag());
+		return std::make_shared<EndTag>();
 
 	case Type::Byte:
-		return std::shared_ptr<ByteTag>(new ByteTag(buffer));
+		return std::make_shared<ByteTag>(buffer);
 
 	case Type::Short:
-		return std::shared_ptr<ShortTag>(new ShortTag(buffer));
+		return std::make_shared<ShortTag>(buffer);
 
 	case Type::Int:
-		return std::shared_ptr<IntTag>(new IntTag(buffer));
+		return std::make_shared<IntTag>(buffer);
 
 	case Type::Long:
-		return std::shared_ptr<LongTag>(new LongTag(buffer));
+		return std::make_shared<LongTag>(buffer);
 
 	case Type::Float:
-		return std::shared_ptr<FloatTag>(new FloatTag(buffer));
+		return std::make_shared<FloatTag>(buffer);
 
 	case Type::Double:
-		return std::shared_ptr<DoubleTag>(new DoubleTag(buffer));
+		return std::make_shared<DoubleTag>(buffer);
 
 	case Type::ByteArray:
-		return std::shared_ptr<ByteArrayTag>(new ByteArrayTag(buffer));
+		return std::make_shared<ByteArrayTag>(buffer);
 
 	case Type::String:
-		return std::shared_ptr<StringTag>(new StringTag(buffer));
+		return std::make_shared<StringTag>(buffer);
 
 	case Type::List:
 		return readList(buffer);
 
 	case Type::Compound:
-		return std::shared_ptr<CompoundTag>(new CompoundTag(buffer));
+		return std::make_shared<CompoundTag>(buffer);
 
 	case Type::IntArray:
-		return std::shared_ptr<IntArrayTag>(new IntArrayTag(buffer));
+		return std::make_shared<IntArrayTag>(buffer);
 
 	case Type::LongArray:
-		return std::shared_ptr<LongArrayTag>(new LongArrayTag(buffer));
+		return std::make_shared<LongArrayTag>(buffer);
 
 	default:
 		throw std::runtime_error("Tag::readTag: unknown tag type");
@@ -98,43 +98,43 @@ std::shared_ptr<const Tag> Tag::readList(Buffer *buffer) {
 
 	switch (type) {
 	case Type::End:
-		return std::shared_ptr<Tag>(new ListTag<EndTag>(type, buffer));
+		return std::make_shared<ListTag<EndTag>>(type, buffer);
 
 	case Type::Byte:
-		return std::shared_ptr<Tag>(new ListTag<ByteTag>(type, buffer));
+		return std::make_shared<ListTag<ByteTag>>(type, buffer);
 
 	case Type::Short:
-		return std::shared_ptr<Tag>(new ListTag<ShortTag>(type, buffer));
+		return std::make_shared<ListTag<ShortTag>>(type, buffer);
 
 	case Type::Int:
-		return std::shared_ptr<Tag>(new ListTag<IntTag>(type, buffer));
+		return std::make_shared<ListTag<IntTag>>(type, buffer);
 
 	case Type::Long:
-		return std::shared_ptr<Tag>(new ListTag<LongTag>(type, buffer));
+		return std::make_shared<ListTag<LongTag>>(type, buffer);
 
 	case Type::Float:
-		return std::shared_ptr<Tag>(new ListTag<FloatTag>(type, buffer));
+		return std::make_shared<ListTag<FloatTag>>(type, buffer);
 
 	case Type::Double:
-		return std::shared_ptr<Tag>(new ListTag<DoubleTag>(type, buffer));
+		return std::make_shared<ListTag<DoubleTag>>(type, buffer);
 
 	case Type::ByteArray:
-		return std::shared_ptr<Tag>(new ListTag<ByteArrayTag>(type, buffer));
+		return std::make_shared<ListTag<ByteArrayTag>>(type, buffer);
 
 	case Type::String:
-		return std::shared_ptr<Tag>(new ListTag<StringTag>(type, buffer));
+		return std::make_shared<ListTag<StringTag>>(type, buffer);
 
 	case Type::List:
-		return std::shared_ptr<Tag>(new ListTag<ListTagBase>(type, buffer));
+		return std::make_shared<ListTag<ListTagBase>>(type, buffer);
 
 	case Type::Compound:
-		return std::shared_ptr<Tag>(new ListTag<CompoundTag>(type, buffer));
+		return std::make_shared<ListTag<CompoundTag>>(type, buffer);
 
 	case Type::IntArray:
-		return std::shared_ptr<Tag>(new ListTag<IntArrayTag>(type, buffer));
+		return std::make_shared<ListTag<IntArrayTag>>(type, buffer);
 
 	case Type::LongArray:
-		return std::shared_ptr<Tag>(new ListTag<LongArrayTag>(type, buffer));
+		return std::make_shared<ListTag<LongArrayTag>>(type, buffer);
 
 	default:
 		throw std::runtime_error("Tag::readList: unknown tag type");
