@@ -57,7 +57,7 @@ public:
 		std::string inner = indent + "  ";
 
 		for (size_t i = 0; i < len; i++) {
-			uint64_t v = Buffer::parse64(&ptr[4*i]);
+			uint64_t v = Buffer::parse64(&ptr[8*i]);
 
 			os << inner
 			   << v << " / "
