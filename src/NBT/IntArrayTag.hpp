@@ -58,7 +58,7 @@ public:
 		std::string inner = indent + "  ";
 
 		for (size_t i = 0; i < len; i++) {
-			uint32_t v = Buffer::parse32(&ptr[4*i]);
+			uint32_t v = getValue(i);
 
 			os << inner
 			   << v << " / "
@@ -76,6 +76,10 @@ public:
 
 	const uint8_t * getPointer() const {
 		return ptr;
+	}
+
+	uint32_t getValue(size_t i) const {
+		return Buffer::parse32(&ptr[4*i]);
 	}
 };
 
