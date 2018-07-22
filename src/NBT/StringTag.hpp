@@ -50,8 +50,12 @@ public:
 		return Type;
 	}
 
+	std::string getValue() const {
+		return std::string(reinterpret_cast<const char *>(ptr), len);
+	}
+
 	virtual void print(std::ostream& os, const std::string &) const {
-		os << "\"" << std::string(reinterpret_cast<const char *>(ptr), len) << "\"";
+		os << "\"" << getValue() << "\"";
 	}
 };
 
