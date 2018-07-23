@@ -128,7 +128,9 @@ Chunk::Blocks Chunk::getTopLayer() const {
 
 				uint8_t id = getBlockAt(x, y, z);
 				uint8_t data = getDataAt(x, y, z);
-				if (!Resource::BLOCK_TYPES[id][data].opaque)
+
+				const Resource::BlockType *type = Resource::LEGACY_BLOCK_TYPES.types[id][data];
+				if (!type || !type->opaque)
 					continue;
 
 				ret.blocks[x][z] = getBlock(x, y, z);

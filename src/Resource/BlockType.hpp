@@ -27,17 +27,33 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
+#include <unordered_map>
 
 namespace MinedMap {
 namespace Resource {
 
 struct BlockType {
+private:
+	static const std::unordered_map<std::string, BlockType> Types;
+
+public:
+	static const BlockType * lookup(const std::string &name);
+
 	bool opaque;
 	bool green;
-	uint32_t color;
+	bool blue;
+	struct {
+		uint8_t r, g, b;
+	} color;
 };
 
-extern const BlockType BLOCK_TYPES[256][16];
+
+struct LegacyPalette {
+	const BlockType *types[256][16];
+};
+
+extern const LegacyPalette LEGACY_BLOCK_TYPES;
 
 }
 }

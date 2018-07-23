@@ -25,22 +25,21 @@
 
 
 #include "Block.hpp"
-#include "../Resource/BlockType.hpp"
 #include "../Resource/Biome.hpp"
+#include "../Resource/BlockType.hpp"
 
 
 namespace MinedMap {
 namespace World {
 
 uint32_t Block::getColor() const {
-	const Resource::BlockType &t = Resource::BLOCK_TYPES[id][data];
-
-	if (!t.opaque)
+	const Resource::BlockType *type = Resource::LEGACY_BLOCK_TYPES.types[id][data];
+	if (!type || !type->opaque)
 		return 0;
 
-	unsigned r = uint8_t(t.color >> 16);
-	unsigned g = uint8_t(t.color >> 8);
-	unsigned b = uint8_t(t.color);
+	float r = type->color.r;
+	float g = type->color.g;
+	float b = type->color.b;
 
 	float heightCoef = height/255.0f + 0.5f;
 
@@ -48,7 +47,7 @@ uint32_t Block::getColor() const {
 	g *= heightCoef;
 	b *= heightCoef;
 
-	if (t.green) {
+	if (type->green) {
 		const Resource::Biome &biomeDef = Resource::BIOMES[biome];
 
 		r *= biomeDef.r;
@@ -56,11 +55,17 @@ uint32_t Block::getColor() const {
 		b *= biomeDef.b;
 	}
 
+	if (type->blue) {
+		r *= 0.265;
+		g *= 0.382;
+		b *= 1.379;
+	}
+
 	if (r > 255) r = 255;
 	if (g > 255) g = 255;
 	if (b > 255) b = 255;
 
-	return (r << 24) | (g << 16) | (b << 8) | 0xff;
+	return ((unsigned)r << 24) | ((unsigned)g << 16) | ((unsigned)b << 8) | 0xff;
 }
 
 }
