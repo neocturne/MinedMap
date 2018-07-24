@@ -15,6 +15,7 @@ add_executable(MinedMap
   World/ChunkData.cpp
   World/Level.cpp
   World/Region.cpp
+  World/Section.cpp
 )
 set_target_properties(MinedMap PROPERTIES COMPILE_FLAGS "-std=c++11 -Wall")
 target_link_libraries(MinedMap ${ZLIB_LIBRARIES} ${PNG_LIBRARIES})

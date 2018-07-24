@@ -24,65 +24,33 @@
 */
 
 
-#pragma once
-
-
-#include "Block.hpp"
-#include "ChunkData.hpp"
 #include "Section.hpp"
-#include "../NBT/ByteArrayTag.hpp"
-#include "../NBT/IntArrayTag.hpp"
-#include "../Resource/BlockType.hpp"
+#include "../NBT/ByteTag.hpp"
 #include "../Util.hpp"
-
-#include <cstdint>
 
 
 namespace MinedMap {
 namespace World {
 
-class Chunk {
-public:
-	static const size_t SIZE = Section::SIZE;
+Section::Section(const std::shared_ptr<const NBT::CompoundTag> &section) {
+	Y = assertValue(section->get<NBT::ByteTag>("Y"))->getValue();
+	blockLight = section->get<NBT::ByteArrayTag>("BlockLight");
+}
 
-	struct Blocks {
-		Block blocks[SIZE][SIZE];
-	};
 
-private:
-	std::shared_ptr<const NBT::CompoundTag> level;
-	std::vector<std::unique_ptr<Section>> sections;
+std::unique_ptr<Section> Section::makeSection(const std::shared_ptr<const NBT::CompoundTag> &section) {
+	std::shared_ptr<const NBT::ByteArrayTag> blocks = assertValue(section->get<NBT::ByteArrayTag>("Blocks"));
+	std::shared_ptr<const NBT::ByteArrayTag> data = assertValue(section->get<NBT::ByteArrayTag>("Data"));
 
-	std::shared_ptr<const NBT::ByteArrayTag> biomeBytes;
-	std::shared_ptr<const NBT::IntArrayTag> biomeInts;
+	return std::unique_ptr<Section>(new LegacySection(section, std::move(blocks), std::move(data)));
+}
 
-	uint8_t getBiomeAt(size_t x, size_t z) const {
-		if (biomeBytes)
-			return biomeBytes->getValue()[z*SIZE + x];
-		else
-			return biomeInts->getValue(z*SIZE + x);
-	}
+const Resource::BlockType * LegacySection::getBlockStateAt(size_t x, size_t y, size_t z) const {
+	uint8_t type = getBlockAt(x, y, z);
+	uint8_t data = getDataAt(x, y, z);
 
-	bool getBlock(Block *block, const Section *section, size_t x, size_t y, size_t z, uint8_t prev_light) const;
-
-public:
-	Chunk(const ChunkData *data);
-
-	const NBT::CompoundTag & getLevel() const {
-		return *level;
-	}
-
-	const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const {
-		size_t Y = y / SIZE;
-
-		if (Y >= sections.size() || !sections[Y])
-			return nullptr;
-
-		return sections[Y]->getBlockStateAt(x, y % SIZE, z);
-	}
-
-	Blocks getTopLayer() const;
-};
+	return Resource::LEGACY_BLOCK_TYPES.types[type][data];
+}
 
 }
 }

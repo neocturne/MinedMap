@@ -25,14 +25,11 @@
 
 
 #include "Chunk.hpp"
-#include "../Resource/BlockType.hpp"
+#include "../NBT/ListTag.hpp"
+#include "../NBT/StringTag.hpp"
 
-#include <iostream>
-#include <stdexcept>
-#include <cstdlib>
 #include <cstring>
-
-#include <zlib.h>
+#include <stdexcept>
 
 
 namespace MinedMap {
@@ -41,100 +38,77 @@ namespace World {
 Chunk::Chunk(const ChunkData *data) {
 	level = assertValue(data->getRoot().get<NBT::CompoundTag>("Level"));
 
-	std::shared_ptr<const NBT::ByteTag> lightPopulatedTag = level->get<NBT::ByteTag>("LightPopulated");
-	bool lightPopulated = lightPopulatedTag && lightPopulatedTag->getValue();
+	std::shared_ptr<const NBT::ListTag> sectionsTag = level->get<NBT::ListTag>("Sections");
+	if (!sectionsTag)
+		return;
 
-	sections = assertValue(level->get<NBT::ListTag>("Sections"));
-	const NBT::CompoundTag *lastSection = assertValue(dynamic_cast<const NBT::CompoundTag *>(sections->back().get()));
-	maxY = (assertValue(lastSection->get<NBT::ByteTag>("Y"))->getValue() + 1) * SIZE;
+	biomeBytes = level->get<NBT::ByteArrayTag>("Biomes");
+	biomeInts = level->get<NBT::IntArrayTag>("Biomes");
+	assertValue(biomeBytes || biomeInts);
 
-
-	std::shared_ptr<const NBT::ByteArrayTag> biomeTag = assertValue(level->get<NBT::ByteArrayTag>("Biomes"));
-	if (biomeTag->getLength() != SIZE*SIZE)
+	if (biomeBytes && biomeBytes->getLength() != SIZE*SIZE)
+		throw std::invalid_argument("corrupt biome data");
+	else if (biomeInts && biomeInts->getLength() != SIZE*SIZE)
 		throw std::invalid_argument("corrupt biome data");
 
-	biomes = biomeTag->getValue();
-
-	blockIDs.reset(new uint8_t[maxY * SIZE * SIZE]);
-	blockData.reset(new uint8_t[maxY * SIZE * SIZE / 2]);
-	blockSkyLight.reset(new uint8_t[maxY * SIZE * SIZE / 2]);
-	blockBlockLight.reset(new uint8_t[maxY * SIZE * SIZE / 2]);
-
-	std::memset(blockIDs.get(), 0, maxY * SIZE * SIZE);
-	std::memset(blockData.get(), 0, maxY * SIZE * SIZE / 2);
-	std::memset(blockSkyLight.get(), 0xff, maxY * SIZE * SIZE / 2);
-	std::memset(blockBlockLight.get(), 0, maxY * SIZE * SIZE / 2);
-
-
-	for (auto &sectionTag : *sections) {
-		const NBT::CompoundTag *section = assertValue(dynamic_cast<const NBT::CompoundTag *>(sectionTag.get()));
-		std::shared_ptr<const NBT::ByteArrayTag> blocks = assertValue(section->get<NBT::ByteArrayTag>("Blocks"));
-		std::shared_ptr<const NBT::ByteArrayTag> data = assertValue(section->get<NBT::ByteArrayTag>("Data"));
-		size_t Y = assertValue(section->get<NBT::ByteTag>("Y"))->getValue();
-
-		if (blocks->getLength() != SIZE*SIZE*SIZE || data->getLength() != SIZE*SIZE*SIZE/2)
-			throw std::invalid_argument("corrupt chunk data");
-
-		if (lightPopulated) {
-			std::shared_ptr<const NBT::ByteArrayTag> blockLight = assertValue(section->get<NBT::ByteArrayTag>("BlockLight"));
-			std::shared_ptr<const NBT::ByteArrayTag> skyLight = assertValue(section->get<NBT::ByteArrayTag>("SkyLight"));
-
-			if (blockLight->getLength() != SIZE*SIZE*SIZE/2 || skyLight->getLength() != SIZE*SIZE*SIZE/2)
-				throw std::invalid_argument("corrupt chunk data");
-
-			std::memcpy(blockBlockLight.get() + Y*SIZE*SIZE*SIZE/2, blockLight->getValue(), SIZE*SIZE*SIZE/2);
-			std::memcpy(blockSkyLight.get() + Y*SIZE*SIZE*SIZE/2, skyLight->getValue(), SIZE*SIZE*SIZE/2);
-		}
-
-		std::memcpy(blockIDs.get() + Y*SIZE*SIZE*SIZE, blocks->getValue(), SIZE*SIZE*SIZE);
-		std::memcpy(blockData.get() + Y*SIZE*SIZE*SIZE/2, data->getValue(), SIZE*SIZE*SIZE/2);
+	for (auto &sTag : *sectionsTag) {
+		auto s = std::dynamic_pointer_cast<const NBT::CompoundTag>(sTag);
+		std::unique_ptr<Section> section = Section::makeSection(s);
+		size_t Y = section->getY();
+		sections.resize(Y);
+		sections.push_back(std::move(section));
 	}
 }
 
-Block Chunk::getBlock(size_t x, size_t y, size_t z) const {
-	size_t y2 = y;
-	if (y2 < maxY-1)
-		y2++;
+bool Chunk::getBlock(Block *block, const Section *section, size_t x, size_t y, size_t z, uint8_t prev_light) const {
+	if (block->height > 0)
+		return false;
 
-	unsigned h;
-	for (h = y; h > 0; h--) {
-		uint8_t id2 = getBlockAt(x, h, z);
-		if (id2 != 8 && id2 != 9)
-			break;
+	const Resource::BlockType *type = section->getBlockStateAt(x, y, z);
+	if (!type || !type->opaque)
+		return false;
+
+	if (!block->type) {
+		block->type = type;
+		block->blockLight = prev_light;
+		block->biome = getBiomeAt(x, z);
 	}
 
-	return Block(
-		getBlockAt(x, y, z),
-		getDataAt(x, y, z),
-		h,
-		getBlockLightAt(x, y2, z),
-		getSkyLightAt(x, y2, z),
-		getBiomeAt(x, z)
-	);
+	if (type->blue)
+		return false;
+
+	block->height = SIZE*section->getY() + y;
+
+	return true;
 }
 
 Chunk::Blocks Chunk::getTopLayer() const {
 	size_t done = 0;
-	Blocks ret;
+	Blocks ret = {};
+	uint8_t prev_light[SIZE][SIZE] = {};
 
-	for (ssize_t y = maxY-1; y >= 0; y--) {
+	for (ssize_t Y = sections.size() - 1; Y >= 0; Y--) {
 		if (done == SIZE*SIZE)
 			break;
 
-		for (size_t z = 0; z < SIZE; z++) {
-			for (size_t x = 0; x < SIZE; x++) {
-				if (ret.blocks[x][z].id)
-					continue;
+		if (!sections[Y]) {
+			std::memset(prev_light, 0, sizeof(prev_light));
+			continue;
+		}
 
-				uint8_t id = getBlockAt(x, y, z);
-				uint8_t data = getDataAt(x, y, z);
+		const Section *section = sections[Y].get();
 
-				const Resource::BlockType *type = Resource::LEGACY_BLOCK_TYPES.types[id][data];
-				if (!type || !type->opaque)
-					continue;
+		for (ssize_t y = SIZE-1; y >= 0; y--) {
+			if (done == SIZE*SIZE)
+				break;
 
-				ret.blocks[x][z] = getBlock(x, y, z);
-				done++;
+			for (size_t z = 0; z < SIZE; z++) {
+				for (size_t x = 0; x < SIZE; x++) {
+					if (getBlock(&ret.blocks[x][z], section, x, y, z, prev_light[x][z]))
+						done++;
+
+					prev_light[x][z] = section->getBlockLightAt(x, y, z);
+				}
 			}
 		}
 	}

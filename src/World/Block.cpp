@@ -26,14 +26,12 @@
 
 #include "Block.hpp"
 #include "../Resource/Biome.hpp"
-#include "../Resource/BlockType.hpp"
 
 
 namespace MinedMap {
 namespace World {
 
 uint32_t Block::getColor() const {
-	const Resource::BlockType *type = Resource::LEGACY_BLOCK_TYPES.types[id][data];
 	if (!type || !type->opaque)
 		return 0;
 
