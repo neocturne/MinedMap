@@ -29,6 +29,8 @@
 
 #include "../NBT/ByteArrayTag.hpp"
 #include "../NBT/CompoundTag.hpp"
+#include "../NBT/ListTag.hpp"
+#include "../NBT/LongArrayTag.hpp"
 #include "../Resource/BlockType.hpp"
 
 #include <cstdint>
@@ -102,6 +104,28 @@ public:
 		std::shared_ptr<const NBT::ByteArrayTag> &&blocks0,
 		std::shared_ptr<const NBT::ByteArrayTag> &&data0
 	) : Section(section), blocks(blocks0), data(data0) {}
+
+	virtual const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const;
+};
+
+class PaletteSection : public Section {
+private:
+	std::shared_ptr<const NBT::LongArrayTag> blockStates;
+	std::vector<const Resource::BlockType *> palette;
+	size_t bits;
+	uint16_t mask;
+
+
+	static size_t mangleByteIndex(size_t index) {
+		return (index & ~(size_t)7) + 7 - (index & 7);
+	}
+
+public:
+	PaletteSection(
+		const std::shared_ptr<const NBT::CompoundTag> &section,
+		std::shared_ptr<const NBT::LongArrayTag> &&blockStates0,
+		const std::shared_ptr<const NBT::ListTag> &paletteData
+	);
 
 	virtual const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const;
 };
