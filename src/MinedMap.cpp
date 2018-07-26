@@ -116,7 +116,11 @@ static void doRegion(const std::string &input, const std::string &output, const 
 			return;
 		}
 
+#ifdef _WIN32
+		intime = (int64_t)instat.st_mtime * 1000000;
+#else
 		intime = (int64_t)instat.st_mtim.tv_sec * 1000000 + instat.st_mtim.tv_nsec / 1000;
+#endif
 	}
 
 	{
@@ -172,7 +176,14 @@ static bool checkFilename(const char *name, int *x, int *z) {
 }
 
 static void makeDir(const std::string &name) {
-	if (mkdir(name.c_str(), 0777) < 0 && errno != EEXIST)
+	if (
+		mkdir(
+			name.c_str()
+#ifndef _WIN32
+			, 0777
+#endif
+		) < 0 && errno != EEXIST
+	)
 		throw std::system_error(errno, std::generic_category(), "unable to create directory " + name);
 }
 
