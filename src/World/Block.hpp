@@ -34,13 +34,17 @@ namespace MinedMap {
 namespace World {
 
 struct Block {
+	struct Color {
+		uint8_t r, g, b, a;
+	};
+
 	const Resource::BlockType *type;
 	unsigned height;
 	uint8_t blockLight;
 	uint8_t biome;
 
 
-	uint32_t getColor() const;
+	Color getColor() const;
 
 	operator bool() const {
 		return type;

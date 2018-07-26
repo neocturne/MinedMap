@@ -41,7 +41,6 @@
 
 #include <sys/types.h>
 
-#include <arpa/inet.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -52,7 +51,7 @@ namespace MinedMap {
 static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
 
 
-static void addChunk(uint32_t image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z, const World::ChunkData *data) {
+static void addChunk(World::Block::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z, const World::ChunkData *data) {
 	World::Chunk chunk(data);
 	World::Chunk::Blocks layer = chunk.getTopLayer();
 
@@ -61,7 +60,7 @@ static void addChunk(uint32_t image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_
 			size_t i = (Z*World::Chunk::SIZE+z)*DIM + X*World::Chunk::SIZE+x;
 			const World::Block &block = layer.blocks[x][z];
 
-			image[i] = htonl(block.getColor());
+			image[i] = block.getColor();
 			lightmap[2*i+1] = (1 - block.blockLight/15.f)*192;
 		}
 	}
@@ -134,7 +133,7 @@ static void doRegion(const std::string &input, const std::string &output, const 
 	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
 
 	try {
-		std::unique_ptr<uint32_t[]> image(new uint32_t[DIM*DIM]);
+		std::unique_ptr<World::Block::Color[]> image(new World::Block::Color[DIM*DIM]);
 		std::memset(image.get(), 0, 4*DIM*DIM);
 
 		std::unique_ptr<uint8_t[]> lightmap(new uint8_t[2*DIM*DIM]);

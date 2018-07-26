@@ -31,9 +31,9 @@
 namespace MinedMap {
 namespace World {
 
-uint32_t Block::getColor() const {
+Block::Color Block::getColor() const {
 	if (!type || !type->opaque)
-		return 0;
+		return Color {};
 
 	float r = type->color.r;
 	float g = type->color.g;
@@ -63,7 +63,7 @@ uint32_t Block::getColor() const {
 	if (g > 255) g = 255;
 	if (b > 255) b = 255;
 
-	return ((unsigned)r << 24) | ((unsigned)g << 16) | ((unsigned)b << 8) | 0xff;
+	return Color {uint8_t(r), uint8_t(g), uint8_t(b), 0xff};
 }
 
 }
