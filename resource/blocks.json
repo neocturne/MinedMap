@@ -10,7 +10,7 @@
 		"texture": "acacia_planks"
 	},
 	"acacia_leaves": {
-		"green": true
+		"foliage": true
 	},
 	"acacia_log": {
 		"texture": "acacia_log_top"
@@ -43,10 +43,10 @@
 		"texture": "anvil_top"
 	},
 	"attached_melon_stem": {
-		"green": true
+		"grass": true
 	},
 	"attached_pumpkin_stem": {
-		"green": true
+		"grass": true
 	},
 	"azure_bluet": null,
 	"barrier": null,
@@ -68,7 +68,7 @@
 		"texture": "birch_planks"
 	},
 	"birch_leaves": {
-		"green": true
+		"foliage": true
 	},
 	"birch_log": {
 		"texture": "birch_log_top"
@@ -317,7 +317,7 @@
 		"texture": "dark_oak_planks"
 	},
 	"dark_oak_leaves": {
-		"green": true
+		"foliage": true
 	},
 	"dark_oak_log": {
 		"texture": "dark_oak_log_top"
@@ -455,7 +455,7 @@
 	},
 	"grass_block": {
 		"texture": "grass_block_top",
-		"green": true
+		"grass": true
 	},
 	"grass": null,
 	"grass_path": {
@@ -571,7 +571,7 @@
 		"texture": "jungle_planks"
 	},
 	"jungle_leaves": {
-		"green": true
+		"foliage": true
 	},
 	"jungle_log": {
 		"texture": "jungle_log_top"
@@ -604,7 +604,7 @@
 	},
 	"large_fern": {
 		"texture": "large_fern_top",
-		"green": true
+		"grass": true
 	},
 	"lava": {
 		"texture": "lava_still"
@@ -663,7 +663,7 @@
 		"texture": "lilac_top"
 	},
 	"lily_pad": {
-		"green": true
+		"grass": true
 	},
 	"lime_banner": null,
 	"lime_bed": null,
@@ -718,7 +718,7 @@
 		"texture": "melon_top"
 	},
 	"melon_stem": {
-		"green": true
+		"grass": true
 	},
 	"mossy_cobblestone": {
 	},
@@ -768,7 +768,7 @@
 		"texture": "oak_planks"
 	},
 	"oak_leaves": {
-		"green": true
+		"foliage": true
 	},
 	"oak_log": {
 		"texture": "oak_log_top"
@@ -906,7 +906,7 @@
 	},
 	"potted_fern": {
 		"texture": "fern",
-		"green": true
+		"grass": true
 	},
 	"potted_jungle_sapling": {
 		"texture": "jungle_sapling"
@@ -960,7 +960,7 @@
 		"texture": "pumpkin_top"
 	},
 	"pumpkin_stem": {
-		"green": true
+		"grass": true
 	},
 	"purple_banner": null,
 	"purple_bed": null,
@@ -1126,7 +1126,7 @@
 		"texture": "spruce_planks"
 	},
 	"spruce_leaves": {
-		"green": true
+		"foliage": true
 	},
 	"spruce_log": {
 		"texture": "spruce_log_top"
@@ -1215,11 +1215,10 @@
 	},
 	"tall_grass": {
 		"texture": "tall_grass_top",
-		"green": true
+		"grass": true
 	},
 	"tall_seagrass": {
-		"texture": "tall_seagrass_top",
-		"green": false
+		"texture": "tall_seagrass_top"
 	},
 	"terracotta": {
 	},
@@ -1240,7 +1239,7 @@
 	"turtle_egg": {
 	},
 	"vine": {
-		"green": true
+		"grass": true
 	},
 	"void_air": null,
 	"wall_sign": null,

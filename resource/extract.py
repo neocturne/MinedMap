@@ -40,7 +40,8 @@ for name, info in blocks.items():
 	output[id] = {
 		'color': {'r': 0, 'g': 0, 'b': 0},
 		'opaque': False,
-		'green': False,
+		'grass': False,
+		'foliage': False,
 		'blue': False,
 	}
 
@@ -51,7 +52,8 @@ for name, info in blocks.items():
 	if color:
 		output[id]['color'] = color
 		output[id]['opaque'] = True
-		output[id]['green'] = info.get('green', False)
+		output[id]['grass'] = info.get('grass', False)
+		output[id]['foliage'] = info.get('foliage', False)
 		output[id]['blue'] = info.get('blue', False)
 
 with open(sys.argv[3], 'w') as f:

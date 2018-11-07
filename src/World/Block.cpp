@@ -45,7 +45,7 @@ Block::Color Block::getColor() const {
 	g *= heightCoef;
 	b *= heightCoef;
 
-	if (type->green) {
+	if (type->grass || type->foliage) {
 		const Resource::Biome &biomeDef = Resource::BIOMES[biome];
 
 		r *= biomeDef.r;

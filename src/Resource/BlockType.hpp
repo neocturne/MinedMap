@@ -41,7 +41,8 @@ public:
 	static const BlockType * lookup(const std::string &name);
 
 	bool opaque;
-	bool green;
+	bool grass;
+	bool foliage;
 	bool blue;
 	struct {
 		uint8_t r, g, b;
