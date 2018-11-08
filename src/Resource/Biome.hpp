@@ -26,14 +26,36 @@
 
 #pragma once
 
+#include "Color.hpp"
+
+
 namespace MinedMap {
 namespace Resource {
 
-struct Biome {
-	float r, g, b;
+class BlockType;
+
+class Biome {
+public:
+	struct FloatColor {
+		float r, g, b;
+	};
+
+private:
+	float temp, rain;
+
+protected:
+	virtual FloatColor getGrassColor(float temp, float rain) const;
+	virtual FloatColor getFoliageColor(float temp, float rain) const;
+	virtual FloatColor getWaterColor(float temp, float rain) const;
+
+public:
+	Biome(float temp0, float rain0) : temp(temp0), rain(rain0) {}
+
+	Color getBlockColor(const BlockType *type, unsigned height) const;
 };
 
-extern const Biome BIOMES[256];
+extern const Biome *const BIOME_DEFAULT;
+extern const Biome *const BIOMES[256];
 
 }
 }

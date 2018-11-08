@@ -27,6 +27,7 @@
 #pragma once
 
 #include "../NBT/CompoundTag.hpp"
+#include "../Resource/Biome.hpp"
 #include "../Resource/BlockType.hpp"
 
 
@@ -34,17 +35,18 @@ namespace MinedMap {
 namespace World {
 
 struct Block {
-	struct Color {
-		uint8_t r, g, b, a;
-	};
-
 	const Resource::BlockType *type;
 	unsigned height;
 	uint8_t blockLight;
 	uint8_t biome;
 
 
-	Color getColor() const;
+	Resource::Color getColor() const {
+		if (!type || !type->opaque)
+			return Resource::Color {};
+
+		return (Resource::BIOMES[biome] ?: Resource::BIOME_DEFAULT)->getBlockColor(type, height);
+	}
 
 	operator bool() const {
 		return type;

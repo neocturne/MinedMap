@@ -51,7 +51,7 @@ namespace MinedMap {
 static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
 
 
-static void addChunk(World::Block::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z, const World::ChunkData *data) {
+static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z, const World::ChunkData *data) {
 	World::Chunk chunk(data);
 	World::Chunk::Blocks layer = chunk.getTopLayer();
 
@@ -137,7 +137,7 @@ static void doRegion(const std::string &input, const std::string &output, const 
 	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
 
 	try {
-		std::unique_ptr<World::Block::Color[]> image(new World::Block::Color[DIM*DIM]);
+		std::unique_ptr<Resource::Color[]> image(new Resource::Color[DIM*DIM]);
 		std::memset(image.get(), 0, 4*DIM*DIM);
 
 		std::unique_ptr<uint8_t[]> lightmap(new uint8_t[2*DIM*DIM]);

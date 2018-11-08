@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <stdexcept>
 #include <utility>
 
@@ -37,6 +38,10 @@ template <typename T> static inline T assertValue(T&& val) {
 		throw std::invalid_argument("assertValue failed");
 
 	return std::forward<T>(val);
+}
+
+static inline float clamp(float v, float min, float max) {
+	return std::max(std::min(v, max), min);
 }
 
 }

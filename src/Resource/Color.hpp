@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2018, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -24,47 +24,17 @@
 */
 
 
-#include "Block.hpp"
-#include "../Resource/Biome.hpp"
+#pragma once
+
+#include <cstdint>
 
 
 namespace MinedMap {
-namespace World {
+namespace Resource {
 
-Block::Color Block::getColor() const {
-	if (!type || !type->opaque)
-		return Color {};
-
-	float r = type->color.r;
-	float g = type->color.g;
-	float b = type->color.b;
-
-	float heightCoef = height/255.0f + 0.5f;
-
-	r *= heightCoef;
-	g *= heightCoef;
-	b *= heightCoef;
-
-	if (type->grass || type->foliage) {
-		const Resource::Biome &biomeDef = Resource::BIOMES[biome];
-
-		r *= biomeDef.r;
-		g *= biomeDef.g;
-		b *= biomeDef.b;
-	}
-
-	if (type->blue) {
-		r *= 0.265;
-		g *= 0.382;
-		b *= 1.379;
-	}
-
-	if (r > 255) r = 255;
-	if (g > 255) g = 255;
-	if (b > 255) b = 255;
-
-	return Color {uint8_t(r), uint8_t(g), uint8_t(b), 0xff};
-}
+struct Color {
+	uint8_t r, g, b, a;
+};
 
 }
 }

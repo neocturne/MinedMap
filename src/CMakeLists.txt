@@ -10,7 +10,6 @@ add_executable(MinedMap
   NBT/Tag.cpp
   Resource/Biome.cpp
   Resource/BlockType.cpp
-  World/Block.cpp
   World/Chunk.cpp
   World/ChunkData.cpp
   World/Level.cpp
