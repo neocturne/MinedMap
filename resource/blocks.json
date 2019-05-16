@@ -453,8 +453,7 @@
 	"furnace": {
 		"texture": "furnace_top"
 	},
-	"glass": {
-	},
+	"glass": null,
 	"glass_pane": {
 		"texture": "glass_pane_top"
 	},

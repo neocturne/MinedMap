@@ -208,7 +208,7 @@
 {"minecraft:flower_pot", {true, false, false, false, {124, 68, 53}}},
 {"minecraft:frosted_ice", {true, false, false, false, {140, 181, 252}}},
 {"minecraft:furnace", {true, false, false, false, {110, 109, 109}}},
-{"minecraft:glass", {true, false, false, false, {175, 213, 219}}},
+{"minecraft:glass", {false, false, false, false, {0, 0, 0}}},
 {"minecraft:glass_pane", {true, false, false, false, {211, 239, 244}}},
 {"minecraft:glowstone", {true, false, false, false, {171, 131, 84}}},
 {"minecraft:gold_block", {true, false, false, false, {246, 208, 61}}},
