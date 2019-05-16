@@ -20,6 +20,7 @@
 {"minecraft:attached_pumpkin_stem", {true, true, false, false, {139, 139, 139}}},
 {"minecraft:azure_bluet", {false, false, false, false, {0, 0, 0}}},
 {"minecraft:bamboo", {true, false, false, false, {93, 144, 19}}},
+{"minecraft:barrel", {true, false, false, false, {134, 100, 58}}},
 {"minecraft:barrier", {false, false, false, false, {0, 0, 0}}},
 {"minecraft:beacon", {true, false, false, false, {117, 220, 215}}},
 {"minecraft:bedrock", {true, false, false, false, {85, 85, 85}}},

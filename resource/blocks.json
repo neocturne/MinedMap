@@ -52,6 +52,9 @@
 	"bamboo": {
 		"texture": "bamboo_stalk"
 	},
+	"barrel": {
+		"texture": "barrel_top"
+	},
 	"barrier": null,
 	"beacon": {
 	},
