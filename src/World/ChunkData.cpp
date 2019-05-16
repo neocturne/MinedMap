@@ -87,7 +87,7 @@ void ChunkData::inflateChunk(Buffer buffer) {
 void ChunkData::parseChunk() {
 	Buffer nbt(data.get(), len);
 	std::pair<std::string, std::shared_ptr<const NBT::Tag>> tag = NBT::Tag::readNamedTag(&nbt);
-	if (tag.first != "")
+	if (!tag.first.empty())
 		throw std::invalid_argument("invalid root tag");
 
 	root = assertValue(std::dynamic_pointer_cast<const NBT::CompoundTag>(tag.second));
