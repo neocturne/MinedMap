@@ -2,3 +2,5 @@
 /viewer/data
 .idea/
 cmake-build-debug/
+/resource/colors.json
+/resource/BlockType.inc
