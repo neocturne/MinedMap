@@ -1,5 +1,6 @@
 /*
   Copyright (c) 2015, 2018, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2019, Roman Shishkin <spark@uwtech.org>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -364,6 +365,8 @@ const Biome *const BIOMES[256] = {
 	/* 165 */ &BiomeBadlands, /* Eroded Badlands */
 	/* 166 */ &BiomeBadlands, /* Modified Wooded Badlands Plateau */
 	/* 167 */ &BiomeBadlands, /* Modified Badlands Plateau */
+	/* 168 */ &BiomeJungle, /* Bamboo Jungle */
+	/* 169 */ &BiomeJungle, /* Bamboo Jungle Hills */
 };
 
 }
