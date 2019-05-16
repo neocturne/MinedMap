@@ -1,2 +1,4 @@
 *~
 /viewer/data
+.idea/
+cmake-build-debug/
