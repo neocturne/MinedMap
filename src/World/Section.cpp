@@ -50,11 +50,11 @@ std::unique_ptr<Section> Section::makeSection(const std::shared_ptr<const NBT::C
 		return std::unique_ptr<Section>(new PaletteSection(section, std::move(blockStates), palette));
 	}
 
-    std::shared_ptr<const NBT::ByteArrayTag> blocks = section->get<NBT::ByteArrayTag>("BlockStates");
+	std::shared_ptr<const NBT::ByteArrayTag> blocks = section->get<NBT::ByteArrayTag>("BlockStates");
 	if (blocks) {
-        std::shared_ptr<const NBT::ByteArrayTag> data = assertValue(section->get<NBT::ByteArrayTag>("Data"));
+		std::shared_ptr<const NBT::ByteArrayTag> data = assertValue(section->get<NBT::ByteArrayTag>("Data"));
 
-        return std::unique_ptr<Section>(new LegacySection(section, std::move(blocks), std::move(data)));
+		return std::unique_ptr<Section>(new LegacySection(section, std::move(blocks), std::move(data)));
 	}
 
 	return nullptr;
