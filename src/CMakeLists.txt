@@ -15,9 +15,10 @@ add_executable(MinedMap
   World/Level.cpp
   World/Region.cpp
   World/Section.cpp
+   ctpl_stl.h
 )
-set_target_properties(MinedMap PROPERTIES COMPILE_FLAGS "-std=c++11 -Wall")
-target_link_libraries(MinedMap ${ZLIB_LIBRARIES} ${PNG_LIBRARIES})
+set_target_properties(MinedMap PROPERTIES COMPILE_FLAGS "-std=c++11 -Wall -lpthread")
+target_link_libraries(MinedMap ${ZLIB_LIBRARIES} ${PNG_LIBRARIES} pthread)
 
 add_executable(nbtdump
   nbtdump.cpp

@@ -24,6 +24,7 @@
 */
 
 
+#include "ctpl_stl.h"
 #include "Info.hpp"
 #include "PNG.hpp"
 #include "World/Level.hpp"
@@ -105,14 +106,14 @@ static void writeImage(const std::string &output, const uint8_t *data, bool colo
 	}
 }
 
-static void doRegion(const std::string &input, const std::string &output, const std::string &output_light) {
+static void doRegion(int id, const std::string &input, const std::string &output, const std::string &output_light) {
 	int64_t intime;
 
 	{
 		struct stat instat;
 
 		if (stat(input.c_str(), &instat) < 0) {
-			std::fprintf(stderr, "Unable to stat %s: %s\n", input.c_str(), std::strerror(errno));
+			std::fprintf(stderr, "[Thread %d] Unable to stat %s: %s\n", id, input.c_str(), std::strerror(errno));
 			return;
 		}
 
@@ -128,13 +129,13 @@ static void doRegion(const std::string &input, const std::string &output, const 
 		if (stat(output.c_str(), &s) == 0) {
 			int64_t outtime = readStamp(output);
 			if (intime <= outtime) {
-				std::printf("%s is up-to-date.\n", output.c_str());
+				std::printf("[Thread %d] %s is up-to-date.\n", id, output.c_str());
 				return;
 			}
 		}
 	}
 
-	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
+	std::printf("[Thread %d] Generating %s from %s...\n", id, output.c_str(), input.c_str());
 
 	try {
 		std::unique_ptr<Resource::Color[]> image(new Resource::Color[DIM*DIM]);
@@ -149,7 +150,7 @@ static void doRegion(const std::string &input, const std::string &output, const 
 		writeImage(output_light, lightmap.get(), false, intime);
 	}
 	catch (const std::exception& ex) {
-		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
+		std::fprintf(stderr, "[Thread %d] Failed to generate %s: %s\n", id, output.c_str(), ex.what());
 	}
 }
 
@@ -311,6 +312,9 @@ int main(int argc, char *argv[]) {
 
 	Info info;
 
+	int threads = std::thread::hardware_concurrency();
+	ctpl::thread_pool pool(threads);
+
 	struct dirent *entry;
 	while ((entry = readdir(dir)) != nullptr) {
 		int x, z;
@@ -320,7 +324,8 @@ int main(int argc, char *argv[]) {
 		info.addRegion(x, z, 0);
 
 		std::string name(entry->d_name), outname = name.substr(0, name.length()-3) + "png";
-		doRegion(regiondir + "/" + name, outputdir + "/map/0/" + outname, outputdir + "/light/0/" + outname);
+		pool.push(doRegion, regiondir + "/" + name, outputdir + "/map/0/" + outname, outputdir + "/light/0/" + outname);
+		//doRegion(0, regiondir + "/" + name, outputdir + "/map/0/" + outname, outputdir + "/light/0/" + outname);
 	}
 
 	closedir(dir);

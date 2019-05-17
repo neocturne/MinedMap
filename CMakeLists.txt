@@ -4,6 +4,6 @@ project(MINEDMAP CXX)
 
 find_package(PNG REQUIRED)
 find_package(ZLIB REQUIRED)
-
+find_package(Threads REQUIRED)
 
 add_subdirectory(src)
