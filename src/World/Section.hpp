@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-2018, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2019, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -72,7 +72,7 @@ public:
 
 	size_t getY() const { return Y; };
 
-	virtual const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const = 0;
+	virtual const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const;
 
 	uint8_t getBlockLightAt(size_t x, size_t y, size_t z) const {
 		if (!blockLight)
