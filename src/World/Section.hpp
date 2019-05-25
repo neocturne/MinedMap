@@ -81,7 +81,7 @@ public:
 		return getHalf(blockLight->getValue(), x, y, z);
 	}
 
-	static std::unique_ptr<Section> makeSection(const std::shared_ptr<const NBT::CompoundTag> &section);
+	static std::unique_ptr<Section> makeSection(const std::shared_ptr<const NBT::CompoundTag> &section, uint32_t dataVersion);
 };
 
 class LegacySection : public Section {
@@ -116,6 +116,8 @@ private:
 	uint16_t mask;
 
 
+	static const Resource::BlockType * lookup(const std::string &name, uint32_t dataVersion);
+
 	static size_t mangleByteIndex(size_t index) {
 		return (index & ~(size_t)7) + 7 - (index & 7);
 	}
@@ -124,7 +126,8 @@ public:
 	PaletteSection(
 		const std::shared_ptr<const NBT::CompoundTag> &section,
 		std::shared_ptr<const NBT::LongArrayTag> &&blockStates0,
-		const std::shared_ptr<const NBT::ListTag> &paletteData
+		const std::shared_ptr<const NBT::ListTag> &paletteData,
+		uint32_t dataVersion
 	);
 
 	virtual const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const;

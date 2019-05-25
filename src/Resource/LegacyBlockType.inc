@@ -143,7 +143,7 @@
 /*  41 */ simple("gold_block"),
 /*  42 */ simple("iron_block"),
 /*  43 */ {
-	"stone_slab",
+	"smooth_stone_slab",
 	"sandstone_slab",
 	"oak_slab",
 	"cobblestone_slab",
@@ -153,7 +153,7 @@
 	"quartz_slab",
 },
 /*  44 */ {
-	"stone_slab",
+	"smooth_stone_slab",
 	"sandstone_slab",
 	"oak_slab",
 	"cobblestone_slab",

@@ -25,6 +25,7 @@
 
 
 #include "Chunk.hpp"
+#include "../NBT/IntTag.hpp"
 #include "../NBT/ListTag.hpp"
 #include "../NBT/StringTag.hpp"
 
@@ -51,9 +52,12 @@ Chunk::Chunk(const ChunkData *data) {
 	else if (biomeInts && biomeInts->getLength() != SIZE*SIZE)
 		throw std::invalid_argument("corrupt biome data");
 
+	auto dataVersionTag = data->getRoot().get<NBT::IntTag>("DataVersion");
+	uint32_t dataVersion = dataVersionTag ? dataVersionTag->getValue() : 0;
+
 	for (auto &sTag : *sectionsTag) {
 		auto s = std::dynamic_pointer_cast<const NBT::CompoundTag>(sTag);
-		std::unique_ptr<Section> section = Section::makeSection(s);
+		std::unique_ptr<Section> section = Section::makeSection(s, dataVersion);
 		size_t Y = section->getY();
 		sections.resize(Y);
 		sections.push_back(std::move(section));

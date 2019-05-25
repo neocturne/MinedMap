@@ -44,12 +44,12 @@ const Resource::BlockType * Section::getBlockStateAt(size_t, size_t, size_t) con
 	return nullptr;
 }
 
-std::unique_ptr<Section> Section::makeSection(const std::shared_ptr<const NBT::CompoundTag> &section) {
+std::unique_ptr<Section> Section::makeSection(const std::shared_ptr<const NBT::CompoundTag> &section, uint32_t dataVersion) {
 	std::shared_ptr<const NBT::LongArrayTag> blockStates = section->get<NBT::LongArrayTag>("BlockStates");
 	if (blockStates) {
 		const std::shared_ptr<const NBT::ListTag> palette = assertValue(section->get<NBT::ListTag>("Palette"));
 
-		return std::unique_ptr<Section>(new PaletteSection(section, std::move(blockStates), palette));
+		return std::unique_ptr<Section>(new PaletteSection(section, std::move(blockStates), palette, dataVersion));
 	}
 
 	std::shared_ptr<const NBT::ByteArrayTag> blocks = section->get<NBT::ByteArrayTag>("Blocks");
@@ -71,10 +71,18 @@ const Resource::BlockType * LegacySection::getBlockStateAt(size_t x, size_t y, s
 }
 
 
+const Resource::BlockType * PaletteSection::lookup(const std::string &name, uint32_t dataVersion) {
+	if (dataVersion < 1900 && name == "minecraft:stone_slab")
+		return Resource::BlockType::lookup("minecraft:smooth_stone_slab");
+
+	return Resource::BlockType::lookup(name);
+}
+
 PaletteSection::PaletteSection(
 	const std::shared_ptr<const NBT::CompoundTag> &section,
 	std::shared_ptr<const NBT::LongArrayTag> &&blockStates0,
-	const std::shared_ptr<const NBT::ListTag> &paletteData
+	const std::shared_ptr<const NBT::ListTag> &paletteData,
+	uint32_t dataVersion
 ) : Section(section), blockStates(blockStates0) {
 	if (blockStates->getLength() % 64)
 		throw std::invalid_argument("corrupt section data");
@@ -90,7 +98,7 @@ PaletteSection::PaletteSection(
 		const NBT::CompoundTag &paletteEntry = *assertValue(dynamic_cast<const NBT::CompoundTag *>(entry.get()));
 		std::string name = assertValue(paletteEntry.get<NBT::StringTag>("Name"))->getValue();
 
-		const Resource::BlockType *type = Resource::BlockType::lookup(name);
+		const Resource::BlockType *type = lookup(name, dataVersion);
 		if (!type)
 			std::fprintf(stderr, "Warning: unknown block type: %s\n", name.c_str());
 
