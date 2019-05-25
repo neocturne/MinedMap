@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-2018, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2019, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@ Chunk::Chunk(const ChunkData *data) {
 	level = assertValue(data->getRoot().get<NBT::CompoundTag>("Level"));
 
 	std::shared_ptr<const NBT::ListTag> sectionsTag = level->get<NBT::ListTag>("Sections");
-	if (!sectionsTag)
+	if (!sectionsTag || sectionsTag->empty())
 		return;
 
 	biomeBytes = level->get<NBT::ByteArrayTag>("Biomes");
