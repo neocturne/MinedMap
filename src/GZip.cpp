@@ -59,7 +59,7 @@ std::vector<uint8_t> readGZip(const char *filename) {
 
 	buffer.resize(len);
 
-	return std::move(buffer);
+	return buffer;
 }
 
 }
