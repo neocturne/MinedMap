@@ -36,3 +36,5 @@ add_executable(regiondump
 )
 set_target_properties(regiondump PROPERTIES COMPILE_FLAGS "-std=c++11 -Wall")
 target_link_libraries(regiondump ${ZLIB_LIBRARIES})
+
+install(TARGETS MinedMap RUNTIME DESTINATION bin)
