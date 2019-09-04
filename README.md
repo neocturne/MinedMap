@@ -2,7 +2,7 @@
 
 * Render beautiful maps of your [Minecraft](https://minecraft.net/) worlds!
 * Put them on a webserver and view them in your browser!
-* Compatible with unmodified Minecraft Java Edition 1.8 up to 1.13 (no mod installation necessary!)
+* Compatible with unmodified Minecraft Java Edition 1.8 up to 1.14 (no mod installation necessary!)
 * Illumination layer: the world at night
 * Fast: create a full map for a huge 3GB savegame in less than 5 minutes
 * Incremental updates: only recreate map tiles for regions that have changed
