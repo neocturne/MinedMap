@@ -74,6 +74,12 @@
 	},
 	"bedrock": {
 	},
+	"beehive": {
+		"texture": "beehive_end"
+	},
+	"bee_nest": {
+		"texture": "bee_nest_top"
+	},
 	"beetroots": {
 		"texture": "beetroots_stage3"
 	},
@@ -605,6 +611,12 @@
 	},
 	"heavy_weighted_pressure_plate": {
 		"texture": "iron_block"
+	},
+	"honey_block": {
+		"texture": "honey_block_top"
+	},
+	"honeycomb_block": {
+		"texture": "honeycomb_block"
 	},
 	"hopper": {
 		"texture": "hopper_top"
