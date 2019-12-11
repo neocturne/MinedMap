@@ -43,13 +43,16 @@ Chunk::Chunk(const ChunkData *data) {
 	if (!sectionsTag || sectionsTag->empty())
 		return;
 
-	biomeBytes = level->get<NBT::ByteArrayTag>("Biomes");
-	biomeInts = level->get<NBT::IntArrayTag>("Biomes");
-	assertValue(biomeBytes || biomeInts);
+	auto biomesIntArray = level->get<NBT::IntArrayTag>("Biomes");
+	auto biomesByteArray = level->get<NBT::ByteArrayTag>("Biomes");
 
-	if (biomeBytes && biomeBytes->getLength() != SIZE*SIZE)
-		throw std::invalid_argument("corrupt biome data");
-	else if (biomeInts && biomeInts->getLength() != SIZE*SIZE)
+	if (biomesIntArray && biomesIntArray->getLength() == BSIZE*BSIZE*BMAXY)
+		biomeInts = std::move(biomesIntArray);
+	else if (biomesIntArray && biomesIntArray->getLength() == SIZE*SIZE)
+		biomeIntsPre115 = std::move(biomesIntArray);
+	else if (biomesByteArray && biomesByteArray->getLength() == SIZE*SIZE)
+		biomeBytes = std::move(biomesByteArray);
+	else
 		throw std::invalid_argument("corrupt biome data");
 
 	auto dataVersionTag = data->getRoot().get<NBT::IntTag>("DataVersion");
@@ -64,6 +67,18 @@ Chunk::Chunk(const ChunkData *data) {
 	}
 }
 
+uint8_t Chunk::getBiome(size_t x, size_t y, size_t z) const {
+	if (x > SIZE || y > MAXY || z > SIZE)
+		throw std::invalid_argument("corrupt chunk data");
+
+	if (biomeInts)
+		return biomeInts->getValue((y/BGROUP)*BSIZE*BSIZE + (z/BGROUP)*BSIZE + (x/BGROUP));
+	else if (biomeIntsPre115)
+		return biomeIntsPre115->getValue(z*SIZE + x);
+	else
+		return biomeBytes->getValue(z*SIZE + x);
+}
+
 bool Chunk::getBlock(Block *block, const Section *section, size_t x, size_t y, size_t z, uint8_t prev_light) const {
 	if (block->height > 0)
 		return false;
@@ -75,7 +90,7 @@ bool Chunk::getBlock(Block *block, const Section *section, size_t x, size_t y, s
 	if (!block->type) {
 		block->type = type;
 		block->blockLight = prev_light;
-		block->biome = getBiomeAt(x, z);
+		block->biome = getBiome(x, y, z);
 	}
 
 	if (type->blue)

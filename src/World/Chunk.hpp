@@ -44,6 +44,11 @@ namespace World {
 class Chunk {
 public:
 	static const size_t SIZE = Section::SIZE;
+	static const size_t MAXY = 256;
+
+	static const size_t BGROUP = 4;
+	static const size_t BSIZE = SIZE / BGROUP;
+	static const size_t BMAXY = MAXY / BGROUP;
 
 	struct Blocks {
 		Block blocks[SIZE][SIZE];
@@ -54,15 +59,10 @@ private:
 	std::vector<std::unique_ptr<Section>> sections;
 
 	std::shared_ptr<const NBT::ByteArrayTag> biomeBytes;
+	std::shared_ptr<const NBT::IntArrayTag> biomeIntsPre115;
 	std::shared_ptr<const NBT::IntArrayTag> biomeInts;
 
-	uint8_t getBiomeAt(size_t x, size_t z) const {
-		if (biomeBytes)
-			return biomeBytes->getValue(z*SIZE + x);
-		else
-			return biomeInts->getValue(z*SIZE + x);
-	}
-
+	uint8_t getBiome(size_t x, size_t y, size_t z) const;
 	bool getBlock(Block *block, const Section *section, size_t x, size_t y, size_t z, uint8_t prev_light) const;
 
 public:
