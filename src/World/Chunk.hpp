@@ -58,7 +58,7 @@ private:
 
 	uint8_t getBiomeAt(size_t x, size_t z) const {
 		if (biomeBytes)
-			return biomeBytes->getValue()[z*SIZE + x];
+			return biomeBytes->getValue(z*SIZE + x);
 		else
 			return biomeInts->getValue(z*SIZE + x);
 	}

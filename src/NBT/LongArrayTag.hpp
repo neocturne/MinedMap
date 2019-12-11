@@ -77,6 +77,10 @@ public:
 	const uint8_t * getPointer() const {
 		return ptr;
 	}
+
+	uint64_t getValue(size_t i) const {
+		return Buffer::parse64(&ptr[8*i]);
+	}
 };
 
 }

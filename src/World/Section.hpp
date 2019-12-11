@@ -78,7 +78,7 @@ public:
 		if (!blockLight)
 			return 0;
 
-		return getHalf(blockLight->getValue(), x, y, z);
+		return getHalf(blockLight->getPointer(), x, y, z);
 	}
 
 	static std::unique_ptr<Section> makeSection(const std::shared_ptr<const NBT::CompoundTag> &section, uint32_t dataVersion);
@@ -91,11 +91,11 @@ private:
 
 
 	uint8_t getBlockAt(size_t x, size_t y, size_t z) const {
-		return blocks->getValue()[getIndex(x, y, z)];
+		return blocks->getValue(getIndex(x, y, z));
 	}
 
 	uint8_t getDataAt(size_t x, size_t y, size_t z) const {
-		return getHalf(data->getValue(), x, y, z);
+		return getHalf(data->getPointer(), x, y, z);
 	}
 
 public:

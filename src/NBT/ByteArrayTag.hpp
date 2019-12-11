@@ -37,7 +37,7 @@ namespace NBT {
 class ByteArrayTag : public Tag {
 private:
 	uint32_t len;
-	const uint8_t *value;
+	const uint8_t *ptr;
 
 public:
 	static const MakeType<ByteArrayTag> Type;
@@ -45,7 +45,7 @@ public:
 
 	ByteArrayTag(Buffer *buffer) {
 		len = buffer->get32();
-		value = buffer->get(len);
+		ptr = buffer->get(len);
 	}
 
 	virtual const TagType & getType() const {
@@ -58,7 +58,7 @@ public:
 		std::string inner = indent + "  ";
 
 		for (size_t i = 0; i < len; i++) {
-			uint8_t v = value[i];
+			uint8_t v = ptr[i];
 
 			os << inner
 			   << (unsigned)v << " / "
@@ -74,8 +74,12 @@ public:
 		return len;
 	}
 
-	const uint8_t * getValue() const {
-		return value;
+	const uint8_t * getPointer() const {
+		return ptr;
+	}
+
+	uint8_t getValue(size_t i) const {
+		return ptr[i];
 	}
 };
 
