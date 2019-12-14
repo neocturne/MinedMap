@@ -39,7 +39,10 @@ std::vector<uint8_t> readGZip(const char *filename) {
 
 	gzFile f = gzopen(filename, "rb");
 	if (!f)
-		throw std::system_error(errno, std::generic_category(), "unable to open GZip file");
+		throw std::system_error(
+			errno, std::generic_category(),
+			(std::string("unable to open file ") + filename).c_str()
+		);
 
 	while (true) {
 		if ((buffer.size() - len) < 4096)
