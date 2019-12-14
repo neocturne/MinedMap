@@ -26,6 +26,7 @@
 
 #include "Region.hpp"
 
+#include <cstring>
 #include <fstream>
 #include <iostream>
 
@@ -56,7 +57,7 @@ Region::ChunkMap Region::processHeader(const uint8_t header[4096]) {
 
 void Region::visitChunks(const char *filename, const ChunkVisitor &visitor) {
 	std::ifstream file;
-	file.exceptions(std::ios::failbit | std::ios::badbit);
+	file.exceptions(std::ios::badbit);
 	file.open(filename, std::ios::in | std::ios::binary);
 
 	ChunkMap chunkMap;
@@ -71,7 +72,7 @@ void Region::visitChunks(const char *filename, const ChunkVisitor &visitor) {
 	bool seen[SIZE][SIZE] = {};
 
 	size_t i = 1, c = 0;
-	while (!file.eof()) {
+	while (!file.eof() && !file.fail()) {
 		auto it = chunkMap.find(i);
 		if (it == chunkMap.end()) {
 			file.ignore(4096);
@@ -89,6 +90,7 @@ void Region::visitChunks(const char *filename, const ChunkVisitor &visitor) {
 		c++;
 
 		uint8_t buffer[len * 4096];
+		std::memset(buffer, 0, sizeof(buffer));
 		file.read((char *)buffer, len * 4096);
 
 		ChunkData chunk(Buffer(buffer, len * 4096));
