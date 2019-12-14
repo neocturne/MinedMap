@@ -36,6 +36,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
+#include <stdexcept>
 #include <sstream>
 #include <system_error>
 
@@ -98,8 +99,7 @@ static void writeImage(const std::string &output, const uint8_t *data, bool colo
 		}
 
 		writeStamp(output, t);
-	}
-	catch (const std::exception& ex) {
+	} catch (const std::exception& ex) {
 		std::remove(tmpfile.c_str());
 		throw;
 	}
@@ -147,8 +147,7 @@ static void doRegion(const std::string &input, const std::string &output, const 
 
 		writeImage(output, reinterpret_cast<const uint8_t*>(image.get()), true, intime);
 		writeImage(output_light, lightmap.get(), false, intime);
-	}
-	catch (const std::exception& ex) {
+	} catch (const std::exception& ex) {
 		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
 	}
 }
@@ -246,8 +245,7 @@ static bool makeMipmap(const std::string &dir, size_t level, size_t x, size_t z,
 		}
 
 		writeStamp(output, t);
-	}
-	catch (const std::exception& ex) {
+	} catch (const std::exception& ex) {
 		std::remove(tmpfile.c_str());
 		throw;
 	}
@@ -281,22 +279,8 @@ static void makeMipmaps(const std::string &dir, Info *info) {
 	}
 }
 
-}
-
-
-int main(int argc, char *argv[]) {
-	using namespace MinedMap;
-
-
-	if (argc < 3) {
-		std::fprintf(stderr, "Usage: %s <data directory> <output directory>\n", argv[0]);
-		return 1;
-	}
-
-	std::string inputdir(argv[1]);
-	std::string regiondir = inputdir + "/region";
-
-	std::string outputdir(argv[2]);
+static void doLevel(const std::string &inputdir, const std::string &outputdir) {
+	const std::string regiondir = inputdir + "/region";
 
 	makeDir(outputdir + "/map");
 	makeDir(outputdir + "/map/0");
@@ -304,10 +288,8 @@ int main(int argc, char *argv[]) {
 	makeDir(outputdir + "/light/0");
 
 	DIR *dir = opendir(regiondir.c_str());
-	if (!dir) {
-		std::fprintf(stderr, "Unable to read input directory: %s\n", std::strerror(errno));
-		return 1;
-	}
+	if (!dir)
+		throw std::system_error(errno, std::generic_category(), "Unable to read input directory");
 
 	Info info;
 
@@ -331,6 +313,23 @@ int main(int argc, char *argv[]) {
 	makeMipmaps(outputdir, &info);
 
 	info.writeJSON((outputdir + "/info.json").c_str());
+}
+
+}
+
+
+int main(int argc, char *argv[]) {
+	if (argc < 3) {
+		std::fprintf(stderr, "Usage: %s <data directory> <output directory>\n", argv[0]);
+		return 1;
+	}
+
+	try {
+		MinedMap::doLevel(argv[1], argv[2]);
+	} catch (const std::runtime_error& ex) {
+		std::fprintf(stderr, "Error: %s\n", ex.what());
+		return 1;
+	}
 
 	return 0;
 }
