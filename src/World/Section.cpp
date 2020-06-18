@@ -82,17 +82,27 @@ PaletteSection::PaletteSection(
 	const std::shared_ptr<const NBT::CompoundTag> &section,
 	std::shared_ptr<const NBT::LongArrayTag> &&blockStates0,
 	const std::shared_ptr<const NBT::ListTag> &paletteData,
-	uint32_t dataVersion
-) : Section(section), blockStates(blockStates0) {
-	if (blockStates->getLength() % 64)
+	uint32_t dataVersion0
+) : Section(section), blockStates(blockStates0), dataVersion(dataVersion0) {
+	bits = 4;
+	while ((1u << bits) < paletteData->size()) {
+		bits++;
+
+		if (bits > 12)
+			throw std::invalid_argument("unsupported block palette size");
+	}
+
+	unsigned expectedLength;
+
+	if (dataVersion < 2529) {
+		expectedLength = 64 * bits;
+	} else {
+		unsigned blocksPerWord = (64 / bits);
+		expectedLength = (4096 + blocksPerWord - 1) / blocksPerWord;
+	}
+
+	if (blockStates->getLength() != expectedLength)
 		throw std::invalid_argument("corrupt section data");
-
-	bits = blockStates->getLength() / 64;
-	if (bits > 16)
-		throw std::invalid_argument("unsupported block state bits");
-
-	mask = (1u << bits) - 1;
-
 
 	for (const auto &entry : *paletteData) {
 		const NBT::CompoundTag &paletteEntry = *assertValue(dynamic_cast<const NBT::CompoundTag *>(entry.get()));
@@ -107,9 +117,20 @@ PaletteSection::PaletteSection(
 }
 
 const Resource::BlockType * PaletteSection::getBlockStateAt(size_t x, size_t y, size_t z) const {
-	size_t index = bits * getIndex(x, y, z);
-	size_t pos = index >> 3;
-	size_t shift = index & 7;
+	size_t index = getIndex(x, y, z);
+	size_t bitIndex;
+
+	if (dataVersion < 2529) {
+		bitIndex = bits * index;
+	} else {
+		unsigned blocksPerWord = (64 / bits);
+		size_t word = index / blocksPerWord;
+		bitIndex = 64 * word + bits * (index % blocksPerWord);
+	}
+
+	size_t pos = bitIndex >> 3;
+	size_t shift = bitIndex & 7;
+	uint16_t mask = (1u << bits) - 1;
 
 	uint32_t v = blockStates->getPointer()[mangleByteIndex(pos)];
 

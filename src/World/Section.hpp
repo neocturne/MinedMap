@@ -112,8 +112,8 @@ class PaletteSection : public Section {
 private:
 	std::shared_ptr<const NBT::LongArrayTag> blockStates;
 	std::vector<const Resource::BlockType *> palette;
-	size_t bits;
-	uint16_t mask;
+	uint32_t dataVersion;
+	unsigned bits;
 
 
 	static const Resource::BlockType * lookup(const std::string &name, uint32_t dataVersion);
@@ -127,7 +127,7 @@ public:
 		const std::shared_ptr<const NBT::CompoundTag> &section,
 		std::shared_ptr<const NBT::LongArrayTag> &&blockStates0,
 		const std::shared_ptr<const NBT::ListTag> &paletteData,
-		uint32_t dataVersion
+		uint32_t dataVersion0
 	);
 
 	virtual const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const;
