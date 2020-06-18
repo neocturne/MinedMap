@@ -42,7 +42,7 @@ struct Block {
 
 
 	Resource::Color getColor() const {
-		if (!type || !type->opaque)
+		if (!type || !(type->flags & BLOCK_OPAQUE))
 			return Resource::Color {};
 
 		return (Resource::BIOMES[biome] ?: Resource::BIOME_DEFAULT)->getBlockColor(type, height);

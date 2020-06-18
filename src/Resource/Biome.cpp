@@ -99,11 +99,11 @@ Color Biome::getBlockColor(const BlockType *type, unsigned height) const {
 	float t = clamp(temp - std::max(0.0f, (height-64)/600.0f), 0, 1);
 	float r = clamp(rain, 0, 1) * t;
 
-	if (type->grass)
+	if (type->flags & BLOCK_GRASS)
 		c *= getGrassColor(t, r);
-	if (type->foliage)
+	if (type->flags & BLOCK_FOLIAGE)
 		c *= getFoliageColor(t, r);
-	if (type->blue)
+	if (type->flags & BLOCK_WATER)
 		c *= getWaterColor(t, r);
 
 	float h = 0.5f + height * 0.005f;

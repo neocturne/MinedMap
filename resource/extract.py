@@ -42,7 +42,7 @@ for name, info in blocks.items():
 		'opaque': False,
 		'grass': False,
 		'foliage': False,
-		'blue': False,
+		'water': False,
 	}
 
 	if info is None:
@@ -54,7 +54,7 @@ for name, info in blocks.items():
 		output[id]['opaque'] = True
 		output[id]['grass'] = info.get('grass', False)
 		output[id]['foliage'] = info.get('foliage', False)
-		output[id]['blue'] = info.get('blue', False)
+		output[id]['water'] = info.get('water', False)
 
 with open(sys.argv[3], 'w') as f:
 	json.dump(output, f)

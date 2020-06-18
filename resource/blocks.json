@@ -209,8 +209,8 @@
 	"brown_wall_banner": null,
 	"brown_wool": {},
 	"bubble_column": {
-		"blue": true,
-		"texture": "water_still"
+		"texture": "water_still",
+		"water": true
 	},
 	"bubble_coral": null,
 	"bubble_coral_block": {},
@@ -1428,8 +1428,8 @@
 	"warped_wall_sign": null,
 	"warped_wart_block": {},
 	"water": {
-		"blue": true,
-		"texture": "water_still"
+		"texture": "water_still",
+		"water": true
 	},
 	"weeping_vines": {},
 	"weeping_vines_plant": {},

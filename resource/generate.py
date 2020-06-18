@@ -15,12 +15,23 @@ output = {}
 
 with open(sys.argv[2], 'w') as f:
 	for name, info in colors.items():
-		print('{"%s", {%s, %s, %s, %s, {%u, %u, %u}}},' % (
+		flags = []
+		if info['opaque']:
+			flags.append('BLOCK_OPAQUE')
+		if info['grass']:
+			flags.append('BLOCK_GRASS')
+		if info['foliage']:
+			flags.append('BLOCK_FOLIAGE')
+		if info['water']:
+			flags.append('BLOCK_WATER')
+		if flags:
+			flags = '|'.join(flags)
+		else:
+			flags = '0'
+
+		print('{"%s", {%s, {%u, %u, %u}}},' % (
 			name,
-			['false', 'true'][info['opaque']],
-			['false', 'true'][info['grass']],
-			['false', 'true'][info['foliage']],
-			['false', 'true'][info['blue']],
+			flags,
 			info['color']['r'],
 			info['color']['g'],
 			info['color']['b'],

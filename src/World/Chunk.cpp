@@ -84,7 +84,7 @@ bool Chunk::getBlock(Block *block, const Section *section, size_t x, size_t y, s
 		return false;
 
 	const Resource::BlockType *type = section->getBlockStateAt(x, y, z);
-	if (!type || !type->opaque)
+	if (!type || !(type->flags & BLOCK_OPAQUE))
 		return false;
 
 	if (!block->type) {
@@ -93,7 +93,7 @@ bool Chunk::getBlock(Block *block, const Section *section, size_t x, size_t y, s
 		block->biome = getBiome(x, y, z);
 	}
 
-	if (type->blue)
+	if (type->flags & BLOCK_WATER)
 		return false;
 
 	block->height = SIZE*section->getY() + y;

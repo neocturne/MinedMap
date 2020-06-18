@@ -33,6 +33,11 @@
 namespace MinedMap {
 namespace Resource {
 
+#define BLOCK_OPAQUE	(1u << 0)
+#define BLOCK_GRASS	(1u << 1)
+#define BLOCK_FOLIAGE	(1u << 2)
+#define BLOCK_WATER	(1u << 3)
+
 struct BlockType {
 private:
 	static const std::unordered_map<std::string, BlockType> Types;
@@ -40,10 +45,7 @@ private:
 public:
 	static const BlockType * lookup(const std::string &name);
 
-	bool opaque;
-	bool grass;
-	bool foliage;
-	bool blue;
+	uint8_t flags;
 	struct {
 		uint8_t r, g, b;
 	} color;
