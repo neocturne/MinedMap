@@ -84,10 +84,6 @@ Biome::FloatColor Biome::getFoliageColor(float temp, float rain) const {
 	return colorFromParams(temp, rain, false);
 }
 
-Biome::FloatColor Biome::getWaterColor(float, float) const {
-	return {0.161f, 0.365f, 0.996f};
-}
-
 
 Color Biome::getBlockColor(const BlockType *type, unsigned height) const {
 	Biome::FloatColor c = {
@@ -108,7 +104,7 @@ Color Biome::getBlockColor(const BlockType *type, unsigned height) const {
 	if (type->flags & BLOCK_SPRUCE)
 		c *= FloatColor {0.502f, 0.655f, 0.333f};
 	if (type->flags & BLOCK_WATER)
-		c *= getWaterColor(t, r);
+		c *= getWaterColor();
 
 	float h = 0.5f + height * 0.005f;
 
@@ -129,12 +125,10 @@ protected:
 	virtual FloatColor getFoliageColor(float temp, float rain) const {
 		return getGrassColor(temp, rain);
 	}
-	virtual FloatColor getWaterColor(float, float) const {
-		return {0.141f, 0.365f, 0.680f};
-	}
 
 public:
-	SwampBiome(float temp0, float rain0) : Biome(temp0, rain0) {}
+	SwampBiome(float temp0, float rain0, FloatColor water0) :
+	Biome(temp0, rain0, water0) {}
 };
 
 class DarkForestBiome : public Biome {
@@ -176,7 +170,7 @@ static const Biome BiomeDesert(2.0f, 0.0f);
 static const Biome BiomeMountains(0.2f, 0.3f);
 static const Biome BiomeForest(0.7f, 0.8f);
 static const Biome BiomeTaiga(0.25f, 0.8f);
-static const SwampBiome BiomeSwamp(0.8f, 0.9f);
+static const SwampBiome BiomeSwamp(0.8f, 0.9f, {0.380f, 0.482f, 0.392f});
 static const Biome BiomeFrozen(0.0f, 0.5f);
 static const Biome BiomeMushroomFields(0.9f, 1.0f);
 static const Biome BiomeJungle(0.95f, 0.9f);
@@ -190,7 +184,11 @@ static const Biome BiomeSavanna(1.2f, 0.0f);
 static const Biome BiomeSavannaPlateau(1.0f, 0.0f);
 static const Biome BiomeShatteredSavanna(1.1f, 0.0f);
 static const BadlandsBiome BiomeBadlands(2.0f, 0.0f);
-static const Biome BiomeWarmOcean(0.8f,  0.5f);
+
+static const Biome BiomeFrozenOcean(0.0f, 0.5f, {0.224f, 0.220f, 0.788f});
+static const Biome BiomeWarmOcean(0.8f, 0.5f, {0.263f, 0.835f, 0.933f});
+static const Biome BiomeLukewarmOcean(0.8f, 0.5f, {0.271f, 0.678f, 0.949f});
+static const Biome BiomeColdOcean(0.8f, 0.5f, {0.239f, 0.341f, 0.839f});
 
 extern const Biome *const BIOME_DEFAULT = &BiomeDefault;
 
@@ -205,8 +203,8 @@ const Biome *const BIOMES[256] = {
 	/*   7 */ &BiomeDefault, /* River */
 	/*   8 */ &BiomeDesert, /* Nether */
 	/*   9 */ &BiomeDefault, /* The End */
-	/*  10 */ &BiomeFrozen, /* Frozen Ocean */
-	/*  11 */ &BiomeFrozen, /* Frozen River */
+	/*  10 */ &BiomeFrozenOcean,
+	/*  11 */ &BiomeFrozenOcean, /* Frozen River */
 	/*  12 */ &BiomeFrozen, /* Snowy Tundra */
 	/*  13 */ &BiomeFrozen, /* Snowy Mountains */
 	/*  14 */ &BiomeMushroomFields,
@@ -240,12 +238,12 @@ const Biome *const BIOMES[256] = {
 	/*  42 */ &BiomeDefault, /* End Highlands */
 	/*  43 */ &BiomeDefault, /* End Barrens */
 	/*  44 */ &BiomeWarmOcean,
-	/*  45 */ &BiomeWarmOcean, /* Lukewarm Ocean */
-	/*  46 */ &BiomeWarmOcean, /* Cold Ocean */
+	/*  45 */ &BiomeLukewarmOcean,
+	/*  46 */ &BiomeColdOcean,
 	/*  47 */ &BiomeWarmOcean, /* Deep Warm Ocean */
-	/*  48 */ &BiomeWarmOcean, /* Deep Lukewarm Ocean */
-	/*  49 */ &BiomeWarmOcean, /* Deep Cold Ocean */
-	/*  50 */ &BiomeWarmOcean, /* Deep Frozen Ocean */
+	/*  48 */ &BiomeLukewarmOcean, /* Deep Lukewarm Ocean */
+	/*  49 */ &BiomeColdOcean, /* Deep Cold Ocean */
+	/*  50 */ &BiomeFrozenOcean, /* Deep Frozen Ocean */
 	/*  51 */ nullptr,
 	/*  52 */ nullptr,
 	/*  53 */ nullptr,
