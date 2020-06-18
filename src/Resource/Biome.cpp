@@ -186,15 +186,9 @@ static const Biome BiomeSavanna(1.2f, 0.0f);
 static const Biome BiomeSavannaPlateau(1.0f, 0.0f);
 static const Biome BiomeShatteredSavanna(1.1f, 0.0f);
 static const BadlandsBiome BiomeBadlands(2.0f, 0.0f);
+static const Biome BiomeWarmOcean(0.8f,  0.5f);
 
 extern const Biome *const BIOME_DEFAULT = &BiomeDefault;
-
-/*
- * TODO: Add proper temp/rain values for oceans 44-50
- * 
- * It does not matter much at the moment, as we do not compute
- * the water color anyways
- */
 
 const Biome *const BIOMES[256] = {
 	/*   0 */ &BiomeDefault, /* Ocean */
@@ -241,13 +235,13 @@ const Biome *const BIOMES[256] = {
 	/*  41 */ &BiomeDefault, /* End Midlands */
 	/*  42 */ &BiomeDefault, /* End Highlands */
 	/*  43 */ &BiomeDefault, /* End Barrens */
-	/*  44 */ &BiomeDefault, /* Warm Ocean */
-	/*  45 */ &BiomeDefault, /* Lukewarm Ocean */
-	/*  46 */ &BiomeDefault, /* Cold Ocean */
-	/*  47 */ &BiomeDefault, /* Deep Warm Ocean */
-	/*  48 */ &BiomeDefault, /* Deep Lukewarm Ocean */
-	/*  49 */ &BiomeDefault, /* Deep Cold Ocean */
-	/*  50 */ &BiomeFrozen, /* Deep Frozen Ocean */
+	/*  44 */ &BiomeWarmOcean,
+	/*  45 */ &BiomeWarmOcean, /* Lukewarm Ocean */
+	/*  46 */ &BiomeWarmOcean, /* Cold Ocean */
+	/*  47 */ &BiomeWarmOcean, /* Deep Warm Ocean */
+	/*  48 */ &BiomeWarmOcean, /* Deep Lukewarm Ocean */
+	/*  49 */ &BiomeWarmOcean, /* Deep Cold Ocean */
+	/*  50 */ &BiomeWarmOcean, /* Deep Frozen Ocean */
 	/*  51 */ nullptr,
 	/*  52 */ nullptr,
 	/*  53 */ nullptr,
