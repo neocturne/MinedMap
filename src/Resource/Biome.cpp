@@ -361,6 +361,10 @@ const Biome *const BIOMES[256] = {
 	/* 167 */ &BiomeBadlands, /* Modified Badlands Plateau */
 	/* 168 */ &BiomeJungle, /* Bamboo Jungle */
 	/* 169 */ &BiomeJungle, /* Bamboo Jungle Hills */
+	/* 170 */ &BiomeDesert, /* Soul Sand Valley */
+	/* 171 */ &BiomeDesert, /* Crimson Forest */
+	/* 172 */ &BiomeDesert, /* Warped Forest */
+	/* 173 */ &BiomeDesert, /* Basalt Deltas */
 };
 
 }
