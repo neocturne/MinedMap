@@ -37,6 +37,9 @@
 	"activator_rail": {},
 	"air": null,
 	"allium": null,
+	"ancient_debris": {
+		"texture": "ancient_debris_top"
+	},
 	"andesite": {},
 	"andesite_slab": {
 		"texture": "andesite"
@@ -65,6 +68,9 @@
 		"texture": "barrel_top"
 	},
 	"barrier": null,
+	"basalt": {
+		"texture": "basalt_top"
+	},
 	"beacon": {},
 	"bedrock": {},
 	"bee_nest": {
@@ -130,6 +136,18 @@
 	"black_terracotta": {},
 	"black_wall_banner": null,
 	"black_wool": {},
+	"blackstone": {
+		"texture": "blackstone_top"
+	},
+	"blackstone_slab": {
+		"texture": "blackstone_top"
+	},
+	"blackstone_stairs": {
+		"texture": "blackstone_top"
+	},
+	"blackstone_wall": {
+		"texture": "blackstone_top"
+	},
 	"blast_furnace": {
 		"texture": "blast_furnace_top"
 	},
@@ -220,6 +238,7 @@
 		"texture": "cauldron_top"
 	},
 	"cave_air": null,
+	"chain": null,
 	"chain_command_block": {
 		"texture": "chain_command_block_side"
 	},
@@ -229,6 +248,8 @@
 	"chipped_anvil": {
 		"texture": "chipped_anvil_top"
 	},
+	"chiseled_nether_bricks": {},
+	"chiseled_polished_blackstone": {},
 	"chiseled_quartz_block": {},
 	"chiseled_red_sandstone": {
 		"texture": "red_sandstone_top"
@@ -266,12 +287,49 @@
 	},
 	"conduit": {},
 	"cornflower": null,
+	"cracked_nether_bricks": {},
+	"cracked_polished_blackstone_bricks": {},
 	"cracked_stone_bricks": {},
 	"crafting_table": {
 		"texture": "crafting_table_top"
 	},
 	"creeper_head": null,
 	"creeper_wall_head": null,
+	"crimson_button": null,
+	"crimson_door": {
+		"texture": "crimson_door_top"
+	},
+	"crimson_fence": {
+		"texture": "crimson_planks"
+	},
+	"crimson_fence_gate": {
+		"texture": "crimson_planks"
+	},
+	"crimson_fungus": null,
+	"crimson_hyphae": {
+		"texture": "crimson_stem"
+	},
+	"crimson_nylium": {},
+	"crimson_planks": {},
+	"crimson_pressure_plate": {
+		"texture": "crimson_planks"
+	},
+	"crimson_roots": {},
+	"crimson_sign": {
+		"texture": "crimson_planks"
+	},
+	"crimson_slab": {
+		"texture": "crimson_planks"
+	},
+	"crimson_stairs": {
+		"texture": "crimson_planks"
+	},
+	"crimson_stem": {
+		"texture": "crimson_stem_top"
+	},
+	"crimson_trapdoor": {},
+	"crimson_wall_sign": null,
+	"crying_obsidian": {},
 	"cut_red_sandstone": {
 		"texture": "red_sandstone_top"
 	},
@@ -446,6 +504,7 @@
 	"furnace": {
 		"texture": "furnace_top"
 	},
+	"gilded_blackstone": {},
 	"glass": {},
 	"glass_pane": {
 		"texture": "glass_pane_top"
@@ -668,6 +727,9 @@
 	"lime_terracotta": {},
 	"lime_wall_banner": null,
 	"lime_wool": {},
+	"lodestone": {
+		"texture": "lodestone_top"
+	},
 	"loom": {
 		"texture": "loom_top"
 	},
@@ -734,12 +796,15 @@
 		"texture": "nether_bricks"
 	},
 	"nether_bricks": {},
+	"nether_gold_ore": {},
 	"nether_portal": {},
 	"nether_quartz_ore": {},
+	"nether_sprouts": {},
 	"nether_wart": {
 		"texture": "nether_wart_stage2"
 	},
 	"nether_wart_block": {},
+	"netherite_block": {},
 	"netherrack": {},
 	"note_block": {},
 	"oak_button": null,
@@ -841,6 +906,33 @@
 	"polished_andesite_stairs": {
 		"texture": "polished_andesite"
 	},
+	"polished_basalt": {
+		"texture": "polished_basalt_top"
+	},
+	"polished_blackstone": {},
+	"polished_blackstone_brick_slab": {
+		"texture": "polished_blackstone_bricks"
+	},
+	"polished_blackstone_brick_stairs": {
+		"texture": "polished_blackstone_bricks"
+	},
+	"polished_blackstone_brick_wall": {
+		"texture": "polished_blackstone_bricks"
+	},
+	"polished_blackstone_bricks": {},
+	"polished_blackstone_button": null,
+	"polished_blackstone_pressure_plate": {
+		"texture": "polished_blackstone"
+	},
+	"polished_blackstone_slab": {
+		"texture": "polished_blackstone"
+	},
+	"polished_blackstone_stairs": {
+		"texture": "polished_blackstone"
+	},
+	"polished_blackstone_wall": {
+		"texture": "polished_blackstone"
+	},
 	"polished_diorite": {},
 	"polished_diorite_slab": {
 		"texture": "polished_diorite"
@@ -886,6 +978,12 @@
 	"potted_cornflower": {
 		"texture": "cornflower"
 	},
+	"potted_crimson_fungus": {
+		"texture": "crimson_fungus"
+	},
+	"potted_crimson_roots": {
+		"texture": "crimson_roots_pot"
+	},
 	"potted_dandelion": {
 		"texture": "dandelion"
 	},
@@ -928,6 +1026,12 @@
 	},
 	"potted_spruce_sapling": {
 		"texture": "spruce_sapling"
+	},
+	"potted_warped_fungus": {
+		"texture": "warped_fungus"
+	},
+	"potted_warped_roots": {
+		"texture": "warped_roots_pot"
 	},
 	"potted_white_tulip": {
 		"texture": "white_tulip"
@@ -986,6 +1090,7 @@
 	"quartz_block": {
 		"texture": "quartz_block_top"
 	},
+	"quartz_bricks": {},
 	"quartz_pillar": {},
 	"quartz_slab": {
 		"texture": "quartz_block_top"
@@ -1048,6 +1153,9 @@
 	"repeating_command_block": {
 		"texture": "repeating_command_block_front"
 	},
+	"respawn_anchor": {
+		"texture": "respawn_anchor_top"
+	},
 	"rose_bush": {
 		"texture": "rose_bush_top"
 	},
@@ -1070,6 +1178,7 @@
 	"sea_lantern": {},
 	"sea_pickle": {},
 	"seagrass": null,
+	"shroomlight": {},
 	"shulker_box": {},
 	"sign": {
 		"texture": "oak_planks"
@@ -1118,7 +1227,17 @@
 	"snow_block": {
 		"texture": "snow"
 	},
+	"soul_campfire": {
+		"texture": "soul_campfire_fire"
+	},
+	"soul_fire": {
+		"texture": "soul_fire_0"
+	},
+	"soul_lantern": {},
 	"soul_sand": {},
+	"soul_soil": {},
+	"soul_torch": null,
+	"soul_wall_torch": null,
 	"spawner": {},
 	"sponge": {},
 	"spruce_button": null,
@@ -1195,6 +1314,12 @@
 	"stripped_birch_wood": {
 		"texture": "stripped_birch_log"
 	},
+	"stripped_crimson_hyphae": {
+		"texture": "stripped_crimson_stem"
+	},
+	"stripped_crimson_stem": {
+		"texture": "stripped_crimson_stem_top"
+	},
 	"stripped_dark_oak_log": {
 		"texture": "stripped_dark_oak_log_top"
 	},
@@ -1219,6 +1344,12 @@
 	"stripped_spruce_wood": {
 		"texture": "stripped_spruce_log"
 	},
+	"stripped_warped_hyphae": {
+		"texture": "stripped_warped_stem"
+	},
+	"stripped_warped_stem": {
+		"texture": "stripped_warped_stem_top"
+	},
 	"structure_block": {},
 	"structure_void": null,
 	"sugar_cane": {},
@@ -1235,6 +1366,9 @@
 	"tall_seagrass": {
 		"texture": "tall_seagrass_top"
 	},
+	"target": {
+		"texture": "target_top"
+	},
 	"terracotta": {},
 	"tnt": {
 		"texture": "tnt_top"
@@ -1250,16 +1384,55 @@
 	"tube_coral_fan": null,
 	"tube_coral_wall_fan": null,
 	"turtle_egg": {},
+	"twisting_vines": {},
+	"twisting_vines_plant": {},
 	"vine": {
 		"grass": true
 	},
 	"void_air": null,
 	"wall_sign": null,
 	"wall_torch": null,
+	"warped_button": null,
+	"warped_door": {
+		"texture": "warped_door_top"
+	},
+	"warped_fence": {
+		"texture": "warped_planks"
+	},
+	"warped_fence_gate": {
+		"texture": "warped_planks"
+	},
+	"warped_fungus": null,
+	"warped_hyphae": {
+		"texture": "warped_stem"
+	},
+	"warped_nylium": {},
+	"warped_planks": {},
+	"warped_pressure_plate": {
+		"texture": "warped_planks"
+	},
+	"warped_roots": {},
+	"warped_sign": {
+		"texture": "warped_planks"
+	},
+	"warped_slab": {
+		"texture": "warped_planks"
+	},
+	"warped_stairs": {
+		"texture": "warped_planks"
+	},
+	"warped_stem": {
+		"texture": "warped_stem_top"
+	},
+	"warped_trapdoor": {},
+	"warped_wall_sign": null,
+	"warped_wart_block": {},
 	"water": {
 		"blue": true,
 		"texture": "water_still"
 	},
+	"weeping_vines": {},
+	"weeping_vines_plant": {},
 	"wet_sponge": {},
 	"wheat": {
 		"texture": "wheat_stage7"
