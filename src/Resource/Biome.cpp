@@ -103,6 +103,10 @@ Color Biome::getBlockColor(const BlockType *type, unsigned height) const {
 		c *= getGrassColor(t, r);
 	if (type->flags & BLOCK_FOLIAGE)
 		c *= getFoliageColor(t, r);
+	if (type->flags & BLOCK_BIRCH)
+		c *= FloatColor {0.380f, 0.600f, 0.380f};
+	if (type->flags & BLOCK_SPRUCE)
+		c *= FloatColor {0.502f, 0.655f, 0.333f};
 	if (type->flags & BLOCK_WATER)
 		c *= getWaterColor(t, r);
 

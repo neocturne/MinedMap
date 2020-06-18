@@ -36,7 +36,9 @@ namespace Resource {
 #define BLOCK_OPAQUE	(1u << 0)
 #define BLOCK_GRASS	(1u << 1)
 #define BLOCK_FOLIAGE	(1u << 2)
-#define BLOCK_WATER	(1u << 3)
+#define BLOCK_BIRCH	(1u << 3)
+#define BLOCK_SPRUCE	(1u << 4)
+#define BLOCK_WATER	(1u << 5)
 
 struct BlockType {
 private:

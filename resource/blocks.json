@@ -96,7 +96,7 @@
 		"texture": "birch_planks"
 	},
 	"birch_leaves": {
-		"foliage": true
+		"birch": true
 	},
 	"birch_log": {
 		"texture": "birch_log_top"
@@ -1251,7 +1251,7 @@
 		"texture": "spruce_planks"
 	},
 	"spruce_leaves": {
-		"foliage": true
+		"spruce": true
 	},
 	"spruce_log": {
 		"texture": "spruce_log_top"

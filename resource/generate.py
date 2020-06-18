@@ -22,6 +22,10 @@ with open(sys.argv[2], 'w') as f:
 			flags.append('BLOCK_GRASS')
 		if info['foliage']:
 			flags.append('BLOCK_FOLIAGE')
+		if info['birch']:
+			flags.append('BLOCK_BIRCH')
+		if info['spruce']:
+			flags.append('BLOCK_SPRUCE')
 		if info['water']:
 			flags.append('BLOCK_WATER')
 		if flags:
