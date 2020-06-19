@@ -81,41 +81,62 @@ uint8_t Chunk::getBiome(size_t x, size_t y, size_t z) const {
 		return 0;
 }
 
-bool Chunk::getBlock(Block *block, const Section *section, size_t x, size_t y, size_t z, uint8_t prev_light) const {
-	if (block->height > 0)
+Block Chunk::getBlock(size_t x, Chunk::Height height, size_t z) const {
+	Block block = {};
+
+	block.depth = height.depth;
+	block.biome = getBiome(x, height.y, z);
+
+	size_t Y = height.y / SIZE;
+	size_t y = height.y % SIZE;
+
+	if (Y < sections.size() && sections[Y])
+		block.type = sections[Y]->getBlockStateAt(x, y, z);
+
+	size_t Yt = (height.y + 1) / SIZE;
+	size_t yt = (height.y + 1) % SIZE;
+
+	if (Yt < sections.size() && sections[Yt])
+		block.blockLight = sections[Yt]->getBlockLightAt(x, yt, z);
+
+	return block;
+}
+
+bool Chunk::getHeight(Chunk::Height *height, const Section *section, size_t x, size_t y, size_t z, bool withDepth) const {
+	if (height->depth > 0)
+		return false;
+
+	if (!withDepth && height->y > 0)
 		return false;
 
 	const Resource::BlockType *type = section->getBlockStateAt(x, y, z);
 	if (!type || !(type->flags & BLOCK_OPAQUE))
 		return false;
 
-	if (!block->type) {
-		block->type = type;
-		block->blockLight = prev_light;
-		block->biome = getBiome(x, y, z);
-	}
+	if (height->y == 0)
+		height->y = SIZE*section->getY() + y;
+
+	if (!withDepth)
+		return true;
 
 	if (type->flags & BLOCK_WATER)
 		return false;
 
-	block->height = SIZE*section->getY() + y;
+	height->depth = SIZE*section->getY() + y;
 
 	return true;
 }
 
-Chunk::Blocks Chunk::getTopLayer() const {
+Chunk::Heightmap Chunk::getTopLayer(bool withDepth) const {
 	size_t done = 0;
-	Blocks ret = {};
-	uint8_t prev_light[SIZE][SIZE] = {};
+	Heightmap ret = {};
 
 	for (ssize_t Y = sections.size() - 1; Y >= 0; Y--) {
 		if (done == SIZE*SIZE)
 			break;
 
-		if (!sections[Y]) {
-			std::memset(prev_light, 0, sizeof(prev_light));
+		if (!sections[Y])
 			continue;
-		}
 
 		const Section *section = sections[Y].get();
 
@@ -125,10 +146,8 @@ Chunk::Blocks Chunk::getTopLayer() const {
 
 			for (size_t z = 0; z < SIZE; z++) {
 				for (size_t x = 0; x < SIZE; x++) {
-					if (getBlock(&ret.blocks[x][z], section, x, y, z, prev_light[x][z]))
+					if (getHeight(&ret.v[x][z], section, x, y, z, withDepth))
 						done++;
-
-					prev_light[x][z] = section->getBlockLightAt(x, y, z);
 				}
 			}
 		}

@@ -54,26 +54,26 @@ static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
 
 static void addChunkBiome(uint8_t biomemap[DIM*DIM], size_t X, size_t Z, const World::ChunkData *data) {
 	World::Chunk chunk(data);
-	World::Chunk::Blocks layer = chunk.getTopLayer();
+	World::Chunk::Heightmap layer = chunk.getTopLayer(false);
 
 	for (size_t x = 0; x < World::Chunk::SIZE; x++) {
 		for (size_t z = 0; z < World::Chunk::SIZE; z++) {
 			size_t i = (Z*World::Chunk::SIZE+z)*DIM + X*World::Chunk::SIZE+x;
-			const World::Block &block = layer.blocks[x][z];
-
-			biomemap[i] = chunk.getBiome(x, block.height, z);
+			const World::Chunk::Height &height = layer.v[x][z];
+			biomemap[i] = chunk.getBiome(x, height.y, z);
 		}
 	}
 }
 
 static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z, const World::ChunkData *data) {
 	World::Chunk chunk(data);
-	World::Chunk::Blocks layer = chunk.getTopLayer();
+	World::Chunk::Heightmap layer = chunk.getTopLayer(true);
 
 	for (size_t x = 0; x < World::Chunk::SIZE; x++) {
 		for (size_t z = 0; z < World::Chunk::SIZE; z++) {
 			size_t i = (Z*World::Chunk::SIZE+z)*DIM + X*World::Chunk::SIZE+x;
-			const World::Block &block = layer.blocks[x][z];
+			const World::Chunk::Height &height = layer.v[x][z];
+			const World::Block block = chunk.getBlock(x, height, z);
 
 			image[i] = block.getColor();
 			lightmap[2*i+1] = (1 - block.blockLight/15.f)*192;

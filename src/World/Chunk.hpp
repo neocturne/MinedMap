@@ -50,8 +50,13 @@ public:
 	static const size_t BSIZE = SIZE / BGROUP;
 	static const size_t BMAXY = MAXY / BGROUP;
 
-	struct Blocks {
-		Block blocks[SIZE][SIZE];
+	struct Height {
+		unsigned y;
+		unsigned depth;
+	};
+
+	struct Heightmap {
+		Height v[SIZE][SIZE];
 	};
 
 private:
@@ -62,16 +67,7 @@ private:
 	std::shared_ptr<const NBT::IntArrayTag> biomeIntsPre115;
 	std::shared_ptr<const NBT::IntArrayTag> biomeInts;
 
-	bool getBlock(Block *block, const Section *section, size_t x, size_t y, size_t z, uint8_t prev_light) const;
-
-public:
-	Chunk(const ChunkData *data);
-
-	const NBT::CompoundTag & getLevel() const {
-		return *level;
-	}
-
-	uint8_t getBiome(size_t x, size_t y, size_t z) const;
+	bool getHeight(Height *height, const Section *section, size_t x, size_t y, size_t z, bool withDepth) const;
 
 	const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const {
 		size_t Y = y / SIZE;
@@ -82,7 +78,18 @@ public:
 		return sections[Y]->getBlockStateAt(x, y % SIZE, z);
 	}
 
-	Blocks getTopLayer() const;
+
+public:
+	Chunk(const ChunkData *data);
+
+	const NBT::CompoundTag & getLevel() const {
+		return *level;
+	}
+
+	uint8_t getBiome(size_t x, size_t y, size_t z) const;
+	Block getBlock(size_t x, Height y, size_t z) const;
+
+	Heightmap getTopLayer(bool withDepth) const;
 };
 
 }

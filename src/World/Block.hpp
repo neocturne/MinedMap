@@ -36,7 +36,7 @@ namespace World {
 
 struct Block {
 	const Resource::BlockType *type;
-	unsigned height;
+	unsigned depth;
 	uint8_t blockLight;
 	uint8_t biome;
 
@@ -45,7 +45,7 @@ struct Block {
 		if (!type || !(type->flags & BLOCK_OPAQUE))
 			return Resource::Color {};
 
-		return (Resource::BIOMES[biome] ?: Resource::BIOME_DEFAULT)->getBlockColor(type, height);
+		return (Resource::BIOMES[biome] ?: Resource::BIOME_DEFAULT)->getBlockColor(type, depth);
 	}
 
 	operator bool() const {
