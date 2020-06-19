@@ -77,7 +77,8 @@ static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM]
 			const World::Chunk::Height &height = layer.v[x][z];
 			World::Block block = chunk.getBlock(x, height, z);
 
-			image[i] = block.getColor(biomemaps[1][1].get()[i]);
+			if (block.isVisible())
+				image[i] = block.getColor(biomemaps[1][1].get()[i]);
 			lightmap[2*i+1] = (1 - block.blockLight/15.f)*192;
 		}
 	}
@@ -259,7 +260,6 @@ static void makeMap(const std::string &regiondir, const std::string &outputdir, 
 		}
 
 		std::unique_ptr<Resource::Color[]> image(new Resource::Color[DIM*DIM]);
-		std::memset(image.get(), 0, 4*DIM*DIM);
 
 		std::unique_ptr<uint8_t[]> lightmap(new uint8_t[2*DIM*DIM]);
 		std::memset(lightmap.get(), 0, 2*DIM*DIM);

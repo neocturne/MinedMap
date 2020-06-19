@@ -34,59 +34,35 @@
 namespace MinedMap {
 namespace Resource {
 
-static Biome::FloatColor operator+(const Biome::FloatColor &a, const Biome::FloatColor &b){
-	return Biome::FloatColor {
-		a.r+b.r,
-		a.g+b.g,
-		a.b+b.b,
-	};
-}
-
-static Biome::FloatColor & operator*=(Biome::FloatColor &a, const Biome::FloatColor &b) {
-	a.r *= b.r;
-	a.g *= b.g;
-	a.b *= b.b;
-
-	return a;
-}
-
-static Biome::FloatColor operator*(float s, const Biome::FloatColor &c) {
-	return Biome::FloatColor {
-		s*c.r,
-		s*c.g,
-		s*c.b,
-	};
-}
-
-static Biome::FloatColor colorFromParams(float temp, float rain, bool grass) {
-	const Biome::FloatColor grassColors[3] = {
+static FloatColor colorFromParams(float temp, float rain, bool grass) {
+	const FloatColor grassColors[3] = {
 		{0.502f, 0.706f, 0.592f}, // lower right
 		{0.247f, 0.012f, -0.259f}, // lower left - lower right
 		{-0.471f, 0.086f, -0.133f}, // upper left - lower left
 	};
-	const Biome::FloatColor foliageColors[3] = {
+	const FloatColor foliageColors[3] = {
 		{0.376f, 0.631f, 0.482f}, // lower right
 		{0.306f, 0.012f, -0.317f}, // lower left - lower right
 		{-0.580f, 0.106f, -0.165f}, // upper left - lower left
 	};
 
-	const Biome::FloatColor *colors = grass ? grassColors : foliageColors;
+	const FloatColor *colors = grass ? grassColors : foliageColors;
 
 	return colors[0] + temp*colors[1] + rain*colors[2];
 }
 
 
-Biome::FloatColor Biome::getGrassColor(float temp, float rain) const {
+FloatColor Biome::getGrassColor(float temp, float rain) const {
 	return colorFromParams(temp, rain, true);
 }
 
-Biome::FloatColor Biome::getFoliageColor(float temp, float rain) const {
+FloatColor Biome::getFoliageColor(float temp, float rain) const {
 	return colorFromParams(temp, rain, false);
 }
 
 
-Color Biome::getBlockColor(const BlockType *type, unsigned height) const {
-	Biome::FloatColor c = {
+FloatColor Biome::getBlockColor(const BlockType *type, unsigned height) const {
+	FloatColor c = {
 		float(type->color.r),
 		float(type->color.g),
 		float(type->color.b),
@@ -108,12 +84,11 @@ Color Biome::getBlockColor(const BlockType *type, unsigned height) const {
 
 	float h = 0.5f + height * 0.005f;
 
-	return Color {
-		uint8_t(clamp(c.r * h, 0, 255)),
-		uint8_t(clamp(c.g * h, 0, 255)),
-		uint8_t(clamp(c.b * h, 0, 255)),
-		0xff,
-	};
+	c.r = clamp(c.r * h, 0, 255);
+	c.g = clamp(c.g * h, 0, 255);
+	c.b = clamp(c.b * h, 0, 255);
+
+	return c;
 }
 
 

@@ -35,11 +35,6 @@ namespace Resource {
 class BlockType;
 
 class Biome {
-public:
-	struct FloatColor {
-		float r, g, b;
-	};
-
 private:
 	float temp, rain;
 	FloatColor water;
@@ -54,7 +49,7 @@ public:
 	Biome(float temp0, float rain0, FloatColor water0 = {0.247f, 0.463f, 0.894f})
 	: temp(temp0), rain(rain0), water(water0) {}
 
-	Color getBlockColor(const BlockType *type, unsigned height) const;
+	FloatColor getBlockColor(const BlockType *type, unsigned height) const;
 };
 
 extern const Biome *const BIOME_DEFAULT;
