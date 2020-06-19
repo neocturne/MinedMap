@@ -310,6 +310,7 @@ static void doLevel(const std::string &inputdir, const std::string &outputdir) {
 	World::Level level((inputdir + "/level.dat").c_str());
 	info.setSpawn(level.getSpawn());
 
+	std::printf("Updating mipmaps...\n");
 	makeMipmaps(outputdir, &info);
 
 	info.writeJSON((outputdir + "/info.json").c_str());
