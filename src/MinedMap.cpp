@@ -87,11 +87,11 @@ static void writeStamp(const std::string &filename, int64_t v) {
 	}
 }
 
-static void writeImage(const std::string &output, const uint8_t *data, bool colored, int64_t t) {
+static void writeImage(const std::string &output, const uint8_t *data, PNG::Format format, int64_t t) {
 	const std::string tmpfile = output + ".tmp";
 
 	try {
-		PNG::write(tmpfile.c_str(), data, DIM, DIM, colored);
+		PNG::write(tmpfile.c_str(), data, DIM, DIM, format);
 
 		if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
 			std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
@@ -146,8 +146,8 @@ static void doRegion(const std::string &input, const std::string &output, const 
 
 		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::ChunkData *chunk) { addChunk(image.get(), lightmap.get(), X, Z, chunk); });
 
-		writeImage(output, reinterpret_cast<const uint8_t*>(image.get()), true, intime);
-		writeImage(output_light, lightmap.get(), false, intime);
+		writeImage(output, reinterpret_cast<const uint8_t*>(image.get()), PNG::RGB_ALPHA, intime);
+		writeImage(output_light, lightmap.get(), PNG::GRAY_ALPHA, intime);
 	} catch (const std::exception& ex) {
 		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
 	}
@@ -203,7 +203,7 @@ static void makeMaps(const std::string &regiondir, const std::string &outputdir,
 	}
 }
 
-static bool makeMipmap(const std::string &dir, size_t level, size_t x, size_t z, bool colored) {
+static bool makeMipmap(const std::string &dir, size_t level, size_t x, size_t z, PNG::Format imageFormat) {
 	bool ret = false;
 
 	std::string indir = dir + "/" + format(level-1) + "/";
@@ -254,7 +254,7 @@ static bool makeMipmap(const std::string &dir, size_t level, size_t x, size_t z,
 	const std::string tmpfile = output + ".tmp";
 
 	try {
-		PNG::mipmap(tmpfile.c_str(), DIM, DIM, colored, nw, ne, sw, se);
+		PNG::mipmap(tmpfile.c_str(), DIM, DIM, imageFormat, nw, ne, sw, se);
 
 		if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
 			std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
@@ -287,10 +287,10 @@ static void makeMipmaps(const std::string &dir, Info *info) {
 
 		for (int x = minX; x <= maxX; x++) {
 			for (int z = minZ; z <= maxZ; z++) {
-				if (makeMipmap(dir + "/map", level, x, z, true))
+				if (makeMipmap(dir + "/map", level, x, z, PNG::RGB_ALPHA))
 					info->addRegion(x, z, level);
 
-				makeMipmap(dir + "/light", level, x, z, false);
+				makeMipmap(dir + "/light", level, x, z, PNG::GRAY_ALPHA);
 			}
 		}
 	}
