@@ -225,10 +225,18 @@ static void makeMap(const std::string &regiondir, const std::string &outputdir, 
 	std::string outname = formatTileName(x, z, "png");
 	std::string input = regiondir + "/" + inname;
 	std::string output = outputdir + "/map/0/" + outname, output_light = outputdir + "/light/0/" + outname;
+	std::string biomenames[3][3];
 
 	int64_t intime = getModTime(input);
 	if (intime == INT64_MIN)
 		return;
+
+	for (size_t i = 0; i < 3; i++) {
+		for (size_t j = 0; j < 3; j++) {
+			biomenames[i][j] = outputdir + "/biome/" + formatTileName(x + i - 1, z + j - 1, "png");
+			intime = std::max(intime, getModTime(biomenames[i][j]));
+		}
+	}
 
 	if (!checkRegion(intime, output))
 		return;
@@ -236,6 +244,18 @@ static void makeMap(const std::string &regiondir, const std::string &outputdir, 
 	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
 
 	try {
+		std::unique_ptr<uint8_t[]> biomemaps[3][3];
+		for (size_t i = 0; i < 3; i++) {
+			for (size_t j = 0; j < 3; j++) {
+				biomemaps[i][j].reset(new uint8_t[DIM*DIM]);
+				std::memset(biomemaps[i][j].get(), 0, DIM*DIM);
+
+				try {
+					PNG::read(biomenames[i][j].c_str(), biomemaps[i][j].get(), DIM, DIM, PNG::GRAY);
+				} catch (const std::exception& ex) {}
+			}
+		}
+
 		std::unique_ptr<Resource::Color[]> image(new Resource::Color[DIM*DIM]);
 		std::memset(image.get(), 0, 4*DIM*DIM);
 
