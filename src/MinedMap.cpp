@@ -119,36 +119,41 @@ static void writeImage(const std::string &output, const uint8_t *data, PNG::Form
 	}
 }
 
-static int64_t checkRegion(const std::string &input, const std::string &output) {
+static int64_t getModTime(const std::string &file) {
 	struct stat s;
-
-	if (stat(input.c_str(), &s) < 0) {
+	if (stat(file.c_str(), &s) < 0) {
 		if (errno != ENOENT)
-			std::fprintf(stderr, "Unable to stat %s: %s\n", input.c_str(), std::strerror(errno));
+			std::fprintf(stderr, "Unable to stat %s: %s\n", file.c_str(), std::strerror(errno));
 		return INT64_MIN;
 	}
 
 #ifdef _WIN32
-	int64_t intime = (int64_t)s.st_mtime * 1000000;
+	return (int64_t)s.st_mtime * 1000000;
 #else
-	int64_t intime = (int64_t)s.st_mtim.tv_sec * 1000000 + s.st_mtim.tv_nsec / 1000;
+	return (int64_t)s.st_mtim.tv_sec * 1000000 + s.st_mtim.tv_nsec / 1000;
 #endif
+}
 
-	if (stat(output.c_str(), &s) < 0)
-		return intime;
+static bool checkRegion(int64_t changed, const std::string &file) {
+	struct stat s;
+	if (stat(file.c_str(), &s) < 0)
+		return true;
 
-	int64_t outtime = readStamp(output);
-	if (intime <= outtime) {
-		std::printf("%s is up-to-date.\n", output.c_str());
-		return INT64_MIN;
+	int64_t outtime = readStamp(file);
+	if (changed <= outtime) {
+		std::printf("%s is up-to-date.\n", file.c_str());
+		return false;
 	}
 
-	return intime;
+	return true;
 }
 
 static void doRegionBiome(const std::string &input, const std::string &output) {
-	int64_t intime = checkRegion(input, output);
+	int64_t intime = getModTime(input);
 	if (intime == INT64_MIN)
+		return;
+
+	if (!checkRegion(intime, output))
 		return;
 
 	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
@@ -166,8 +171,11 @@ static void doRegionBiome(const std::string &input, const std::string &output) {
 }
 
 static void doRegion(const std::string &input, const std::string &output, const std::string &output_light) {
-	int64_t intime = checkRegion(input, output);
+	int64_t intime = getModTime(input);
 	if (intime == INT64_MIN)
+		return;
+
+	if (!checkRegion(intime, output))
 		return;
 
 	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
