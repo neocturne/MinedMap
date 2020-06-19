@@ -65,6 +65,34 @@ static void addChunkBiome(uint8_t biomemap[DIM*DIM], size_t X, size_t Z, const W
 	}
 }
 
+static uint8_t biomeAt(ssize_t x, ssize_t z, const std::unique_ptr<uint8_t[]> biomemaps[3][3]) {
+	size_t a = 1, b = 1;
+
+	if (x < 0) {
+		a--;
+		x += DIM;
+	} else if (x >= (ssize_t)DIM) {
+		a++;
+		x -= DIM;
+	}
+	if (z < 0) {
+		b--;
+		z += DIM;
+	} else if (z >= (ssize_t)DIM) {
+		b++;
+		z -= DIM;
+	}
+
+	return biomemaps[a][b].get()[z*DIM + x];
+}
+
+static Resource::Color collectColors(size_t x, size_t z, const World::Block &block, const std::unique_ptr<uint8_t[]> biomemaps[3][3]) {
+	if (!block.isVisible())
+		return Resource::Color();
+
+	return block.getColor(biomeAt(x, z, biomemaps));
+}
+
 static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z,
 	const World::ChunkData *data, const std::unique_ptr<uint8_t[]> biomemaps[3][3]
 ) {
@@ -77,8 +105,7 @@ static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM]
 			const World::Chunk::Height &height = layer.v[x][z];
 			World::Block block = chunk.getBlock(x, height, z);
 
-			if (block.isVisible())
-				image[i] = block.getColor(biomemaps[1][1].get()[i]);
+			image[i] = collectColors(X*World::Chunk::SIZE+x, Z*World::Chunk::SIZE+z, block, biomemaps);
 			lightmap[2*i+1] = (1 - block.blockLight/15.f)*192;
 		}
 	}
