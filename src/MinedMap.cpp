@@ -36,6 +36,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
+#include <unordered_map>
 #include <stdexcept>
 #include <sstream>
 #include <system_error>
@@ -49,6 +50,7 @@
 
 namespace MinedMap {
 
+static const int BIOME_SMOOTH = 3;
 static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
 
 
@@ -90,7 +92,32 @@ static Resource::Color collectColors(size_t x, size_t z, const World::Block &blo
 	if (!block.isVisible())
 		return Resource::Color();
 
-	return block.getColor(biomeAt(x, z, biomemaps));
+	std::unordered_map<uint8_t, size_t> biomes;
+	for (int dx = -BIOME_SMOOTH; dx <= BIOME_SMOOTH; dx++) {
+		for (int dz = -BIOME_SMOOTH; dz <= BIOME_SMOOTH; dz++) {
+			if (std::abs(dx) + std::abs(dz) > BIOME_SMOOTH)
+				continue;
+
+			uint8_t biome = biomeAt(x+dx, z+dz, biomemaps);
+			if (biomes.count(biome))
+				biomes[biome]++;
+			else
+				biomes[biome] = 1;
+		}
+	}
+
+	Resource::FloatColor c = {};
+	size_t total = 0;
+
+	for (const auto &e : biomes) {
+		uint8_t biome = e.first;
+		size_t count = e.second;
+
+		c = c + count * block.getColor(biome);
+		total += count;
+	}
+
+	return (1.0f / total) * c;
 }
 
 static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z,
