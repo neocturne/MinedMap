@@ -182,7 +182,7 @@ static void makeDir(const std::string &name) {
 		throw std::system_error(errno, std::generic_category(), "unable to create directory " + name);
 }
 
-static void makeBiome(const std::string &regiondir, const std::string &outputdir, size_t x, size_t z) {
+static void makeBiome(const std::string &regiondir, const std::string &outputdir, int x, int z) {
 	std::string inname = formatTileName(x, z, "mca");
 	std::string outname = formatTileName(x, z, "png");
 	std::string input = regiondir + "/" + inname, output = outputdir + "/biome/" + outname;
@@ -220,7 +220,7 @@ static void makeBiomes(const std::string &regiondir, const std::string &outputdi
 	}
 }
 
-static void makeMap(const std::string &regiondir, const std::string &outputdir, size_t x, size_t z) {
+static void makeMap(const std::string &regiondir, const std::string &outputdir, int x, int z) {
 	std::string inname = formatTileName(x, z, "mca");
 	std::string outname = formatTileName(x, z, "png");
 	std::string input = regiondir + "/" + inname;
@@ -261,7 +261,7 @@ static void makeMaps(const std::string &regiondir, const std::string &outputdir,
 	}
 }
 
-static bool makeMipmap(const std::string &dir, size_t level, size_t x, size_t z, PNG::Format imageFormat) {
+static bool makeMipmap(const std::string &dir, size_t level, int x, int z, PNG::Format imageFormat) {
 	bool ret = false;
 
 	std::string indir = dir + "/" + format(level-1) + "/";
