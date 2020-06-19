@@ -112,7 +112,8 @@ static void doRegion(const std::string &input, const std::string &output, const 
 		struct stat instat;
 
 		if (stat(input.c_str(), &instat) < 0) {
-			std::fprintf(stderr, "Unable to stat %s: %s\n", input.c_str(), std::strerror(errno));
+			if (errno != ENOENT)
+				std::fprintf(stderr, "Unable to stat %s: %s\n", input.c_str(), std::strerror(errno));
 			return;
 		}
 
@@ -184,6 +185,22 @@ static void makeDir(const std::string &name) {
 		) < 0 && errno != EEXIST
 	)
 		throw std::system_error(errno, std::generic_category(), "unable to create directory " + name);
+}
+
+static void makeMap(const std::string &regiondir, const std::string &outputdir, size_t x, size_t z) {
+	std::string inname = formatTileName(x, z, "mca");
+	std::string outname = formatTileName(x, z, "png");
+	doRegion(regiondir + "/" + inname, outputdir + "/map/0/" + outname, outputdir + "/light/0/" + outname);
+}
+
+static void makeMaps(const std::string &regiondir, const std::string &outputdir, const Info *info) {
+	int minX, maxX, minZ, maxZ;
+	std::tie(minX, maxX, minZ, maxZ) = info->getBounds(0);
+
+	for (int x = minX; x <= maxX; x++) {
+		for (int z = minZ; z <= maxZ; z++)
+			makeMap(regiondir, outputdir, x, z);
+	}
 }
 
 static bool makeMipmap(const std::string &dir, size_t level, size_t x, size_t z, bool colored) {
@@ -279,14 +296,7 @@ static void makeMipmaps(const std::string &dir, Info *info) {
 	}
 }
 
-static void doLevel(const std::string &inputdir, const std::string &outputdir) {
-	const std::string regiondir = inputdir + "/region";
-
-	makeDir(outputdir + "/map");
-	makeDir(outputdir + "/map/0");
-	makeDir(outputdir + "/light");
-	makeDir(outputdir + "/light/0");
-
+static Info collectInfo(const std::string &regiondir) {
 	DIR *dir = opendir(regiondir.c_str());
 	if (!dir)
 		throw std::system_error(errno, std::generic_category(), "Unable to read input directory");
@@ -301,11 +311,25 @@ static void doLevel(const std::string &inputdir, const std::string &outputdir) {
 
 		info.addRegion(x, z, 0);
 
-		std::string name(entry->d_name), outname = name.substr(0, name.length()-3) + "png";
-		doRegion(regiondir + "/" + name, outputdir + "/map/0/" + outname, outputdir + "/light/0/" + outname);
 	}
 
 	closedir(dir);
+
+	return info;
+}
+
+static void doLevel(const std::string &inputdir, const std::string &outputdir) {
+	const std::string regiondir = inputdir + "/region";
+
+	makeDir(outputdir + "/map");
+	makeDir(outputdir + "/map/0");
+	makeDir(outputdir + "/light");
+	makeDir(outputdir + "/light/0");
+
+	Info info = collectInfo(regiondir);
+
+	std::printf("Updating map data...\n");
+	makeMaps(regiondir, outputdir, &info);
 
 	World::Level level((inputdir + "/level.dat").c_str());
 	info.setSpawn(level.getSpawn());
