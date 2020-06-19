@@ -148,54 +148,6 @@ static bool checkRegion(int64_t changed, const std::string &file) {
 	return true;
 }
 
-static void doRegionBiome(const std::string &input, const std::string &output) {
-	int64_t intime = getModTime(input);
-	if (intime == INT64_MIN)
-		return;
-
-	if (!checkRegion(intime, output))
-		return;
-
-	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
-
-	try {
-		std::unique_ptr<uint8_t[]> biomemap(new uint8_t[DIM*DIM]);
-		std::memset(biomemap.get(), 0, DIM*DIM);
-
-		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::ChunkData *chunk) { addChunkBiome(biomemap.get(), X, Z, chunk); });
-
-		writeImage(output, biomemap.get(), PNG::GRAY, intime);
-	} catch (const std::exception& ex) {
-		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
-	}
-}
-
-static void doRegion(const std::string &input, const std::string &output, const std::string &output_light) {
-	int64_t intime = getModTime(input);
-	if (intime == INT64_MIN)
-		return;
-
-	if (!checkRegion(intime, output))
-		return;
-
-	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
-
-	try {
-		std::unique_ptr<Resource::Color[]> image(new Resource::Color[DIM*DIM]);
-		std::memset(image.get(), 0, 4*DIM*DIM);
-
-		std::unique_ptr<uint8_t[]> lightmap(new uint8_t[2*DIM*DIM]);
-		std::memset(lightmap.get(), 0, 2*DIM*DIM);
-
-		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::ChunkData *chunk) { addChunk(image.get(), lightmap.get(), X, Z, chunk); });
-
-		writeImage(output, reinterpret_cast<const uint8_t*>(image.get()), PNG::RGB_ALPHA, intime);
-		writeImage(output_light, lightmap.get(), PNG::GRAY_ALPHA, intime);
-	} catch (const std::exception& ex) {
-		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
-	}
-}
-
 template<typename T>
 static std::string format(const T &v) {
 	std::ostringstream s;
@@ -233,7 +185,29 @@ static void makeDir(const std::string &name) {
 static void makeBiome(const std::string &regiondir, const std::string &outputdir, size_t x, size_t z) {
 	std::string inname = formatTileName(x, z, "mca");
 	std::string outname = formatTileName(x, z, "png");
-	doRegionBiome(regiondir + "/" + inname, outputdir + "/biome/" + outname);
+	std::string input = regiondir + "/" + inname, output = outputdir + "/biome/" + outname;
+
+	int64_t intime = getModTime(input);
+	if (intime == INT64_MIN)
+		return;
+
+	if (!checkRegion(intime, output))
+		return;
+
+	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
+
+	try {
+		std::unique_ptr<uint8_t[]> biomemap(new uint8_t[DIM*DIM]);
+		std::memset(biomemap.get(), 0, DIM*DIM);
+
+		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::ChunkData *chunk) {
+			addChunkBiome(biomemap.get(), X, Z, chunk);
+		});
+
+		writeImage(output, biomemap.get(), PNG::GRAY, intime);
+	} catch (const std::exception& ex) {
+		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
+	}
 }
 
 static void makeBiomes(const std::string &regiondir, const std::string &outputdir, const Info *info) {
@@ -249,7 +223,32 @@ static void makeBiomes(const std::string &regiondir, const std::string &outputdi
 static void makeMap(const std::string &regiondir, const std::string &outputdir, size_t x, size_t z) {
 	std::string inname = formatTileName(x, z, "mca");
 	std::string outname = formatTileName(x, z, "png");
-	doRegion(regiondir + "/" + inname, outputdir + "/map/0/" + outname, outputdir + "/light/0/" + outname);
+	std::string input = regiondir + "/" + inname;
+	std::string output = outputdir + "/map/0/" + outname, output_light = outputdir + "/light/0/" + outname;
+
+	int64_t intime = getModTime(input);
+	if (intime == INT64_MIN)
+		return;
+
+	if (!checkRegion(intime, output))
+		return;
+
+	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
+
+	try {
+		std::unique_ptr<Resource::Color[]> image(new Resource::Color[DIM*DIM]);
+		std::memset(image.get(), 0, 4*DIM*DIM);
+
+		std::unique_ptr<uint8_t[]> lightmap(new uint8_t[2*DIM*DIM]);
+		std::memset(lightmap.get(), 0, 2*DIM*DIM);
+
+		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::ChunkData *chunk) { addChunk(image.get(), lightmap.get(), X, Z, chunk); });
+
+		writeImage(output, reinterpret_cast<const uint8_t*>(image.get()), PNG::RGB_ALPHA, intime);
+		writeImage(output_light, lightmap.get(), PNG::GRAY_ALPHA, intime);
+	} catch (const std::exception& ex) {
+		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
+	}
 }
 
 static void makeMaps(const std::string &regiondir, const std::string &outputdir, const Info *info) {
