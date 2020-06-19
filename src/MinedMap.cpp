@@ -52,6 +52,20 @@ namespace MinedMap {
 static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
 
 
+static void addChunkBiome(uint8_t biomemap[DIM*DIM], size_t X, size_t Z, const World::ChunkData *data) {
+	World::Chunk chunk(data);
+	World::Chunk::Blocks layer = chunk.getTopLayer();
+
+	for (size_t x = 0; x < World::Chunk::SIZE; x++) {
+		for (size_t z = 0; z < World::Chunk::SIZE; z++) {
+			size_t i = (Z*World::Chunk::SIZE+z)*DIM + X*World::Chunk::SIZE+x;
+			const World::Block &block = layer.blocks[x][z];
+
+			biomemap[i] = chunk.getBiome(x, block.height, z);
+		}
+	}
+}
+
 static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z, const World::ChunkData *data) {
 	World::Chunk chunk(data);
 	World::Chunk::Blocks layer = chunk.getTopLayer();
@@ -105,35 +119,56 @@ static void writeImage(const std::string &output, const uint8_t *data, PNG::Form
 	}
 }
 
-static void doRegion(const std::string &input, const std::string &output, const std::string &output_light) {
-	int64_t intime;
+static int64_t checkRegion(const std::string &input, const std::string &output) {
+	struct stat s;
 
-	{
-		struct stat instat;
-
-		if (stat(input.c_str(), &instat) < 0) {
-			if (errno != ENOENT)
-				std::fprintf(stderr, "Unable to stat %s: %s\n", input.c_str(), std::strerror(errno));
-			return;
-		}
+	if (stat(input.c_str(), &s) < 0) {
+		if (errno != ENOENT)
+			std::fprintf(stderr, "Unable to stat %s: %s\n", input.c_str(), std::strerror(errno));
+		return INT64_MIN;
+	}
 
 #ifdef _WIN32
-		intime = (int64_t)instat.st_mtime * 1000000;
+	int64_t intime = (int64_t)s.st_mtime * 1000000;
 #else
-		intime = (int64_t)instat.st_mtim.tv_sec * 1000000 + instat.st_mtim.tv_nsec / 1000;
+	int64_t intime = (int64_t)s.st_mtim.tv_sec * 1000000 + s.st_mtim.tv_nsec / 1000;
 #endif
+
+	if (stat(output.c_str(), &s) < 0)
+		return intime;
+
+	int64_t outtime = readStamp(output);
+	if (intime <= outtime) {
+		std::printf("%s is up-to-date.\n", output.c_str());
+		return INT64_MIN;
 	}
 
-	{
-		struct stat s;
-		if (stat(output.c_str(), &s) == 0) {
-			int64_t outtime = readStamp(output);
-			if (intime <= outtime) {
-				std::printf("%s is up-to-date.\n", output.c_str());
-				return;
-			}
-		}
+	return intime;
+}
+
+static void doRegionBiome(const std::string &input, const std::string &output) {
+	int64_t intime = checkRegion(input, output);
+	if (intime == INT64_MIN)
+		return;
+
+	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
+
+	try {
+		std::unique_ptr<uint8_t[]> biomemap(new uint8_t[DIM*DIM]);
+		std::memset(biomemap.get(), 0, DIM*DIM);
+
+		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::ChunkData *chunk) { addChunkBiome(biomemap.get(), X, Z, chunk); });
+
+		writeImage(output, biomemap.get(), PNG::GRAY, intime);
+	} catch (const std::exception& ex) {
+		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
 	}
+}
+
+static void doRegion(const std::string &input, const std::string &output, const std::string &output_light) {
+	int64_t intime = checkRegion(input, output);
+	if (intime == INT64_MIN)
+		return;
 
 	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
 
@@ -185,6 +220,22 @@ static void makeDir(const std::string &name) {
 		) < 0 && errno != EEXIST
 	)
 		throw std::system_error(errno, std::generic_category(), "unable to create directory " + name);
+}
+
+static void makeBiome(const std::string &regiondir, const std::string &outputdir, size_t x, size_t z) {
+	std::string inname = formatTileName(x, z, "mca");
+	std::string outname = formatTileName(x, z, "png");
+	doRegionBiome(regiondir + "/" + inname, outputdir + "/biome/" + outname);
+}
+
+static void makeBiomes(const std::string &regiondir, const std::string &outputdir, const Info *info) {
+	int minX, maxX, minZ, maxZ;
+	std::tie(minX, maxX, minZ, maxZ) = info->getBounds(0);
+
+	for (int x = minX; x <= maxX; x++) {
+		for (int z = minZ; z <= maxZ; z++)
+			makeBiome(regiondir, outputdir, x, z);
+	}
 }
 
 static void makeMap(const std::string &regiondir, const std::string &outputdir, size_t x, size_t z) {
@@ -321,12 +372,16 @@ static Info collectInfo(const std::string &regiondir) {
 static void doLevel(const std::string &inputdir, const std::string &outputdir) {
 	const std::string regiondir = inputdir + "/region";
 
+	makeDir(outputdir + "/biome");
 	makeDir(outputdir + "/map");
 	makeDir(outputdir + "/map/0");
 	makeDir(outputdir + "/light");
 	makeDir(outputdir + "/light/0");
 
 	Info info = collectInfo(regiondir);
+
+	std::printf("Updating biome data...\n");
+	makeBiomes(regiondir, outputdir, &info);
 
 	std::printf("Updating map data...\n");
 	makeMaps(regiondir, outputdir, &info);

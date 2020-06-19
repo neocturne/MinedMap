@@ -75,8 +75,10 @@ uint8_t Chunk::getBiome(size_t x, size_t y, size_t z) const {
 		return biomeInts->getValue((y/BGROUP)*BSIZE*BSIZE + (z/BGROUP)*BSIZE + (x/BGROUP));
 	else if (biomeIntsPre115)
 		return biomeIntsPre115->getValue(z*SIZE + x);
-	else
+	else if (biomeBytes)
 		return biomeBytes->getValue(z*SIZE + x);
+	else
+		return 0;
 }
 
 bool Chunk::getBlock(Block *block, const Section *section, size_t x, size_t y, size_t z, uint8_t prev_light) const {

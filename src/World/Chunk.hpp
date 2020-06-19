@@ -62,7 +62,6 @@ private:
 	std::shared_ptr<const NBT::IntArrayTag> biomeIntsPre115;
 	std::shared_ptr<const NBT::IntArrayTag> biomeInts;
 
-	uint8_t getBiome(size_t x, size_t y, size_t z) const;
 	bool getBlock(Block *block, const Section *section, size_t x, size_t y, size_t z, uint8_t prev_light) const;
 
 public:
@@ -71,6 +70,8 @@ public:
 	const NBT::CompoundTag & getLevel() const {
 		return *level;
 	}
+
+	uint8_t getBiome(size_t x, size_t y, size_t z) const;
 
 	const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const {
 		size_t Y = y / SIZE;
