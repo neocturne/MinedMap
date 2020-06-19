@@ -85,7 +85,6 @@ Block Chunk::getBlock(size_t x, Chunk::Height height, size_t z) const {
 	Block block = {};
 
 	block.depth = height.depth;
-	block.biome = getBiome(x, height.y, z);
 
 	size_t Y = height.y / SIZE;
 	size_t y = height.y % SIZE;

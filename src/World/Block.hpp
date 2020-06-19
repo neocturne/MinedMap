@@ -38,10 +38,9 @@ struct Block {
 	const Resource::BlockType *type;
 	unsigned depth;
 	uint8_t blockLight;
-	uint8_t biome;
 
 
-	Resource::Color getColor() const {
+	Resource::Color getColor(uint8_t biome) const {
 		if (!type || !(type->flags & BLOCK_OPAQUE))
 			return Resource::Color {};
 

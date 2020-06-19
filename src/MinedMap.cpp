@@ -65,7 +65,9 @@ static void addChunkBiome(uint8_t biomemap[DIM*DIM], size_t X, size_t Z, const W
 	}
 }
 
-static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z, const World::ChunkData *data) {
+static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z,
+	const World::ChunkData *data, const std::unique_ptr<uint8_t[]> biomemaps[3][3]
+) {
 	World::Chunk chunk(data);
 	World::Chunk::Heightmap layer = chunk.getTopLayer(true);
 
@@ -73,9 +75,9 @@ static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM]
 		for (size_t z = 0; z < World::Chunk::SIZE; z++) {
 			size_t i = (Z*World::Chunk::SIZE+z)*DIM + X*World::Chunk::SIZE+x;
 			const World::Chunk::Height &height = layer.v[x][z];
-			const World::Block block = chunk.getBlock(x, height, z);
+			World::Block block = chunk.getBlock(x, height, z);
 
-			image[i] = block.getColor();
+			image[i] = block.getColor(biomemaps[1][1].get()[i]);
 			lightmap[2*i+1] = (1 - block.blockLight/15.f)*192;
 		}
 	}
@@ -262,7 +264,9 @@ static void makeMap(const std::string &regiondir, const std::string &outputdir, 
 		std::unique_ptr<uint8_t[]> lightmap(new uint8_t[2*DIM*DIM]);
 		std::memset(lightmap.get(), 0, 2*DIM*DIM);
 
-		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::ChunkData *chunk) { addChunk(image.get(), lightmap.get(), X, Z, chunk); });
+		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::ChunkData *chunk) {
+			addChunk(image.get(), lightmap.get(), X, Z, chunk, biomemaps);
+		});
 
 		writeImage(output, reinterpret_cast<const uint8_t*>(image.get()), PNG::RGB_ALPHA, intime);
 		writeImage(output_light, lightmap.get(), PNG::GRAY_ALPHA, intime);
