@@ -89,9 +89,6 @@ static uint8_t biomeAt(ssize_t x, ssize_t z, const std::unique_ptr<uint8_t[]> bi
 }
 
 static Resource::Color collectColors(size_t x, size_t z, const World::Block &block, const std::unique_ptr<uint8_t[]> biomemaps[3][3]) {
-	if (!block.isVisible())
-		return Resource::Color();
-
 	std::unordered_map<uint8_t, size_t> biomes;
 	for (int dx = -BIOME_SMOOTH; dx <= BIOME_SMOOTH; dx++) {
 		for (int dz = -BIOME_SMOOTH; dz <= BIOME_SMOOTH; dz++) {
@@ -137,6 +134,9 @@ static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM]
 			size_t i = (Z*World::Chunk::SIZE+z)*DIM + X*World::Chunk::SIZE+x;
 			const World::Chunk::Height &height = layer.v[x][z];
 			World::Block block = chunk.getBlock(x, height, z);
+
+			if (!block.isVisible())
+				continue;
 
 			image[i] = collectColors(X*World::Chunk::SIZE+x, Z*World::Chunk::SIZE+z, block, biomemaps);
 			lightmap[2*i+1] = (1 - block.blockLight/15.f)*192;
