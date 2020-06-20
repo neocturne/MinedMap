@@ -164,15 +164,29 @@ static void writeStamp(const std::string &filename, int64_t v) {
 	}
 }
 
-static void writeImage(const std::string &output, const uint8_t *data, PNG::Format format, int64_t t) {
+static bool writeImage(const std::string &output, const uint8_t *data, PNG::Format format, int64_t t) {
 	const std::string tmpfile = output + ".tmp";
 
-	try {
-		PNG::write(tmpfile.c_str(), data, DIM, DIM, format);
+	size_t len = PNG::formatBytes(format)*DIM*DIM;
+	bool changed = true;
 
-		if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
-			std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
-			std::remove(tmpfile.c_str());
+	try {
+		std::unique_ptr<uint8_t[]> old(new uint8_t[len]);
+		PNG::read(output.c_str(), old.get(), DIM, DIM, format);
+
+		if (std::memcmp(data, old.get(), len) == 0)
+			changed = false;
+	} catch (const std::exception& ex) {
+	}
+
+	try {
+		if (changed) {
+			PNG::write(tmpfile.c_str(), data, DIM, DIM, format);
+
+			if (std::rename(tmpfile.c_str(), output.c_str()) < 0) {
+				std::fprintf(stderr, "Unable to save %s: %s\n", output.c_str(), std::strerror(errno));
+				std::remove(tmpfile.c_str());
+			}
 		}
 
 		writeStamp(output, t);
@@ -180,6 +194,8 @@ static void writeImage(const std::string &output, const uint8_t *data, PNG::Form
 		std::remove(tmpfile.c_str());
 		throw;
 	}
+
+	return changed;
 }
 
 static int64_t getModTime(const std::string &file) {
@@ -257,7 +273,8 @@ static void makeBiome(const std::string &regiondir, const std::string &outputdir
 	if (!checkRegion(intime, output))
 		return;
 
-	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
+	std::printf("Generating %s from %s... ", output.c_str(), input.c_str());
+	std::fflush(stdout);
 
 	try {
 		std::unique_ptr<uint8_t[]> biomemap(new uint8_t[DIM*DIM]);
@@ -267,7 +284,8 @@ static void makeBiome(const std::string &regiondir, const std::string &outputdir
 			addChunkBiome(biomemap.get(), X, Z, chunk);
 		});
 
-		writeImage(output, biomemap.get(), PNG::GRAY, intime);
+		bool changed = writeImage(output, biomemap.get(), PNG::GRAY, intime);
+		std::printf("%s.\n", changed ? "done" : "unchanged");
 	} catch (const std::exception& ex) {
 		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
 	}
@@ -304,7 +322,8 @@ static void makeMap(const std::string &regiondir, const std::string &outputdir, 
 	if (!checkRegion(intime, output))
 		return;
 
-	std::printf("Generating %s from %s...\n", output.c_str(), input.c_str());
+	std::printf("Generating %s from %s... ", output.c_str(), input.c_str());
+	std::fflush(stdout);
 
 	try {
 		std::unique_ptr<uint8_t[]> biomemaps[3][3];
@@ -328,8 +347,9 @@ static void makeMap(const std::string &regiondir, const std::string &outputdir, 
 			addChunk(image.get(), lightmap.get(), X, Z, chunk, biomemaps);
 		});
 
-		writeImage(output, reinterpret_cast<const uint8_t*>(image.get()), PNG::RGB_ALPHA, intime);
-		writeImage(output_light, lightmap.get(), PNG::GRAY_ALPHA, intime);
+		bool changed = writeImage(output, reinterpret_cast<const uint8_t*>(image.get()), PNG::RGB_ALPHA, intime);
+		changed = writeImage(output_light, lightmap.get(), PNG::GRAY_ALPHA, intime) || changed;
+		std::printf("%s.\n", changed ? "done" : "unchanged");
 	} catch (const std::exception& ex) {
 		std::fprintf(stderr, "Failed to generate %s: %s\n", output.c_str(), ex.what());
 	}
