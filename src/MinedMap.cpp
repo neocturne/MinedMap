@@ -113,9 +113,15 @@ static Resource::Color collectColors(size_t x, size_t z, const World::Block &blo
 		uint8_t biome = e.first;
 		size_t count = e.second;
 
+		if (biome == 0xff)
+			continue;
+
 		c = c + count * block.getColor(biome);
 		total += count;
 	}
+
+	if (!total)
+		return block.getColor(0);
 
 	return (1.0f / total) * c;
 }
@@ -255,7 +261,7 @@ static void makeBiome(const std::string &regiondir, const std::string &outputdir
 
 	try {
 		std::unique_ptr<uint8_t[]> biomemap(new uint8_t[DIM*DIM]);
-		std::memset(biomemap.get(), 0, DIM*DIM);
+		std::memset(biomemap.get(), 0xff, DIM*DIM);
 
 		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::ChunkData *chunk) {
 			addChunkBiome(biomemap.get(), X, Z, chunk);

@@ -78,7 +78,7 @@ uint8_t Chunk::getBiome(size_t x, size_t y, size_t z) const {
 	else if (biomeBytes)
 		return biomeBytes->getValue(z*SIZE + x);
 	else
-		return 0;
+		return 0xff;
 }
 
 Block Chunk::getBlock(size_t x, Chunk::Height height, size_t z) const {
