@@ -44,12 +44,6 @@ static const int formatColorTypes[] = {
 	[GRAY] = PNG_COLOR_TYPE_GRAY,
 };
 
-static const size_t formatBytes[] = {
-	[RGB_ALPHA] = 4,
-	[GRAY_ALPHA] = 2,
-	[GRAY] = 1,
-};
-
 void write(const char *filename, const uint8_t *data, size_t width, size_t height, Format format) {
 	std::FILE *f = std::fopen(filename, "wb");
 	if (!f)
@@ -78,7 +72,7 @@ void write(const char *filename, const uint8_t *data, size_t width, size_t heigh
 
 	uint8_t *row_pointers[height];
 	for (size_t i = 0; i < height; i++)
-		row_pointers[i] = const_cast<uint8_t*>(&data[formatBytes[format]*i*width]);
+		row_pointers[i] = const_cast<uint8_t*>(&data[formatBytes(format)*i*width]);
 
 	png_set_rows(png_ptr, info_ptr, row_pointers);
 	png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, nullptr);
@@ -126,7 +120,7 @@ void read(const char *filename, uint8_t *data, size_t width, size_t height, Form
 
 	uint8_t **row_pointers = png_get_rows(png_ptr, info_ptr);
 	for (size_t i = 0; i < height; i++)
-		std::memcpy(&data[formatBytes[format]*i*width], row_pointers[i], formatBytes[format]*width);
+		std::memcpy(&data[formatBytes(format)*i*width], row_pointers[i], formatBytes(format)*width);
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 	std::fclose(f);
@@ -136,7 +130,7 @@ static void readScaled(uint8_t *data, size_t offset_w, size_t offset_h, const ch
 	if (!file)
 		return;
 
-	size_t b = formatBytes[format];
+	size_t b = formatBytes(format);
 
 	std::unique_ptr<uint8_t[]> input(new uint8_t[b*width*height]);
 	read(file, input.get(), width, height, format);
@@ -152,7 +146,7 @@ static void readScaled(uint8_t *data, size_t offset_w, size_t offset_h, const ch
 }
 
 void mipmap(const char *output, size_t width, size_t height, Format format, const char *nw, const char *ne, const char *sw, const char *se) {
-	size_t size = formatBytes[format]*width*height;
+	size_t size = formatBytes(format)*width*height;
 	std::unique_ptr<uint8_t[]> data(new uint8_t[size]);
 	std::memset(data.get(), 0, size);
 

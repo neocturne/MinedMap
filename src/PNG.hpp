@@ -37,8 +37,17 @@ enum Format {
 	RGB_ALPHA,
 	GRAY_ALPHA,
 	GRAY,
-
 };
+
+static inline size_t formatBytes(Format format) {
+	const size_t data[] = {
+		[RGB_ALPHA] = 4,
+		[GRAY_ALPHA] = 2,
+		[GRAY] = 1,
+	};
+
+	return data[format];
+}
 
 void write(const char *filename, const uint8_t *data, size_t width, size_t height, Format format);
 void read(const char *filename, uint8_t *data, size_t width, size_t height, Format format);
