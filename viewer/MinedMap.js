@@ -46,7 +46,7 @@ var MinedMapLayer = L.GridLayer.extend({
 		    mipmap.regions[coords.y-mipmap.info.minZ][coords.x-mipmap.info.minX])
 			tile.src = 'data/'+this.layer+'/'+z+'/r.'+coords.x+'.'+coords.y+'.png';
 
-		if (z == 0)
+		if (z === 0)
 			L.DomUtil.addClass(tile, 'overzoomed');
 
 		return tile;
@@ -230,7 +230,7 @@ window.createMap = function () {
 		map.on('layerremove', refreshHash);
 
 		window.onhashchange = function () {
-			if (window.location.hash == makeHash())
+			if (window.location.hash === makeHash())
 				return;
 
 			updateParams();
