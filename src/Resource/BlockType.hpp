@@ -40,7 +40,7 @@ namespace Resource {
 #define BLOCK_SPRUCE	(1u << 4)
 #define BLOCK_WATER	(1u << 5)
 
-struct BlockType {
+class BlockType {
 private:
 	static const std::unordered_map<std::string, BlockType> Types;
 
