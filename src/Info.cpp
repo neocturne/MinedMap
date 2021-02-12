@@ -46,12 +46,14 @@ void Info::writeJSON(const char *filename) const {
 	std::fprintf(f, "{");
 	std::fprintf(f, "\"mipmaps\":[");
 
-	for (size_t level = 0; level < regions.size(); level++) {
-		if (level != 0)
+	bool first_level = true;
+	for (const auto &level : levels) {
+		if (!first_level)
 			std::fprintf(f, ",");
+		first_level = false;
 
 		int minX, maxX, minZ, maxZ;
-		std::tie(minX, maxX, minZ, maxZ) = getBounds(level);
+		std::tie(minX, maxX, minZ, maxZ) = level.bounds;
 
 		std::fprintf(f, "{");
 		std::fprintf(f, "\"bounds\":{");
@@ -63,7 +65,7 @@ void Info::writeJSON(const char *filename) const {
 		std::fprintf(f, "\"regions\":{");
 
 		bool first_z = true;
-		for (const auto &item : regions[level]) {
+		for (const auto &item : level.regions) {
 			if (!first_z)
 				std::fprintf(f, ",");
 			first_z = false;
