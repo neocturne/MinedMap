@@ -29,6 +29,7 @@
 #include <climits>
 #include <cstddef>
 #include <cstdint>
+#include <map>
 #include <set>
 #include <tuple>
 #include <utility>
@@ -39,7 +40,7 @@ namespace MinedMap {
 
 class Info {
 private:
-	std::vector<std::set<std::pair<int, int>>> regions;
+	std::vector<std::map<int, std::set<int>>> regions;
 	std::vector<std::tuple<int, int, int, int>> bounds;
 
 	int32_t spawnX, spawnZ;
@@ -54,7 +55,12 @@ public:
 	}
 
 	void addRegion(int x, int z, size_t level) {
-		regions[level].insert(std::make_pair(x, z));
+		auto &level_r = regions[level];
+		auto z_regions = level_r.emplace(
+			std::piecewise_construct,
+			std::make_tuple(z),
+			std::make_tuple()).first;
+		z_regions->second.insert(x);
 
 		std::tuple<int, int, int, int> &b = bounds[level];
 

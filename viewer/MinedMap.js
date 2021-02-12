@@ -1,3 +1,22 @@
+// bsearch-based array element check
+function contains(array, elem) {
+	var min = 0, max = array.length, i, cur;
+
+	while (min < max) {
+		i = min + Math.floor((max-min)/2);
+		cur = array[i];
+
+		if (cur === elem)
+			return true;
+		else if (cur < elem)
+			min = i + 1;
+		else
+			max = i;
+	}
+
+	return false;
+}
+
 var MinedMapLayer = L.GridLayer.extend({
 	initialize: function (mipmaps, layer) {
 		this.mipmaps = mipmaps;
@@ -43,7 +62,7 @@ var MinedMapLayer = L.GridLayer.extend({
 
 		if (coords.x >= mipmap.info.minX && coords.x <= mipmap.info.maxX &&
 		    coords.y >= mipmap.info.minZ && coords.y <= mipmap.info.maxZ &&
-		    mipmap.regions[coords.y-mipmap.info.minZ][coords.x-mipmap.info.minX])
+		    contains(mipmap.regions[coords.y] || [], coords.x))
 			tile.src = 'data/'+this.layer+'/'+z+'/r.'+coords.x+'.'+coords.y+'.png';
 
 		if (z === 0)

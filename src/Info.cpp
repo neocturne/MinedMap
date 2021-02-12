@@ -47,6 +47,9 @@ void Info::writeJSON(const char *filename) const {
 	std::fprintf(f, "\"mipmaps\":[");
 
 	for (size_t level = 0; level < regions.size(); level++) {
+		if (level != 0)
+			std::fprintf(f, ",");
+
 		int minX, maxX, minZ, maxZ;
 		std::tie(minX, maxX, minZ, maxZ) = getBounds(level);
 
@@ -57,30 +60,33 @@ void Info::writeJSON(const char *filename) const {
 		std::fprintf(f, "\"minZ\":%i,", minZ);
 		std::fprintf(f, "\"maxZ\":%i", maxZ);
 		std::fprintf(f, "},");
-		std::fprintf(f, "\"regions\":[");
+		std::fprintf(f, "\"regions\":{");
 
-		for (int z = minZ; z <= maxZ; z++) {
-			std::fprintf(f, "[");
+		bool first_z = true;
+		for (const auto &item : regions[level]) {
+			if (!first_z)
+				std::fprintf(f, ",");
+			first_z = false;
 
-			for (int x = minX; x <= maxX; x++) {
-				std::fprintf(f, "%s", regions[level].count(std::make_pair(x, z)) ? "true" : "false");
+			int z = item.first;
+			const std::set<int> &z_regions = item.second;
 
-				if (x < maxX)
+			std::fprintf(f, "\"%d\":[", z);
+
+			bool first_x = true;
+			for (int x : z_regions) {
+				if (!first_x)
 					std::fprintf(f, ",");
+				first_x = false;
+
+
+				std::fprintf(f, "%d", x);
 			}
 
-			if (z < maxZ)
-				std::fprintf(f, "],");
-			else
-				std::fprintf(f, "]");
+			std::fprintf(f, "]");
 		}
 
-		std::fprintf(f, "]");
-
-		if (level < regions.size() - 1)
-			std::fprintf(f, "},");
-		else
-			std::fprintf(f, "}");
+		std::fprintf(f, "}}");
 	}
 
 	std::fprintf(f, "],");
