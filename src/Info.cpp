@@ -43,52 +43,52 @@ void Info::writeJSON(const char *filename) const {
 		return;
 	}
 
-	std::fprintf(f, "{\n");
-	std::fprintf(f, "  \"mipmaps\" : [\n");
+	std::fprintf(f, "{");
+	std::fprintf(f, "\"mipmaps\":[");
 
 	for (size_t level = 0; level < regions.size(); level++) {
 		int minX, maxX, minZ, maxZ;
 		std::tie(minX, maxX, minZ, maxZ) = getBounds(level);
 
-		std::fprintf(f, "    {\n");
-		std::fprintf(f, "      \"info\" : {\n");
-		std::fprintf(f, "        \"minX\" : %i,\n", minX);
-		std::fprintf(f, "        \"maxX\" : %i,\n", maxX);
-		std::fprintf(f, "        \"minZ\" : %i,\n", minZ);
-		std::fprintf(f, "        \"maxZ\" : %i\n", maxZ);
-		std::fprintf(f, "      },\n");
-		std::fprintf(f, "      \"regions\" : [\n");
+		std::fprintf(f, "{");
+		std::fprintf(f, "\"info\":{");
+		std::fprintf(f, "\"minX\":%i,", minX);
+		std::fprintf(f, "\"maxX\":%i,", maxX);
+		std::fprintf(f, "\"minZ\":%i,", minZ);
+		std::fprintf(f, "\"maxZ\":%i", maxZ);
+		std::fprintf(f, "},");
+		std::fprintf(f, "\"regions\":[");
 
 		for (int z = minZ; z <= maxZ; z++) {
-			std::fprintf(f, "        [");
+			std::fprintf(f, "[");
 
 			for (int x = minX; x <= maxX; x++) {
 				std::fprintf(f, "%s", regions[level].count(std::make_pair(x, z)) ? "true" : "false");
 
 				if (x < maxX)
-					std::fprintf(f, ", ");
+					std::fprintf(f, ",");
 			}
 
 			if (z < maxZ)
-				std::fprintf(f, "],\n");
+				std::fprintf(f, "],");
 			else
-				std::fprintf(f, "]\n");
+				std::fprintf(f, "]");
 		}
 
-		std::fprintf(f, "      ]\n");
+		std::fprintf(f, "]");
 
 		if (level < regions.size() - 1)
-			std::fprintf(f, "    },\n");
+			std::fprintf(f, "},");
 		else
-			std::fprintf(f, "    }\n");
+			std::fprintf(f, "}");
 	}
 
-	std::fprintf(f, "  ],\n");
-	std::fprintf(f, "  \"spawn\" : {\n");
-	std::fprintf(f, "    \"x\" : %li,\n", (long)spawnX);
-	std::fprintf(f, "    \"z\" : %li\n", (long)spawnZ);
-	std::fprintf(f, "  }\n");
-	std::fprintf(f, "}\n");
+	std::fprintf(f, "],");
+	std::fprintf(f, "\"spawn\":{");
+	std::fprintf(f, "\"x\":%li,", (long)spawnX);
+	std::fprintf(f, "\"z\":%li", (long)spawnZ);
+	std::fprintf(f, "}");
+	std::fprintf(f, "}");
 
 	std::fclose(f);
 
