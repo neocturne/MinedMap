@@ -60,8 +60,8 @@ var MinedMapLayer = L.GridLayer.extend({
 
 		var mipmap = this.mipmaps[z];
 
-		if (coords.x >= mipmap.info.minX && coords.x <= mipmap.info.maxX &&
-		    coords.y >= mipmap.info.minZ && coords.y <= mipmap.info.maxZ &&
+		if (coords.x >= mipmap.bounds.minX && coords.x <= mipmap.bounds.maxX &&
+		    coords.y >= mipmap.bounds.minZ && coords.y <= mipmap.bounds.maxZ &&
 		    contains(mipmap.regions[coords.y] || [], coords.x))
 			tile.src = 'data/'+this.layer+'/'+z+'/r.'+coords.x+'.'+coords.y+'.png';
 
@@ -190,8 +190,8 @@ window.createMap = function () {
 			maxZoom: 3,
 			crs: L.CRS.Simple,
 			maxBounds: [
-				[-512*(mipmaps[0].info.maxZ+1), 512*mipmaps[0].info.minX],
-				[-512*mipmaps[0].info.minZ, 512*(mipmaps[0].info.maxX+1)],
+				[-512*(mipmaps[0].bounds.maxZ+1), 512*mipmaps[0].bounds.minX],
+				[-512*mipmaps[0].bounds.minZ, 512*(mipmaps[0].bounds.maxX+1)],
 			],
 		});
 

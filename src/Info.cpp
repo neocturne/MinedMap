@@ -54,7 +54,7 @@ void Info::writeJSON(const char *filename) const {
 		std::tie(minX, maxX, minZ, maxZ) = getBounds(level);
 
 		std::fprintf(f, "{");
-		std::fprintf(f, "\"info\":{");
+		std::fprintf(f, "\"bounds\":{");
 		std::fprintf(f, "\"minX\":%i,", minX);
 		std::fprintf(f, "\"maxX\":%i,", maxX);
 		std::fprintf(f, "\"minZ\":%i,", minZ);
