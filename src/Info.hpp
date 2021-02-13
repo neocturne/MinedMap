@@ -29,6 +29,7 @@
 #include <climits>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <map>
 #include <set>
 #include <tuple>
@@ -40,6 +41,8 @@ namespace MinedMap {
 
 class Info {
 public:
+	typedef std::function<void (int, int)> RegionVisitor;
+
 	struct Level {
 		std::map<int, std::set<int>> regions;
 		std::tuple<int, int, int, int> bounds;
@@ -82,8 +85,12 @@ public:
 		});
 	}
 
-	size_t getMipmapLevel() const {
-		return levels.size()-1;
+	void visitRegions(size_t level, const RegionVisitor &visitor) const {
+		for (const auto &item : levels[level].regions) {
+			int z = item.first;
+			for (int x : item.second)
+				visitor(x, z);
+		}
 	}
 
 	void setSpawn(const std::pair<int32_t, int32_t> &v) {

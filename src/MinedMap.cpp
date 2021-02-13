@@ -292,13 +292,9 @@ static void makeBiome(const std::string &regiondir, const std::string &outputdir
 }
 
 static void makeBiomes(const std::string &regiondir, const std::string &outputdir, const Info *info) {
-	int minX, maxX, minZ, maxZ;
-	std::tie(minX, maxX, minZ, maxZ) = info->getBounds(0);
-
-	for (int x = minX; x <= maxX; x++) {
-		for (int z = minZ; z <= maxZ; z++)
-			makeBiome(regiondir, outputdir, x, z);
-	}
+	info->visitRegions(0, [&] (int x, int z) {
+		makeBiome(regiondir, outputdir, x, z);
+	});
 }
 
 static void makeMap(const std::string &regiondir, const std::string &outputdir, int x, int z) {
@@ -356,13 +352,9 @@ static void makeMap(const std::string &regiondir, const std::string &outputdir, 
 }
 
 static void makeMaps(const std::string &regiondir, const std::string &outputdir, const Info *info) {
-	int minX, maxX, minZ, maxZ;
-	std::tie(minX, maxX, minZ, maxZ) = info->getBounds(0);
-
-	for (int x = minX; x <= maxX; x++) {
-		for (int z = minZ; z <= maxZ; z++)
-			makeMap(regiondir, outputdir, x, z);
-	}
+	info->visitRegions(0, [&] (int x, int z) {
+		makeMap(regiondir, outputdir, x, z);
+	});
 }
 
 static bool makeMipmap(const std::string &dir, size_t level, int x, int z, PNG::Format imageFormat) {
@@ -432,29 +424,32 @@ static bool makeMipmap(const std::string &dir, size_t level, int x, int z, PNG::
 	return true;
 }
 
+static int floored_half(int a) {
+	return (a - (a < 0)) / 2;
+}
+
 static void makeMipmaps(const std::string &dir, Info *info) {
-	int minX, maxX, minZ, maxZ;
-	std::tie(minX, maxX, minZ, maxZ) = info->getBounds(0);
+	for (size_t level = 0; ; level++) {
+		int minX, maxX, minZ, maxZ;
+		std::tie(minX, maxX, minZ, maxZ) = info->getBounds(level);
 
-	while (minX < -1 || maxX > 0 || minZ < -1 || maxZ > 0) {
+		if (minX >= -1 && maxX <= 0 && minZ >= -1 && maxZ <= 0)
+			break;
+
 		info->addMipmapLevel();
-		size_t level = info->getMipmapLevel();
-		makeDir(dir + "/map/" + format(level));
-		makeDir(dir + "/light/" + format(level));
+		makeDir(dir + "/map/" + format(level + 1));
+		makeDir(dir + "/light/" + format(level + 1));
 
-		minX = (minX-1)/2;
-		maxX = maxX/2;
-		minZ = (minZ-1)/2;
-		maxZ = maxZ/2;
+		info->visitRegions(level, [&] (int x, int z) {
+			info->addRegion(floored_half(x), floored_half(z), level + 1);
+		});
 
-		for (int x = minX; x <= maxX; x++) {
-			for (int z = minZ; z <= maxZ; z++) {
-				if (makeMipmap(dir + "/map", level, x, z, PNG::RGB_ALPHA))
-					info->addRegion(x, z, level);
+		info->visitRegions(level + 1, [&] (int x, int z) {
+			if (makeMipmap(dir + "/map", level + 1, x, z, PNG::RGB_ALPHA))
+				info->addRegion(x, z, level + 1);
 
-				makeMipmap(dir + "/light", level, x, z, PNG::GRAY_ALPHA);
-			}
-		}
+			makeMipmap(dir + "/light", level + 1, x, z, PNG::GRAY_ALPHA);
+		});
 	}
 }
 
