@@ -342,6 +342,8 @@ const Biome *const BIOMES[256] = {
 	/* 171 */ &BiomeDesert, /* Crimson Forest */
 	/* 172 */ &BiomeDesert, /* Warped Forest */
 	/* 173 */ &BiomeDesert, /* Basalt Deltas */
+	/* 174 */ &BiomePlains, /* Dripstone Caves */
+	/* 175 */ &BiomeDefault, /* Lush Caves */
 };
 
 }
