@@ -6,7 +6,7 @@ import sys
 
 
 if len(sys.argv) != 3:
-	sys.exit('Usage: extract.py <colors.json> <BlockType.inc>')
+	sys.exit('Usage: extract.py <colors.json> <BlockType.inc.cpp>')
 
 with open(sys.argv[1]) as f:
 	colors = json.load(f)

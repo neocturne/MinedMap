@@ -32,7 +32,7 @@ namespace Resource {
 
 const std::unordered_map<std::string, BlockType> BlockType::Types = {
 
-#include "BlockType.inc"
+#include "BlockType.inc.cpp"
 
 };
 
@@ -51,7 +51,7 @@ static constexpr LegacyBlockType simple(const char *t) {
 
 static const LegacyBlockType LEGACY_BLOCK_TYPE_DATA[256] = {
 
-#include "LegacyBlockType.inc"
+#include "LegacyBlockType.inc.cpp"
 
 };
 
