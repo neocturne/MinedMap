@@ -1,5 +1,4 @@
-include_directories(${ZLIB_INCLUDE_DIRS} ${PNG_INCLUDE_DIRS})
-add_definitions(${PNG_DEFINITIONS})
+add_compile_options(-std=c++11 -Wall)
 
 add_executable(MinedMap
   MinedMap.cpp
@@ -16,16 +15,14 @@ add_executable(MinedMap
   World/Region.cpp
   World/Section.cpp
 )
-set_target_properties(MinedMap PROPERTIES COMPILE_FLAGS "-std=c++11 -Wall")
-target_link_libraries(MinedMap ${ZLIB_LIBRARIES} ${PNG_LIBRARIES})
+target_link_libraries(MinedMap PkgConfig::ZLIB PkgConfig::PNG)
 
 add_executable(nbtdump
   nbtdump.cpp
   GZip.cpp
   NBT/Tag.cpp
 )
-set_target_properties(nbtdump PROPERTIES COMPILE_FLAGS "-std=c++11 -Wall")
-target_link_libraries(nbtdump ${ZLIB_LIBRARIES})
+target_link_libraries(nbtdump PkgConfig::ZLIB)
 
 add_executable(regiondump
   regiondump.cpp
@@ -34,7 +31,6 @@ add_executable(regiondump
   World/ChunkData.cpp
   World/Region.cpp
 )
-set_target_properties(regiondump PROPERTIES COMPILE_FLAGS "-std=c++11 -Wall")
-target_link_libraries(regiondump ${ZLIB_LIBRARIES})
+target_link_libraries(regiondump PkgConfig::ZLIB)
 
 install(TARGETS MinedMap RUNTIME DESTINATION bin)
