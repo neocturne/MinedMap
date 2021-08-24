@@ -56,7 +56,7 @@ static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
 
 static void addChunkBiome(uint8_t biomemap[DIM*DIM], size_t X, size_t Z, const World::ChunkData *data) {
 	World::Chunk chunk(data);
-	World::Chunk::Heightmap layer = chunk.getTopLayer(false);
+	World::Chunk::Heightmap layer = chunk.getTopLayer(0);
 
 	for (size_t x = 0; x < World::Chunk::SIZE; x++) {
 		for (size_t z = 0; z < World::Chunk::SIZE; z++) {
@@ -127,7 +127,7 @@ static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM]
 	const World::ChunkData *data, const std::unique_ptr<uint8_t[]> biomemaps[3][3]
 ) {
 	World::Chunk chunk(data);
-	World::Chunk::Heightmap layer = chunk.getTopLayer(true);
+	World::Chunk::Heightmap layer = chunk.getTopLayer(World::Chunk::WITH_DEPTH);
 
 	for (size_t x = 0; x < World::Chunk::SIZE; x++) {
 		for (size_t z = 0; z < World::Chunk::SIZE; z++) {

@@ -50,6 +50,9 @@ public:
 	static const size_t BSIZE = SIZE / BGROUP;
 	static const size_t BMAXY = MAXY / BGROUP;
 
+	// Flags
+	static const int WITH_DEPTH = (1 << 0);
+
 	struct Height {
 		unsigned y;
 		unsigned depth;
@@ -67,7 +70,7 @@ private:
 	std::shared_ptr<const NBT::IntArrayTag> biomeIntsPre115;
 	std::shared_ptr<const NBT::IntArrayTag> biomeInts;
 
-	bool getHeight(Height *height, const Section *section, size_t x, size_t y, size_t z, bool withDepth) const;
+	bool getHeight(Height *height, const Section *section, size_t x, size_t y, size_t z, int flags) const;
 
 	const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const {
 		size_t Y = y / SIZE;
@@ -89,7 +92,7 @@ public:
 	uint8_t getBiome(size_t x, size_t y, size_t z) const;
 	Block getBlock(size_t x, Height y, size_t z) const;
 
-	Heightmap getTopLayer(bool withDepth) const;
+	Heightmap getTopLayer(int flags) const;
 };
 
 }

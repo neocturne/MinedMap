@@ -101,11 +101,11 @@ Block Chunk::getBlock(size_t x, Chunk::Height height, size_t z) const {
 	return block;
 }
 
-bool Chunk::getHeight(Chunk::Height *height, const Section *section, size_t x, size_t y, size_t z, bool withDepth) const {
+bool Chunk::getHeight(Chunk::Height *height, const Section *section, size_t x, size_t y, size_t z, int flags) const {
 	if (height->depth > 0)
 		return false;
 
-	if (!withDepth && height->y > 0)
+	if (!(flags & WITH_DEPTH) && height->y > 0)
 		return false;
 
 	const Resource::BlockType *type = section->getBlockStateAt(x, y, z);
@@ -115,7 +115,7 @@ bool Chunk::getHeight(Chunk::Height *height, const Section *section, size_t x, s
 	if (height->y == 0)
 		height->y = SIZE*section->getY() + y;
 
-	if (!withDepth)
+	if (!(flags & WITH_DEPTH))
 		return true;
 
 	if (type->flags & BLOCK_WATER)
@@ -126,7 +126,7 @@ bool Chunk::getHeight(Chunk::Height *height, const Section *section, size_t x, s
 	return true;
 }
 
-Chunk::Heightmap Chunk::getTopLayer(bool withDepth) const {
+Chunk::Heightmap Chunk::getTopLayer(int flags) const {
 	size_t done = 0;
 	Heightmap ret = {};
 
@@ -145,7 +145,7 @@ Chunk::Heightmap Chunk::getTopLayer(bool withDepth) const {
 
 			for (size_t z = 0; z < SIZE; z++) {
 				for (size_t x = 0; x < SIZE; x++) {
-					if (getHeight(&ret.v[x][z], section, x, y, z, withDepth))
+					if (getHeight(&ret.v[x][z], section, x, y, z, flags))
 						done++;
 				}
 			}
