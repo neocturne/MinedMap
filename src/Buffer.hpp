@@ -31,6 +31,8 @@
 #include <stdexcept>
 #include <string>
 
+#include <byteswap.h>
+
 
 namespace MinedMap {
 
@@ -41,16 +43,15 @@ private:
 
 public:
 	static uint16_t parse16(const uint8_t *buf) {
-		return (buf[0] << 8) | buf[1];
+		return bswap_16(*reinterpret_cast<const uint16_t*>(buf));
 	}
 
 	static uint32_t parse32(const uint8_t *buf) {
-		return (uint32_t(buf[0]) << 24) | (uint32_t(buf[1]) << 16) | (uint32_t(buf[2]) << 8) | uint32_t(buf[3]);
+		return bswap_32(*reinterpret_cast<const uint32_t*>(buf));
 	}
 
 	static uint64_t parse64(const uint8_t *buf) {
-		return (uint64_t(buf[0]) << 56) | (uint64_t(buf[1]) << 48) | (uint64_t(buf[2]) << 40) | (uint64_t(buf[3]) << 32)
-			| (uint64_t(buf[4]) << 24) | (uint64_t(buf[5]) << 16) | (uint64_t(buf[6]) << 8) | uint64_t(buf[7]);
+		return bswap_64(*reinterpret_cast<const uint64_t*>(buf));
 	}
 
 
