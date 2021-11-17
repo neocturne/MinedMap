@@ -53,7 +53,7 @@ uint8_t Chunk::getBiome(block_idx_t x, y_idx_t y, block_idx_t z) const {
 		throw std::invalid_argument("corrupt chunk data");
 
 	if (biomeInts)
-		return biomeInts->getValue((y/BGROUP)*BSIZE*BSIZE + (z/BGROUP)*BSIZE + (x/BGROUP));
+		return biomeInts->getValue((y>>BSHIFT)*BSIZE*BSIZE + (z>>BSHIFT)*BSIZE + (x>>BSHIFT));
 	else if (biomeIntsPre115)
 		return biomeIntsPre115->getValue(z*SIZE + x);
 	else if (biomeBytes)
@@ -67,14 +67,14 @@ Block Chunk::getBlock(block_idx_t x, Chunk::Height height, block_idx_t z) const 
 
 	block.depth = height.depth;
 
-	section_idx_t Y = height.y / SIZE;
-	block_idx_t y = height.y % SIZE;
+	section_idx_t Y = height.y >> HSHIFT;
+	block_idx_t y = height.y & HMASK;
 
 	if (Y < sections.size() && sections[Y])
 		block.type = sections[Y]->getBlockStateAt(x, y, z);
 
-	section_idx_t Yt = (height.y + 1) / SIZE;
-	block_idx_t yt = (height.y + 1) % SIZE;
+	section_idx_t Yt = (height.y + 1) >> HSHIFT;
+	block_idx_t yt = (height.y + 1) & HMASK;
 
 	if (Yt < sections.size() && sections[Yt])
 		block.blockLight = sections[Yt]->getBlockLightAt(x, yt, z);
@@ -97,7 +97,7 @@ bool Chunk::getHeight(
 		return false;
 
 	if (height->y == 0)
-		height->y = SIZE*section->getY() + y;
+		height->y = (section->getY() << HSHIFT) + y;
 
 	if (!(flags & WITH_DEPTH))
 		return true;
@@ -105,7 +105,7 @@ bool Chunk::getHeight(
 	if (type->flags & BLOCK_WATER)
 		return false;
 
-	height->depth = SIZE*section->getY() + y;
+	height->depth = (section->getY() << HSHIFT) + y;
 
 	return true;
 }

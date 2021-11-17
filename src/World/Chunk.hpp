@@ -29,13 +29,18 @@ public:
 	// Maximum Y value
 	static const y_idx_t MAXY = 256;
 
+	// Shift to get from height to section index
+	static const unsigned HSHIFT = 4;
+	// Mask to get from height to y index inside section
+	static const block_idx_t HMASK = 0xf;
+
 	// Since Minecraft 1.15, biome information is stored for
 	// 4x4x4 block groups
-	static const uint32_t BGROUP = 4;
+	static const unsigned BSHIFT = 2;
 	// Number of biome values in a chunk in x/z dimensions
-	static const uint32_t BSIZE = SIZE / BGROUP;
+	static const uint32_t BSIZE = SIZE >> BSHIFT;
 	// Number of biome values in a chunk in y dimension
-	static const uint32_t BMAXY = MAXY / BGROUP;
+	static const uint32_t BMAXY = MAXY >> BSHIFT;
 
 	// Flags
 	static const int WITH_DEPTH = (1 << 0);
@@ -63,12 +68,12 @@ private:
 	) const;
 
 	const Resource::BlockType * getBlockStateAt(block_idx_t x, y_idx_t y, block_idx_t z) const {
-		section_idx_t Y = y / SIZE;
+		section_idx_t Y = y >> HSHIFT;
 
 		if (Y >= sections.size() || !sections[Y])
 			return nullptr;
 
-		return sections[Y]->getBlockStateAt(x, y % SIZE, z);
+		return sections[Y]->getBlockStateAt(x, y & HMASK, z);
 	}
 
 
