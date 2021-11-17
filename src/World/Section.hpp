@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-  Copyright (c) 2015-2019, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2021, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 */
 
@@ -13,6 +13,7 @@
 #include "../NBT/ListTag.hpp"
 #include "../NBT/LongArrayTag.hpp"
 #include "../Resource/BlockType.hpp"
+#include "../Util.hpp"
 
 #include <cstdint>
 #include <stdexcept>
@@ -23,21 +24,22 @@ namespace World {
 
 class Section {
 public:
-	static const size_t SIZE = 16;
+	// Number of blocks in a section in each dimension
+	static const uint32_t SIZE = 16;
 
 private:
-	size_t Y;
+	section_idx_t Y;
 	std::shared_ptr<const NBT::ByteArrayTag> blockLight;
 
 protected:
-	static size_t getIndex(size_t x, size_t y, size_t z) {
+	static size_t getIndex(block_idx_t x, block_idx_t y, block_idx_t z) {
 		if (x >= SIZE || y >= SIZE || z >= SIZE)
 			throw std::range_error("Chunk::getIndex(): bad coordinates");
 
 		return SIZE*SIZE*y + SIZE*z + x;
 	}
 
-	static uint8_t getHalf(const uint8_t *v, size_t x, size_t y, size_t z) {
+	static uint8_t getHalf(const uint8_t *v, block_idx_t x, block_idx_t y, block_idx_t z) {
 		size_t i = getIndex(x, y, z);
 
 		if (i % 2)
@@ -51,11 +53,11 @@ protected:
 public:
 	virtual ~Section() {}
 
-	size_t getY() const { return Y; };
+	section_idx_t getY() const { return Y; };
 
-	virtual const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const;
+	virtual const Resource::BlockType * getBlockStateAt(block_idx_t x, block_idx_t y, block_idx_t z) const;
 
-	uint8_t getBlockLightAt(size_t x, size_t y, size_t z) const {
+	uint8_t getBlockLightAt(block_idx_t x, block_idx_t y, block_idx_t z) const {
 		if (!blockLight)
 			return 0;
 
@@ -71,11 +73,11 @@ private:
 	std::shared_ptr<const NBT::ByteArrayTag> data;
 
 
-	uint8_t getBlockAt(size_t x, size_t y, size_t z) const {
+	uint8_t getBlockAt(block_idx_t x, block_idx_t y, block_idx_t z) const {
 		return blocks->getValue(getIndex(x, y, z));
 	}
 
-	uint8_t getDataAt(size_t x, size_t y, size_t z) const {
+	uint8_t getDataAt(block_idx_t x, block_idx_t y, block_idx_t z) const {
 		return getHalf(data->getPointer(), x, y, z);
 	}
 
@@ -86,7 +88,7 @@ public:
 		std::shared_ptr<const NBT::ByteArrayTag> &&data0
 	) : Section(section), blocks(blocks0), data(data0) {}
 
-	virtual const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const;
+	virtual const Resource::BlockType * getBlockStateAt(block_idx_t x, block_idx_t y, block_idx_t z) const;
 };
 
 class PaletteSection : public Section {
@@ -111,7 +113,7 @@ public:
 		uint32_t dataVersion0
 	);
 
-	virtual const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const;
+	virtual const Resource::BlockType * getBlockStateAt(block_idx_t x, block_idx_t y, block_idx_t z) const;
 };
 
 }

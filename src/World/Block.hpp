@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-  Copyright (c) 2015, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2021, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 */
 
@@ -17,7 +17,7 @@ namespace World {
 
 struct Block {
 	const Resource::BlockType *type;
-	unsigned depth;
+	y_idx_t depth;
 	uint8_t blockLight;
 
 	bool isVisible() const {

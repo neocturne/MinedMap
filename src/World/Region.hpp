@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-  Copyright (c) 2015, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2021, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 */
 
@@ -21,15 +21,16 @@ namespace World {
 
 class Region {
 public:
-	static const size_t SIZE = 32;
+	// Number of chunks in a region in each dimension
+	static const uint32_t SIZE = 32;
 
-	typedef std::function<void (size_t, size_t, const ChunkData *)> ChunkVisitor;
+	typedef std::function<void (chunk_idx_t, chunk_idx_t, const ChunkData *)> ChunkVisitor;
 
 	Region() = delete;
 
 private:
-	typedef std::tuple<size_t, size_t, size_t> ChunkDesc;
-	typedef std::unordered_map<size_t, ChunkDesc> ChunkMap;
+	typedef std::tuple<chunk_idx_t, chunk_idx_t, uint8_t> ChunkDesc;
+	typedef std::unordered_map<uint32_t, ChunkDesc> ChunkMap;
 
 	static ChunkMap processHeader(const uint8_t header[4096]);
 

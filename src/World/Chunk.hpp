@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-  Copyright (c) 2015-2018, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2021, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 */
 
@@ -24,19 +24,25 @@ namespace World {
 
 class Chunk {
 public:
-	static const size_t SIZE = Section::SIZE;
-	static const size_t MAXY = 256;
+	// Number of blocks in a chunk in x/z dimensions
+	static const uint32_t SIZE = Section::SIZE;
+	// Maximum Y value
+	static const y_idx_t MAXY = 256;
 
-	static const size_t BGROUP = 4;
-	static const size_t BSIZE = SIZE / BGROUP;
-	static const size_t BMAXY = MAXY / BGROUP;
+	// Since Minecraft 1.15, biome information is stored for
+	// 4x4x4 block groups
+	static const uint32_t BGROUP = 4;
+	// Number of biome values in a chunk in x/z dimensions
+	static const uint32_t BSIZE = SIZE / BGROUP;
+	// Number of biome values in a chunk in y dimension
+	static const uint32_t BMAXY = MAXY / BGROUP;
 
 	// Flags
 	static const int WITH_DEPTH = (1 << 0);
 
 	struct Height {
-		unsigned y;
-		unsigned depth;
+		y_idx_t y;
+		y_idx_t depth;
 	};
 
 	struct Heightmap {
@@ -51,10 +57,13 @@ private:
 	std::shared_ptr<const NBT::IntArrayTag> biomeIntsPre115;
 	std::shared_ptr<const NBT::IntArrayTag> biomeInts;
 
-	bool getHeight(Height *height, const Section *section, size_t x, size_t y, size_t z, int flags) const;
+	bool getHeight(
+		Height *height, const Section *section,
+		block_idx_t x, block_idx_t y, block_idx_t z, int flags
+	) const;
 
-	const Resource::BlockType * getBlockStateAt(size_t x, size_t y, size_t z) const {
-		size_t Y = y / SIZE;
+	const Resource::BlockType * getBlockStateAt(block_idx_t x, y_idx_t y, block_idx_t z) const {
+		section_idx_t Y = y / SIZE;
 
 		if (Y >= sections.size() || !sections[Y])
 			return nullptr;
@@ -70,8 +79,8 @@ public:
 		return *level;
 	}
 
-	uint8_t getBiome(size_t x, size_t y, size_t z) const;
-	Block getBlock(size_t x, Height y, size_t z) const;
+	uint8_t getBiome(block_idx_t x, y_idx_t y, block_idx_t z) const;
+	Block getBlock(block_idx_t x, Height y, block_idx_t z) const;
 
 	Heightmap getTopLayer(int flags) const;
 };

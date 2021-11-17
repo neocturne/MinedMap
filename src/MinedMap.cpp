@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-  Copyright (c) 2015, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2021, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 */
 
@@ -32,15 +32,15 @@
 namespace MinedMap {
 
 static const int BIOME_SMOOTH = 3;
-static const size_t DIM = World::Region::SIZE*World::Chunk::SIZE;
+static const uint32_t DIM = World::Region::SIZE*World::Chunk::SIZE;
 
 
-static void addChunkBiome(uint8_t biomemap[DIM*DIM], size_t X, size_t Z, const World::ChunkData *data) {
+static void addChunkBiome(uint8_t biomemap[DIM*DIM], chunk_idx_t X, chunk_idx_t Z, const World::ChunkData *data) {
 	World::Chunk chunk(data);
 	World::Chunk::Heightmap layer = chunk.getTopLayer(0);
 
-	for (size_t x = 0; x < World::Chunk::SIZE; x++) {
-		for (size_t z = 0; z < World::Chunk::SIZE; z++) {
+	for (block_idx_t x = 0; x < World::Chunk::SIZE; x++) {
+		for (block_idx_t z = 0; z < World::Chunk::SIZE; z++) {
 			size_t i = (Z*World::Chunk::SIZE+z)*DIM + X*World::Chunk::SIZE+x;
 			const World::Chunk::Height &height = layer.v[x][z];
 			biomemap[i] = chunk.getBiome(x, height.y, z);
@@ -48,20 +48,20 @@ static void addChunkBiome(uint8_t biomemap[DIM*DIM], size_t X, size_t Z, const W
 	}
 }
 
-static uint8_t biomeAt(ssize_t x, ssize_t z, const std::unique_ptr<uint8_t[]> biomemaps[3][3]) {
+static uint8_t biomeAt(int16_t x, int16_t z, const std::unique_ptr<uint8_t[]> biomemaps[3][3]) {
 	size_t a = 1, b = 1;
 
 	if (x < 0) {
 		a--;
 		x += DIM;
-	} else if (x >= (ssize_t)DIM) {
+	} else if (x >= (int32_t)DIM) {
 		a++;
 		x -= DIM;
 	}
 	if (z < 0) {
 		b--;
 		z += DIM;
-	} else if (z >= (ssize_t)DIM) {
+	} else if (z >= (int32_t)DIM) {
 		b++;
 		z -= DIM;
 	}
@@ -69,10 +69,13 @@ static uint8_t biomeAt(ssize_t x, ssize_t z, const std::unique_ptr<uint8_t[]> bi
 	return biomemaps[a][b].get()[z*DIM + x];
 }
 
-static Resource::Color collectColors(size_t x, size_t z, const World::Block &block, const std::unique_ptr<uint8_t[]> biomemaps[3][3]) {
-	std::unordered_map<uint8_t, size_t> biomes;
-	for (int dx = -BIOME_SMOOTH; dx <= BIOME_SMOOTH; dx++) {
-		for (int dz = -BIOME_SMOOTH; dz <= BIOME_SMOOTH; dz++) {
+static Resource::Color collectColors(
+	region_block_idx_t x, region_block_idx_t z,
+	const World::Block &block, const std::unique_ptr<uint8_t[]> biomemaps[3][3]
+) {
+	std::unordered_map<uint8_t, unsigned> biomes;
+	for (int16_t dx = -BIOME_SMOOTH; dx <= BIOME_SMOOTH; dx++) {
+		for (int16_t dz = -BIOME_SMOOTH; dz <= BIOME_SMOOTH; dz++) {
 			if (std::abs(dx) + std::abs(dz) > BIOME_SMOOTH)
 				continue;
 
@@ -85,11 +88,11 @@ static Resource::Color collectColors(size_t x, size_t z, const World::Block &blo
 	}
 
 	Resource::FloatColor c = {};
-	size_t total = 0;
+	unsigned total = 0;
 
 	for (const auto &e : biomes) {
 		uint8_t biome = e.first;
-		size_t count = e.second;
+		unsigned count = e.second;
 
 		if (biome == 0xff)
 			continue;
@@ -104,14 +107,14 @@ static Resource::Color collectColors(size_t x, size_t z, const World::Block &blo
 	return (1.0f / total) * c;
 }
 
-static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], size_t X, size_t Z,
+static void addChunk(Resource::Color image[DIM*DIM], uint8_t lightmap[2*DIM*DIM], chunk_idx_t X, chunk_idx_t Z,
 	const World::ChunkData *data, const std::unique_ptr<uint8_t[]> biomemaps[3][3]
 ) {
 	World::Chunk chunk(data);
 	World::Chunk::Heightmap layer = chunk.getTopLayer(World::Chunk::WITH_DEPTH);
 
-	for (size_t x = 0; x < World::Chunk::SIZE; x++) {
-		for (size_t z = 0; z < World::Chunk::SIZE; z++) {
+	for (block_idx_t x = 0; x < World::Chunk::SIZE; x++) {
+		for (block_idx_t z = 0; z < World::Chunk::SIZE; z++) {
 			size_t i = (Z*World::Chunk::SIZE+z)*DIM + X*World::Chunk::SIZE+x;
 			const World::Chunk::Height &height = layer.v[x][z];
 			World::Block block = chunk.getBlock(x, height, z);
@@ -261,7 +264,7 @@ static void makeBiome(const std::string &regiondir, const std::string &outputdir
 		std::unique_ptr<uint8_t[]> biomemap(new uint8_t[DIM*DIM]);
 		std::memset(biomemap.get(), 0xff, DIM*DIM);
 
-		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::ChunkData *chunk) {
+		World::Region::visitChunks(input.c_str(), [&] (chunk_idx_t X, chunk_idx_t Z, const World::ChunkData *chunk) {
 			addChunkBiome(biomemap.get(), X, Z, chunk);
 		});
 
@@ -289,8 +292,8 @@ static void makeMap(const std::string &regiondir, const std::string &outputdir, 
 	if (intime == INT64_MIN)
 		return;
 
-	for (size_t i = 0; i < 3; i++) {
-		for (size_t j = 0; j < 3; j++) {
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
 			biomenames[i][j] = outputdir + "/biome/" + formatTileName(x + i - 1, z + j - 1, "png");
 			intime = std::max(intime, getModTime(biomenames[i][j]));
 		}
@@ -304,8 +307,8 @@ static void makeMap(const std::string &regiondir, const std::string &outputdir, 
 
 	try {
 		std::unique_ptr<uint8_t[]> biomemaps[3][3];
-		for (size_t i = 0; i < 3; i++) {
-			for (size_t j = 0; j < 3; j++) {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
 				biomemaps[i][j].reset(new uint8_t[DIM*DIM]);
 				std::memset(biomemaps[i][j].get(), 0, DIM*DIM);
 
@@ -320,7 +323,7 @@ static void makeMap(const std::string &regiondir, const std::string &outputdir, 
 		std::unique_ptr<uint8_t[]> lightmap(new uint8_t[2*DIM*DIM]);
 		std::memset(lightmap.get(), 0, 2*DIM*DIM);
 
-		World::Region::visitChunks(input.c_str(), [&] (size_t X, size_t Z, const World::ChunkData *chunk) {
+		World::Region::visitChunks(input.c_str(), [&] (chunk_idx_t X, chunk_idx_t Z, const World::ChunkData *chunk) {
 			addChunk(image.get(), lightmap.get(), X, Z, chunk, biomemaps);
 		});
 
@@ -355,7 +358,7 @@ static bool makeMipmap(const std::string &dir, size_t level, int x, int z, PNG::
 	const char *se = se_str.c_str();
 
 	int64_t t = INT64_MIN;
-	size_t count = 0;
+	unsigned count = 0;
 	for (auto name : {&nw, &ne, &sw, &se}) {
 		struct stat s;
 		if (stat(*name, &s) < 0) {

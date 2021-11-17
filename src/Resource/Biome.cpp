@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-  Copyright (c) 2015, 2018, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2021, Matthias Schiffer <mschiffer@universe-factory.net>
   Copyright (c) 2019, Roman Shishkin <spark@uwtech.org>
   All rights reserved.
 */
@@ -9,7 +9,6 @@
 #include "Biome.hpp"
 
 #include "BlockType.hpp"
-#include "../Util.hpp"
 
 
 namespace MinedMap {
@@ -42,7 +41,7 @@ FloatColor Biome::getFoliageColor(float temp, float rain) const {
 }
 
 
-FloatColor Biome::getBlockColor(const BlockType *type, unsigned height) const {
+FloatColor Biome::getBlockColor(const BlockType *type, y_idx_t height) const {
 	FloatColor c = {
 		float(type->color.r),
 		float(type->color.g),

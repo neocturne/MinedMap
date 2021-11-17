@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-  Copyright (c) 2015, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2021, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 */
 
@@ -18,16 +18,16 @@ namespace World {
 Region::ChunkMap Region::processHeader(const uint8_t header[4096]) {
 	ChunkMap map;
 
-	for (size_t z = 0; z < 32; z++) {
-		for (size_t x = 0; x < 32; x++) {
+	for (chunk_idx_t z = 0; z < 32; z++) {
+		for (chunk_idx_t x = 0; x < 32; x++) {
 			const uint8_t *p = &header[128*z + x*4];
 
-			size_t offset = (p[0] << 16) | (p[1] << 8) | p[2];
+			uint32_t offset = (p[0] << 16) | (p[1] << 8) | p[2];
 
 			if (!offset)
 				continue;
 
-			size_t len = p[3];
+			uint8_t len = p[3];
 
 			map.emplace(offset, ChunkDesc(x, z, len));
 		}
@@ -61,8 +61,9 @@ void Region::visitChunks(const char *filename, const ChunkVisitor &visitor) {
 			continue;
 		}
 
-		size_t x, z, len;
-		std::tie(x, z, len) = it->second;
+		chunk_idx_t x = std::get<0>(it->second);
+		chunk_idx_t z = std::get<1>(it->second);
+		size_t len = std::get<2>(it->second);
 
 		if (seen[x][z])
 			throw std::invalid_argument("duplicate chunk");

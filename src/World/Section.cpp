@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-  Copyright (c) 2015-2019, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2021, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 */
 
@@ -8,7 +8,6 @@
 #include "Section.hpp"
 #include "../NBT/ByteTag.hpp"
 #include "../NBT/StringTag.hpp"
-#include "../Util.hpp"
 
 #include <cstdio>
 
@@ -21,7 +20,7 @@ Section::Section(const std::shared_ptr<const NBT::CompoundTag> &section) {
 	blockLight = section->get<NBT::ByteArrayTag>("BlockLight");
 }
 
-const Resource::BlockType * Section::getBlockStateAt(size_t, size_t, size_t) const {
+const Resource::BlockType * Section::getBlockStateAt(block_idx_t, block_idx_t, block_idx_t) const {
 	return nullptr;
 }
 
@@ -44,7 +43,7 @@ std::unique_ptr<Section> Section::makeSection(const std::shared_ptr<const NBT::C
 }
 
 
-const Resource::BlockType * LegacySection::getBlockStateAt(size_t x, size_t y, size_t z) const {
+const Resource::BlockType * LegacySection::getBlockStateAt(block_idx_t x, block_idx_t y, block_idx_t z) const {
 	uint8_t type = getBlockAt(x, y, z);
 	uint8_t data = getDataAt(x, y, z);
 
@@ -97,7 +96,7 @@ PaletteSection::PaletteSection(
 	}
 }
 
-const Resource::BlockType * PaletteSection::getBlockStateAt(size_t x, size_t y, size_t z) const {
+const Resource::BlockType * PaletteSection::getBlockStateAt(block_idx_t x, block_idx_t y, block_idx_t z) const {
 	size_t index = getIndex(x, y, z);
 	size_t bitIndex;
 
@@ -110,7 +109,7 @@ const Resource::BlockType * PaletteSection::getBlockStateAt(size_t x, size_t y, 
 	}
 
 	size_t pos = bitIndex >> 3;
-	size_t shift = bitIndex & 7;
+	unsigned shift = bitIndex & 7;
 	uint16_t mask = (1u << bits) - 1;
 
 	uint32_t v = blockStates->getPointer()[mangleByteIndex(pos)];

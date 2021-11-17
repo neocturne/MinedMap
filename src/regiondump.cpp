@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-  Copyright (c) 2018, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2018-2021, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 */
 
@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	World::Region::visitChunks(argv[1], [&] (size_t X, size_t Z, const World::ChunkData *chunk) {
+	World::Region::visitChunks(argv[1], [&] (chunk_idx_t X, chunk_idx_t Z, const World::ChunkData *chunk) {
 		std::cout << "Chunk(" << X << ", " << Z << "): "
 			<< chunk->getRoot() << std::endl;
 	});

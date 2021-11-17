@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 /*
-  Copyright (c) 2015-2019, Matthias Schiffer <mschiffer@universe-factory.net>
+  Copyright (c) 2015-2021, Matthias Schiffer <mschiffer@universe-factory.net>
   All rights reserved.
 */
 
@@ -42,13 +42,13 @@ Chunk::Chunk(const ChunkData *data) {
 	for (auto &sTag : *sectionsTag) {
 		auto s = std::dynamic_pointer_cast<const NBT::CompoundTag>(sTag);
 		std::unique_ptr<Section> section = Section::makeSection(s, dataVersion);
-		size_t Y = section->getY();
+		section_idx_t Y = section->getY();
 		sections.resize(Y);
 		sections.push_back(std::move(section));
 	}
 }
 
-uint8_t Chunk::getBiome(size_t x, size_t y, size_t z) const {
+uint8_t Chunk::getBiome(block_idx_t x, y_idx_t y, block_idx_t z) const {
 	if (x > SIZE || y > MAXY || z > SIZE)
 		throw std::invalid_argument("corrupt chunk data");
 
@@ -62,19 +62,19 @@ uint8_t Chunk::getBiome(size_t x, size_t y, size_t z) const {
 		return 0xff;
 }
 
-Block Chunk::getBlock(size_t x, Chunk::Height height, size_t z) const {
+Block Chunk::getBlock(block_idx_t x, Chunk::Height height, block_idx_t z) const {
 	Block block = {};
 
 	block.depth = height.depth;
 
-	size_t Y = height.y / SIZE;
-	size_t y = height.y % SIZE;
+	section_idx_t Y = height.y / SIZE;
+	block_idx_t y = height.y % SIZE;
 
 	if (Y < sections.size() && sections[Y])
 		block.type = sections[Y]->getBlockStateAt(x, y, z);
 
-	size_t Yt = (height.y + 1) / SIZE;
-	size_t yt = (height.y + 1) % SIZE;
+	section_idx_t Yt = (height.y + 1) / SIZE;
+	block_idx_t yt = (height.y + 1) % SIZE;
 
 	if (Yt < sections.size() && sections[Yt])
 		block.blockLight = sections[Yt]->getBlockLightAt(x, yt, z);
@@ -82,7 +82,10 @@ Block Chunk::getBlock(size_t x, Chunk::Height height, size_t z) const {
 	return block;
 }
 
-bool Chunk::getHeight(Chunk::Height *height, const Section *section, size_t x, size_t y, size_t z, int flags) const {
+bool Chunk::getHeight(
+	Chunk::Height *height, const Section *section,
+	block_idx_t x, block_idx_t y, block_idx_t z, int flags
+) const {
 	if (height->depth > 0)
 		return false;
 
@@ -108,10 +111,10 @@ bool Chunk::getHeight(Chunk::Height *height, const Section *section, size_t x, s
 }
 
 Chunk::Heightmap Chunk::getTopLayer(int flags) const {
-	size_t done = 0;
+	uint32_t done = 0;
 	Heightmap ret = {};
 
-	for (ssize_t Y = sections.size() - 1; Y >= 0; Y--) {
+	for (int16_t Y = sections.size() - 1; Y >= 0; Y--) {
 		if (done == SIZE*SIZE)
 			break;
 
@@ -120,12 +123,12 @@ Chunk::Heightmap Chunk::getTopLayer(int flags) const {
 
 		const Section *section = sections[Y].get();
 
-		for (ssize_t y = SIZE-1; y >= 0; y--) {
+		for (int8_t y = SIZE-1; y >= 0; y--) {
 			if (done == SIZE*SIZE)
 				break;
 
-			for (size_t z = 0; z < SIZE; z++) {
-				for (size_t x = 0; x < SIZE; x++) {
+			for (block_idx_t z = 0; z < SIZE; z++) {
+				for (block_idx_t x = 0; x < SIZE; x++) {
 					if (getHeight(&ret.v[x][z], section, x, y, z, flags))
 						done++;
 				}
