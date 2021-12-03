@@ -57,8 +57,14 @@ public:
 private:
 	std::vector<std::unique_ptr<Section>> sections;
 
+	enum BiomeFormat {
+		UNKNOWN = 0,
+		BYTE_ARRAY,
+		INT_ARRAY_PRE1_15,
+		INT_ARRAY,
+	} biomeFormat = UNKNOWN;
+
 	std::shared_ptr<const NBT::ByteArrayTag> biomeBytes;
-	std::shared_ptr<const NBT::IntArrayTag> biomeIntsPre115;
 	std::shared_ptr<const NBT::IntArrayTag> biomeInts;
 
 	bool getHeight(
