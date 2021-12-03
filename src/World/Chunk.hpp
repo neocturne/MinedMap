@@ -55,7 +55,6 @@ public:
 	};
 
 private:
-	std::shared_ptr<const NBT::CompoundTag> level;
 	std::vector<std::unique_ptr<Section>> sections;
 
 	std::shared_ptr<const NBT::ByteArrayTag> biomeBytes;
@@ -79,10 +78,6 @@ private:
 
 public:
 	Chunk(const ChunkData *data);
-
-	const NBT::CompoundTag & getLevel() const {
-		return *level;
-	}
 
 	uint8_t getBiome(block_idx_t x, y_idx_t y, block_idx_t z) const;
 	Block getBlock(block_idx_t x, Height y, block_idx_t z) const;

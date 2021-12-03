@@ -18,7 +18,8 @@ namespace MinedMap {
 namespace World {
 
 Chunk::Chunk(const ChunkData *data) {
-	level = assertValue(data->getRoot().get<NBT::CompoundTag>("Level"));
+	std::shared_ptr<const NBT::CompoundTag> level =
+		assertValue(data->getRoot().get<NBT::CompoundTag>("Level"));
 
 	std::shared_ptr<const NBT::ListTag> sectionsTag = level->get<NBT::ListTag>("Sections");
 	if (!sectionsTag || sectionsTag->empty())
