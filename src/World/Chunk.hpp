@@ -26,7 +26,7 @@ class Chunk {
 public:
 	// Number of blocks in a chunk in x/z dimensions
 	static const uint32_t SIZE = Section::SIZE;
-	// Maximum Y value
+	// Maximum Y value for pre-1.18 chunks
 	static const y_idx_t MAXY = 256;
 
 	// Shift to get from height to section index
@@ -55,6 +55,7 @@ public:
 	};
 
 private:
+	section_idx_t sectionOffset;
 	std::vector<std::unique_ptr<Section>> sections;
 
 	enum BiomeFormat {
@@ -62,6 +63,7 @@ private:
 		BYTE_ARRAY,
 		INT_ARRAY_PRE1_15,
 		INT_ARRAY,
+		SECTION,
 	} biomeFormat = UNKNOWN;
 
 	std::shared_ptr<const NBT::ByteArrayTag> biomeBytes;
@@ -73,9 +75,9 @@ private:
 	) const;
 
 	const Resource::BlockType * getBlockStateAt(block_idx_t x, y_idx_t y, block_idx_t z) const {
-		section_idx_t Y = y >> HSHIFT;
+		section_idx_t Y = (y >> HSHIFT) - sectionOffset;
 
-		if (Y >= sections.size() || !sections[Y])
+		if (Y < 0 || size_t(Y) >= sections.size() || !sections[Y])
 			return nullptr;
 
 		return sections[Y]->getBlockStateAt(x, y & HMASK, z);

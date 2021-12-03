@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <limits>
 #include <stdexcept>
 #include <utility>
 
@@ -29,13 +30,15 @@ static inline float clamp(float v, float min, float max) {
 // A block coordinate relative to a chunk/section (X/Y/Z)
 typedef uint8_t block_idx_t;
 // A section index in a chunk (Y)
-typedef uint8_t section_idx_t;
+typedef int8_t section_idx_t;
 // A chunk coordinate relative to a region (X/Z)
 typedef uint8_t chunk_idx_t;
 
 // A block coordinate relative to a region (X/Z)
 typedef uint16_t region_block_idx_t;
 // A block coordinate (Y)
-typedef uint16_t y_idx_t;
+typedef int16_t y_idx_t;
+
+const y_idx_t y_idx_min = std::numeric_limits<y_idx_t>::min();
 
 }

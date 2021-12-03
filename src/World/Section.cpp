@@ -16,7 +16,7 @@ namespace MinedMap {
 namespace World {
 
 Section::Section(const std::shared_ptr<const NBT::CompoundTag> &section) {
-	Y = assertValue(section->get<NBT::ByteTag>("Y"))->getValue();
+	Y = int8_t(assertValue(section->get<NBT::ByteTag>("Y"))->getValue());
 	blockLight = section->get<NBT::ByteArrayTag>("BlockLight");
 }
 
@@ -25,18 +25,32 @@ const Resource::BlockType * Section::getBlockStateAt(block_idx_t, block_idx_t, b
 }
 
 std::unique_ptr<Section> Section::makeSection(const std::shared_ptr<const NBT::CompoundTag> &section, uint32_t dataVersion) {
-	std::shared_ptr<const NBT::LongArrayTag> blockStates = section->get<NBT::LongArrayTag>("BlockStates");
-	if (blockStates) {
-		const std::shared_ptr<const NBT::ListTag> palette = assertValue(section->get<NBT::ListTag>("Palette"));
+	{
+		const std::shared_ptr<const NBT::CompoundTag> blockStates = section->get<NBT::CompoundTag>("block_states");
+		if (blockStates) {
+			const std::shared_ptr<const NBT::ListTag> palette = assertValue(blockStates->get<NBT::ListTag>("palette"));
+			std::shared_ptr<const NBT::LongArrayTag> data = blockStates->get<NBT::LongArrayTag>("data");
 
-		return std::unique_ptr<Section>(new PaletteSection(section, std::move(blockStates), palette, dataVersion));
+			return std::unique_ptr<Section>(new PaletteSection(section, std::move(data), palette, dataVersion));
+		}
 	}
 
-	std::shared_ptr<const NBT::ByteArrayTag> blocks = section->get<NBT::ByteArrayTag>("Blocks");
-	if (blocks) {
-		std::shared_ptr<const NBT::ByteArrayTag> data = assertValue(section->get<NBT::ByteArrayTag>("Data"));
+	{
+		std::shared_ptr<const NBT::LongArrayTag> blockStates = section->get<NBT::LongArrayTag>("BlockStates");
+		if (blockStates) {
+			const std::shared_ptr<const NBT::ListTag> palette = assertValue(section->get<NBT::ListTag>("Palette"));
 
-		return std::unique_ptr<Section>(new LegacySection(section, std::move(blocks), std::move(data)));
+			return std::unique_ptr<Section>(new PaletteSection(section, std::move(blockStates), palette, dataVersion));
+		}
+	}
+
+	{
+		std::shared_ptr<const NBT::ByteArrayTag> blocks = section->get<NBT::ByteArrayTag>("Blocks");
+		if (blocks) {
+			std::shared_ptr<const NBT::ByteArrayTag> data = assertValue(section->get<NBT::ByteArrayTag>("Data"));
+
+			return std::unique_ptr<Section>(new LegacySection(section, std::move(blocks), std::move(data)));
+		}
 	}
 
 	return std::unique_ptr<Section>(new Section(section));
@@ -81,7 +95,7 @@ PaletteSection::PaletteSection(
 		expectedLength = (4096 + blocksPerWord - 1) / blocksPerWord;
 	}
 
-	if (blockStates->getLength() != expectedLength)
+	if (blockStates && blockStates->getLength() != expectedLength)
 		throw std::invalid_argument("corrupt section data");
 
 	for (const auto &entry : *paletteData) {
@@ -97,6 +111,9 @@ PaletteSection::PaletteSection(
 }
 
 const Resource::BlockType * PaletteSection::getBlockStateAt(block_idx_t x, block_idx_t y, block_idx_t z) const {
+	if (!blockStates)
+		return palette.at(0);
+
 	size_t index = getIndex(x, y, z);
 	size_t bitIndex;
 
