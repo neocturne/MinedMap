@@ -32,8 +32,8 @@ private:
 public:
 	ChunkData(Buffer buffer);
 
-	const NBT::CompoundTag & getRoot() const {
-		return *root;
+	const std::shared_ptr<const NBT::CompoundTag> & getRoot() const {
+		return root;
 	}
 };
 

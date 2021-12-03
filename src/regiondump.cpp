@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
 	World::Region::visitChunks(argv[1], [&] (chunk_idx_t X, chunk_idx_t Z, const World::ChunkData *chunk) {
 		std::cout << "Chunk(" << X << ", " << Z << "): "
-			<< chunk->getRoot() << std::endl;
+			<< *chunk->getRoot() << std::endl;
 	});
 
 	return 0;

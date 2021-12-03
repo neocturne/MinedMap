@@ -19,7 +19,7 @@ namespace World {
 
 Chunk::Chunk(const ChunkData *data) {
 	std::shared_ptr<const NBT::CompoundTag> level =
-		assertValue(data->getRoot().get<NBT::CompoundTag>("Level"));
+		assertValue(data->getRoot()->get<NBT::CompoundTag>("Level"));
 
 	std::shared_ptr<const NBT::ListTag> sectionsTag = level->get<NBT::ListTag>("Sections");
 	if (!sectionsTag || sectionsTag->empty())
@@ -37,7 +37,7 @@ Chunk::Chunk(const ChunkData *data) {
 	else
 		throw std::invalid_argument("corrupt biome data");
 
-	auto dataVersionTag = data->getRoot().get<NBT::IntTag>("DataVersion");
+	auto dataVersionTag = data->getRoot()->get<NBT::IntTag>("DataVersion");
 	uint32_t dataVersion = dataVersionTag ? dataVersionTag->getValue() : 0;
 
 	for (auto &sTag : *sectionsTag) {
