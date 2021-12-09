@@ -10,7 +10,6 @@
 
 #include "BlockType.hpp"
 
-
 namespace MinedMap {
 namespace Resource {
 
@@ -145,9 +144,19 @@ static const Biome BiomeWarmOcean(0.8f, 0.5f, {0.263f, 0.835f, 0.933f});
 static const Biome BiomeLukewarmOcean(0.8f, 0.5f, {0.271f, 0.678f, 0.949f});
 static const Biome BiomeColdOcean(0.8f, 0.5f, {0.239f, 0.341f, 0.839f});
 
-extern const Biome *const BIOME_DEFAULT = &BiomeDefault;
+static const Biome BiomeMeadow(0.5f, 0.8f);
+static const Biome BiomeGrove(-0.2f, 0.8f);
+static const Biome BiomeJaggedPeaks(-0.7f, 0.9f);
+static const Biome BiomeStonyPeaks(1.0f, 0.3f);
+static const Biome BiomeSnowySlopes(-0.3f, 0.9f);
 
-const Biome *const BIOMES[256] = {
+const Biome *const Biome::Default = &BiomeDefault;
+
+/* Minecraft 1.18 does not use numerical IDs for biomes anymore.
+ * Previously unused biome IDs are assigned to the new biome types of
+ * Minecraft 1.18 for storage in MinedMap's biome data cache. */
+
+const Biome *const Biome::Biomes[256] = {
 	/*   0 */ &BiomeDefault, /* Ocean */
 	/*   1 */ &BiomePlains,
 	/*   2 */ &BiomeDesert,
@@ -199,11 +208,11 @@ const Biome *const BIOMES[256] = {
 	/*  48 */ &BiomeLukewarmOcean, /* Deep Lukewarm Ocean */
 	/*  49 */ &BiomeColdOcean, /* Deep Cold Ocean */
 	/*  50 */ &BiomeFrozenOcean, /* Deep Frozen Ocean */
-	/*  51 */ nullptr,
-	/*  52 */ nullptr,
-	/*  53 */ nullptr,
-	/*  54 */ nullptr,
-	/*  55 */ nullptr,
+	/*  51 */ &BiomeMeadow, /* MinedMap assignment */
+	/*  52 */ &BiomeGrove, /* MinedMap assignment */
+	/*  53 */ &BiomeJaggedPeaks, /* MinedMap assignment */
+	/*  54 */ &BiomeStonyPeaks, /* MinedMap assignment */
+	/*  55 */ &BiomeSnowySlopes, /* MinedMap assignment */
 	/*  56 */ nullptr,
 	/*  57 */ nullptr,
 	/*  58 */ nullptr,
@@ -324,6 +333,111 @@ const Biome *const BIOMES[256] = {
 	/* 173 */ &BiomeDesert, /* Basalt Deltas */
 	/* 174 */ &BiomePlains, /* Dripstone Caves */
 	/* 175 */ &BiomeDefault, /* Lush Caves */
+};
+
+/* It is unclear which of the renamed/merged biome IDs can appear in practice,
+ * but it shouldn't hurt to support them anyways */
+
+const std::unordered_map<std::string, uint8_t> Biome::Names = {
+	{ "minecraft:badlands", 37 },
+	{ "minecraft:badlands_plateau", 39 }, /* 1.18: Merged into badlands */
+	{ "minecraft:bamboo_jungle", 168 },
+	{ "minecraft:bamboo_jungle_hills", 169 }, /* 1.18: Merged into bamboo_jungle */
+	{ "minecraft:basalt_deltas", 173 },
+	{ "minecraft:beach", 16 },
+	{ "minecraft:birch_forest", 27 },
+	{ "minecraft:birch_forest_hills", 28 }, /* 1.18: Merged into birch_forest */
+	{ "minecraft:cold_ocean", 46 },
+	{ "minecraft:crimson_forest", 171 },
+	{ "minecraft:dark_forest", 29 },
+	{ "minecraft:dark_forest_hills", 157 }, /* 1.18: Merged into dark_forest */
+	{ "minecraft:deep_cold_ocean", 49 },
+	{ "minecraft:deep_frozen_ocean", 50 },
+	{ "minecraft:deep_lukewarm_ocean", 48 },
+	{ "minecraft:deep_ocean", 24 },
+	{ "minecraft:deep_warm_ocean", 47 }, /* 1.18: Merged into warm_ocean */
+	{ "minecraft:desert", 2 },
+	{ "minecraft:desert_hills", 17 }, /* 1.18: Merged into desert */
+	{ "minecraft:desert_lakes", 130 }, /* 1.18: Merged into desert */
+	{ "minecraft:dripstone_caves", 174 },
+	{ "minecraft:end_barrens", 43 },
+	{ "minecraft:end_highlands", 42 },
+	{ "minecraft:end_midlands", 41 },
+	{ "minecraft:eroded_badlands", 165 },
+	{ "minecraft:extreme_hills", 3 }, /* 1.18: Renamed to windswept_hills (after rename from mountains) */
+	{ "minecraft:flower_forest", 132 },
+	{ "minecraft:forest", 4 },
+	{ "minecraft:frozen_ocean", 10 },
+	{ "minecraft:frozen_peaks", 53 }, /* 1.18: New */
+	{ "minecraft:frozen_river", 11 },
+	{ "minecraft:giant_spruce_taiga", 160 }, /* 1.18: Renamed to old_growth_spruce_taiga */
+	{ "minecraft:giant_spruce_taiga_hills", 161 }, /* 1.18: Merged into giant_spruce_taiga */
+	{ "minecraft:giant_tree_taiga", 32 }, /* 1.18: Renamed to old_growth_pine_taiga */
+	{ "minecraft:giant_tree_taiga_hills", 33 }, /* 1.18: Merged into giant_tree_taiga */
+	{ "minecraft:gravelly_mountains", 131 }, /* 1.18: Renamed to windswept_gravelly_hills */
+	{ "minecraft:grove", 52 }, /* 1.18: New */
+	{ "minecraft:ice_spikes", 140 },
+	{ "minecraft:jagged_peaks", 53 }, /* 1.18: New */
+	{ "minecraft:jungle", 21 },
+	{ "minecraft:jungle_edge", 23 }, /* 1.18: Renamed to sparse_jungle */
+	{ "minecraft:jungle_hills", 22 }, /* 1.18: Merged into jungle */
+	{ "minecraft:lukewarm_ocean", 45 },
+	{ "minecraft:lush_caves", 175 },
+	{ "minecraft:meadow", 51 }, /* 1.18: New */
+	{ "minecraft:modified_badlands_plateau", 167 }, /* 1.18: Merged into badlands */
+	{ "minecraft:modified_gravelly_mountains", 162 }, /* 1.18: Merged into gravelly_mountains */
+	{ "minecraft:modified_jungle", 149 }, /* 1.18: Merged into jungle */
+	{ "minecraft:modified_jungle_edge", 151 }, /* 1.18: Merged into jungle_edge */
+	{ "minecraft:modified_wooded_badlands_plateau", 166 }, /* 1.18: Merged into wooded_badlands */
+	{ "minecraft:mountain_edge", 20 }, /* 1.18: Merged into mountains */
+	{ "minecraft:mountains", 3 }, /* 1.18: Renamed to windswept_hills */
+	{ "minecraft:mushroom_field_shore", 15 }, /* 1.18: Merged into mushroom_fields */
+	{ "minecraft:mushroom_fields", 14 },
+	{ "minecraft:nether_wastes", 8 },
+	{ "minecraft:ocean", 0 },
+	{ "minecraft:old_growth_birch_forest", 155 },
+	{ "minecraft:old_growth_pine_taiga", 32 },
+	{ "minecraft:old_growth_spruce_taiga", 160 },
+	{ "minecraft:plains", 1 },
+	{ "minecraft:river", 7 },
+	{ "minecraft:savanna", 35 },
+	{ "minecraft:savanna_plateau", 36 },
+	{ "minecraft:shattered_savanna", 163 },
+	{ "minecraft:shattered_savanna_plateau", 164 }, /* 1.18: Merged into shattered_savanna */
+	{ "minecraft:small_end_islands", 40 },
+	{ "minecraft:snowy_beach", 26 },
+	{ "minecraft:snowy_mountains", 13 }, /* 1.18: Merged into snowy_tundra */
+	{ "minecraft:snowy_plains", 12 },
+	{ "minecraft:snowy_slopes", 55 },
+	{ "minecraft:snowy_taiga", 30 },
+	{ "minecraft:snowy_taiga_hills", 31 }, /* 1.18: Merged into snowy_taiga */
+	{ "minecraft:snowy_taiga_mountains", 158 }, /* 1.18: Merged into snowy_taiga */
+	{ "minecraft:snowy_tundra", 12 },
+	{ "minecraft:soul_sand_valley", 170 },
+	{ "minecraft:sparse_jungle", 23 },
+	{ "minecraft:stone_shore", 25 },
+	{ "minecraft:stony_peaks", 54 }, /* 1.18: New */
+	{ "minecraft:stony_shore", 25 },
+	{ "minecraft:sunflower_plains", 129 },
+	{ "minecraft:swamp", 6 },
+	{ "minecraft:swamp_hills", 134 }, /* 1.18: Merged into swamp */
+	{ "minecraft:taiga", 5 },
+	{ "minecraft:taiga_hills", 19 }, /* 1.18: Merged into taiga */
+	{ "minecraft:taiga_mountains", 133 }, /* 1.18: Merged into taiga */
+	{ "minecraft:tall_birch_forest", 155 }, /* 1.18: Renamed to old_growth_birch_forest */
+	{ "minecraft:tall_birch_hills", 156 }, /* 1.18: Merged into tall_birch_forest */
+	{ "minecraft:the_end", 9 },
+	{ "minecraft:the_void", 127 },
+	{ "minecraft:warm_ocean", 44 },
+	{ "minecraft:warped_forest", 172 },
+	{ "minecraft:windswept_forest", 34 },
+	{ "minecraft:windswept_gravelly_hills", 131 },
+	{ "minecraft:windswept_hills", 3 },
+	{ "minecraft:windswept_savanna", 163 },
+	{ "minecraft:wooded_badlands", 38 },
+	{ "minecraft:wooded_badlands_plateau", 38 }, /* 1.18: Renamed to wooded_badlands */
+	{ "minecraft:wooded_hills", 18 }, /* 1.18: Merged into forest */
+	{ "minecraft:wooded_mountains", 34 /* 1.18: Renamed to windswept_forest */},
 };
 
 }

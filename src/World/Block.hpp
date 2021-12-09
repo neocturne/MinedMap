@@ -28,7 +28,7 @@ struct Block {
 		if (!isVisible())
 			return Resource::FloatColor {};
 
-		return (Resource::BIOMES[biome] ?: Resource::BIOME_DEFAULT)->getBlockColor(type, depth);
+		return (Resource::Biome::Biomes[biome] ?: Resource::Biome::Default)->getBlockColor(type, depth);
 	}
 
 	operator bool() const {

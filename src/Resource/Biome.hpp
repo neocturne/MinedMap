@@ -10,6 +10,7 @@
 #include "Color.hpp"
 #include "../Util.hpp"
 
+#include <unordered_map>
 
 namespace MinedMap {
 namespace Resource {
@@ -28,14 +29,15 @@ protected:
 	FloatColor getWaterColor() const { return water; };
 
 public:
+	static const Biome *const Default;
+	static const Biome *const Biomes[256];
+	static const std::unordered_map<std::string, uint8_t> Names;
+
 	Biome(float temp0, float rain0, FloatColor water0 = {0.247f, 0.463f, 0.894f})
 	: temp(temp0), rain(rain0), water(water0) {}
 
 	FloatColor getBlockColor(const BlockType *type, y_idx_t height) const;
 };
-
-extern const Biome *const BIOME_DEFAULT;
-extern const Biome *const BIOMES[256];
 
 }
 }
