@@ -79,6 +79,14 @@ uint8_t Chunk::getBiome(block_idx_t x, y_idx_t y, block_idx_t z) const {
 		return biomeInts->getValue(z*SIZE + x);
 	case BYTE_ARRAY:
 		return biomeBytes->getValue(z*SIZE + x);
+	case SECTION: {
+		section_idx_t Y = (y >> HSHIFT) - sectionOffset;
+
+		if (Y < 0 || size_t(Y) >= sections.size() || !sections[Y])
+			break;
+
+		return sections[Y]->getBiomeAt(x, y & HMASK, z);
+	}
 	default:
 		break;
 	}

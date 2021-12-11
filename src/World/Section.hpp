@@ -27,6 +27,13 @@ public:
 	// Number of blocks in a section in each dimension
 	static const uint32_t SIZE = 16;
 
+	// Since Minecraft 1.15, biome information is stored for
+	// 4x4x4 block groups
+	static const unsigned BSHIFT = 2;
+	// Number of biome values in a chunk in x/z dimensions
+	static const uint32_t BSIZE = SIZE >> BSHIFT;
+
+
 private:
 	section_idx_t Y;
 	std::shared_ptr<const NBT::ByteArrayTag> blockLight;
@@ -34,9 +41,16 @@ private:
 protected:
 	static size_t getIndex(block_idx_t x, block_idx_t y, block_idx_t z) {
 		if (x >= SIZE || y >= SIZE || z >= SIZE)
-			throw std::range_error("Chunk::getIndex(): bad coordinates");
+			throw std::range_error("Section::getIndex(): bad coordinates");
 
 		return SIZE*SIZE*y + SIZE*z + x;
+	}
+
+	static size_t getBiomeIndex(block_idx_t x, block_idx_t y, block_idx_t z) {
+		if (x >= SIZE || y >= SIZE || z >= SIZE)
+			throw std::range_error("Section::getBiomeIndex(): bad coordinates");
+
+		return BSIZE*BSIZE*(y>>BSHIFT) + BSIZE*(z>>BSHIFT) + (x>>BSHIFT);
 	}
 
 	static uint8_t getHalf(const uint8_t *v, block_idx_t x, block_idx_t y, block_idx_t z) {
@@ -56,6 +70,7 @@ public:
 	section_idx_t getY() const { return Y; };
 
 	virtual const Resource::BlockType * getBlockStateAt(block_idx_t x, block_idx_t y, block_idx_t z) const;
+	virtual uint8_t getBiomeAt(block_idx_t x, block_idx_t y, block_idx_t z) const;
 
 	uint8_t getBlockLightAt(block_idx_t x, block_idx_t y, block_idx_t z) const {
 		if (!blockLight)
@@ -95,9 +110,13 @@ class PaletteSection : public Section {
 private:
 	std::shared_ptr<const NBT::LongArrayTag> blockStates;
 	std::vector<const Resource::BlockType *> palette;
-	uint32_t dataVersion;
 	unsigned bits;
 
+	std::shared_ptr<const NBT::LongArrayTag> biomes;
+	std::vector<uint8_t> biomePalette;
+	unsigned biomeBits;
+
+	uint32_t dataVersion;
 
 	static const Resource::BlockType * lookup(const std::string &name, uint32_t dataVersion);
 
@@ -110,10 +129,13 @@ public:
 		const std::shared_ptr<const NBT::CompoundTag> &section,
 		std::shared_ptr<const NBT::LongArrayTag> &&blockStates0,
 		const std::shared_ptr<const NBT::ListTag> &paletteData,
+		std::shared_ptr<const NBT::LongArrayTag> &&biomes0,
+		const std::shared_ptr<const NBT::ListTag> &biomePaletteData,
 		uint32_t dataVersion0
 	);
 
 	virtual const Resource::BlockType * getBlockStateAt(block_idx_t x, block_idx_t y, block_idx_t z) const;
+	virtual uint8_t getBiomeAt(block_idx_t x, block_idx_t y, block_idx_t z) const;
 };
 
 }

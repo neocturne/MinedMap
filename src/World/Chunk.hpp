@@ -36,9 +36,9 @@ public:
 
 	// Since Minecraft 1.15, biome information is stored for
 	// 4x4x4 block groups
-	static const unsigned BSHIFT = 2;
+	static const unsigned BSHIFT = Section::BSHIFT;
 	// Number of biome values in a chunk in x/z dimensions
-	static const uint32_t BSIZE = SIZE >> BSHIFT;
+	static const uint32_t BSIZE = Section::BSIZE;
 	// Number of biome values in a chunk in y dimension
 	static const uint32_t BMAXY = MAXY >> BSHIFT;
 
