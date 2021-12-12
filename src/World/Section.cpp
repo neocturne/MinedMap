@@ -8,6 +8,7 @@
 #include "Section.hpp"
 #include "../Resource/Biome.hpp"
 #include "../NBT/ByteTag.hpp"
+#include "../NBT/IntTag.hpp"
 #include "../NBT/StringTag.hpp"
 
 #include <cstdio>
@@ -17,7 +18,16 @@ namespace MinedMap {
 namespace World {
 
 Section::Section(const std::shared_ptr<const NBT::CompoundTag> &section) {
-	Y = int8_t(assertValue(section->get<NBT::ByteTag>("Y"))->getValue());
+	const std::shared_ptr<const NBT::ByteTag> YByteTag = section->get<NBT::ByteTag>("Y");
+	if (YByteTag) {
+		Y = int8_t(YByteTag->getValue());
+	} else {
+		const std::shared_ptr<const NBT::IntTag> YIntTag = assertValue(section->get<NBT::IntTag>("Y"));
+		int32_t value = YIntTag->getValue();
+		if (int8_t(value) != value)
+			throw std::invalid_argument("unsupported section Y coordinate");
+		Y = value;
+	}
 	blockLight = section->get<NBT::ByteArrayTag>("BlockLight");
 }
 
