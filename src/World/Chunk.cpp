@@ -52,17 +52,35 @@ Chunk::Chunk(const ChunkData *data) {
 	auto dataVersionTag = data->getRoot()->get<NBT::IntTag>("DataVersion");
 	uint32_t dataVersion = dataVersionTag ? dataVersionTag->getValue() : 0;
 
+	std::vector<std::unique_ptr<Section>> tmpSections;
+	section_idx_t minY = std::numeric_limits<section_idx_t>::max();
+	section_idx_t maxY = std::numeric_limits<section_idx_t>::min();
+
 	for (auto &sTag : *sectionsTag) {
 		auto s = std::dynamic_pointer_cast<const NBT::CompoundTag>(sTag);
 		std::unique_ptr<Section> section = Section::makeSection(s, dataVersion);
 		section_idx_t Y = section->getY();
-		if (sections.empty())
-			sectionOffset = Y;
+		if (Y < minY)
+			minY = Y;
+		if (Y > maxY)
+			maxY = Y;
 
+		tmpSections.push_back(std::move(section));
+	}
+
+	if (tmpSections.empty())
+		return;
+
+	assertValue(minY <= maxY);
+	sectionOffset = minY;
+	sections.resize(maxY - minY + 1);
+
+	for (auto &section : tmpSections) {
+		section_idx_t Y = section->getY();
 		Y -= sectionOffset;
-		assertValue(Y >= 0 && size_t(Y) >= sections.size());
-		sections.resize(Y);
-		sections.push_back(std::move(section));
+		assertValue(Y >= 0 && size_t(Y) < sections.size());
+		assertValue(!sections[Y]);
+		sections[Y] = std::move(section);
 	}
 }
 
