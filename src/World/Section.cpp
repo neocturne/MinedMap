@@ -107,7 +107,7 @@ PaletteSection::PaletteSection(
 		while ((1u << biomeBits) < biomePaletteData->size()) {
 			biomeBits++;
 
-			if (bits > 6)
+			if (biomeBits > 6)
 				throw std::invalid_argument("unsupported biome palette size");
 		}
 	}
