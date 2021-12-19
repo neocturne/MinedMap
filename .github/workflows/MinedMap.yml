@@ -83,3 +83,30 @@ jobs:
         with:
           name: 'MinedMap-${{ steps.tag.outputs.tag }}-${{ matrix.label }}'
           path: 'build/pkg'
+
+  viewer:
+    name: 'Package viewer'
+    runs-on: 'ubuntu-20.04'
+
+    steps:
+      - name: 'Checkout'
+        uses: 'actions/checkout@v2'
+
+      - name: 'Get version'
+        id: 'tag'
+        run: |
+          set -o pipefail
+          git fetch --prune --unshallow
+          git describe --abbrev=7 --match='v*' | sed 's/^v/::set-output name=tag::/'
+
+      - name: 'Install'
+        run: |
+          pkgdir='build/pkg/MinedMap-${{ steps.tag.outputs.tag }}-viewer'
+          mkdir -p "$pkgdir"
+          cp -r viewer/* "$pkgdir"/
+
+      - name: 'Archive'
+        uses: 'actions/upload-artifact@v2'
+        with:
+          name: 'MinedMap-${{ steps.tag.outputs.tag }}-viewer'
+          path: 'build/pkg'
