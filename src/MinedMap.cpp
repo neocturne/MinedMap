@@ -133,7 +133,9 @@ static int64_t readStamp(const std::string &filename) {
 
 	std::FILE *f = std::fopen((filename + ".stamp").c_str(), "r");
 	if (f) {
-		std::fscanf(f, "%" SCNd64, &v);
+		if (std::fscanf(f, "%" SCNd64, &v) != 1) {
+			// Ignore errors
+		}
 		std::fclose(f);
 	}
 
