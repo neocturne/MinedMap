@@ -22,6 +22,11 @@ jobs:
             packages: ['g++-mingw-w64-x86-64', 'libz-mingw-w64-dev']
             prefix: '/usr/x86_64-w64-mingw32'
             build_libpng: true
+          - host: 'i686-w64-mingw32'
+            label: 'Win32'
+            packages: ['g++-mingw-w64-i686', 'libz-mingw-w64-dev']
+            prefix: '/usr/i686-w64-mingw32'
+            build_libpng: true
 
     env:
       CMAKE_TOOLCHAIN_FILE: '${{ github.workspace }}/.github/toolchains/${{ matrix.host }}.cmake'
