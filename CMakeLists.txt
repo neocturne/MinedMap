@@ -1,5 +1,13 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.13)
 project(MINEDMAP CXX)
+
+# May not work with all toolchains, added for the Windows CI build
+option(BUILD_STATIC "Create a statically linked MinedMap executable")
+
+if(BUILD_STATIC)
+  list(REMOVE_ITEM CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".dll.a")
+  add_link_options("-static")
+endif()
 
 find_package(PkgConfig REQUIRED)
 
