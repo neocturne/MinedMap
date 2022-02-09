@@ -7,9 +7,10 @@
 
 #include "ChunkData.hpp"
 
-#include <iostream>
-#include <stdexcept>
 #include <cstdlib>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
 
 #include <zlib.h>
 
@@ -62,7 +63,7 @@ void ChunkData::inflateChunk(Buffer buffer) {
 	inflateEnd(&stream);
 
 	len = stream.total_out;
-	data = UniqueCPtr<uint8_t[]>(output);
+	data = std::unique_ptr<uint8_t[]>(output);
 }
 
 void ChunkData::parseChunk() {

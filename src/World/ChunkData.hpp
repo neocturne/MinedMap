@@ -9,11 +9,11 @@
 
 
 #include "../Buffer.hpp"
-#include "../UniqueCPtr.hpp"
 #include "../Util.hpp"
 #include "../NBT/CompoundTag.hpp"
 
 #include <cstdint>
+#include <memory>
 
 
 namespace MinedMap {
@@ -22,7 +22,7 @@ namespace World {
 class ChunkData {
 private:
 	size_t len;
-	UniqueCPtr<uint8_t[]> data;
+	std::unique_ptr<uint8_t[]> data;
 
 	std::shared_ptr<const NBT::CompoundTag> root;
 
