@@ -10,7 +10,9 @@
 #include <cstdlib>
 #include <memory>
 
-
+// UniqueCPtr is a wrapper around std::unique_ptr using std::free as its deallocator
+//
+// This allows to use it to manage memory allocated by C APIs (malloc, realloc, ...)
 template<typename T> class UniqueCPtr : public std::unique_ptr<T, void (*)(void *)> {
 public:
 	UniqueCPtr() : std::unique_ptr<T, void (*)(void *)>(nullptr, std::free) {}
