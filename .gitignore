@@ -1,4 +1,6 @@
 *~
 /viewer/data
+/resource/data
+/resource/colors.json
 .idea/
 cmake-build-debug/
