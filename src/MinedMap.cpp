@@ -196,7 +196,7 @@ static int64_t getModTime(const std::string &file) {
 	return (int64_t)s.st_mtime * 1000000;
 #else
     #ifdef __APPLE__
-        // stat.h syntax has changed on MacOSX SDK since at least 11.3
+        // stat.h syntax has changed on MacOSX SDK since at least 10.15
         return (int64_t)s.st_mtimespec.tv_sec * 1000000 + s.st_mtimespec.tv_nsec / 1000;
     #else
         return (int64_t)s.st_mtim.tv_sec * 1000000 + s.st_mtim.tv_nsec / 1000;
