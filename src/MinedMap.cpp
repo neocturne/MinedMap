@@ -192,8 +192,10 @@ static int64_t getModTime(const std::string &file) {
 		return INT64_MIN;
 	}
 
-#ifdef _WIN32
+#if defined(_WIN32)
 	return (int64_t)s.st_mtime * 1000000;
+#elif defined(__APPLE__)
+	return (int64_t)s.st_mtimespec.tv_sec * 1000000 + s.st_mtimespec.tv_nsec / 1000;
 #else
 	return (int64_t)s.st_mtim.tv_sec * 1000000 + s.st_mtim.tv_nsec / 1000;
 #endif
