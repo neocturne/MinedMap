@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: 'Checkout'
-        uses: 'actions/checkout@v2'
+        uses: 'actions/checkout@v3'
 
       - name: 'Get version'
         id: 'tag'
@@ -84,7 +84,7 @@ jobs:
           cp "$DESTDIR/usr/local/bin"/* "$pkgdir"/
 
       - name: 'Archive'
-        uses: 'actions/upload-artifact@v2'
+        uses: 'actions/upload-artifact@v3'
         with:
           name: 'MinedMap-${{ steps.tag.outputs.tag }}-${{ matrix.label }}'
           path: 'build/pkg'
@@ -95,7 +95,7 @@ jobs:
 
     steps:
       - name: 'Checkout'
-        uses: 'actions/checkout@v2'
+        uses: 'actions/checkout@v3'
 
       - name: 'Get version'
         id: 'tag'
@@ -111,7 +111,7 @@ jobs:
           cp -r viewer/* "$pkgdir"/
 
       - name: 'Archive'
-        uses: 'actions/upload-artifact@v2'
+        uses: 'actions/upload-artifact@v3'
         with:
           name: 'MinedMap-${{ steps.tag.outputs.tag }}-viewer'
           path: 'build/pkg'
