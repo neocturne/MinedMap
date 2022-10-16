@@ -116,7 +116,8 @@ public:
 };
 
 
-/* Values from https://github.com/erich666/Mineways/blob/master/Win/biomes.cpp */
+/* Values from https://github.com/erich666/Mineways/blob/master/Win/biomes.cpp or
+ * extracted from Minecraft code decompiled using https://github.com/Hexeption/MCP-Reborn */
 
 static const Biome BiomeDefault(0.5f,  0.5f);
 static const Biome BiomePlains(0.8f, 0.4f);
@@ -149,6 +150,7 @@ static const Biome BiomeGrove(-0.2f, 0.8f);
 static const Biome BiomeJaggedPeaks(-0.7f, 0.9f);
 static const Biome BiomeStonyPeaks(1.0f, 0.3f);
 static const Biome BiomeSnowySlopes(-0.3f, 0.9f);
+static const SwampBiome BiomeMangroveSwamp(0.8f, 0.9f, {0.227f, 0.478f, 0.416f});
 
 const Biome *const Biome::Default = &BiomeDefault;
 
@@ -213,7 +215,7 @@ const Biome *const Biome::Biomes[256] = {
 	/*  53 */ &BiomeJaggedPeaks, /* MinedMap assignment */
 	/*  54 */ &BiomeStonyPeaks, /* MinedMap assignment */
 	/*  55 */ &BiomeSnowySlopes, /* MinedMap assignment */
-	/*  56 */ nullptr,
+	/*  56 */ &BiomeMangroveSwamp, /* MinedMap assignment */
 	/*  57 */ nullptr,
 	/*  58 */ nullptr,
 	/*  59 */ nullptr,
@@ -352,6 +354,7 @@ const std::unordered_map<std::string, uint8_t> Biome::Names = {
 	{ "minecraft:dark_forest", 29 },
 	{ "minecraft:dark_forest_hills", 157 }, /* 1.18: Merged into dark_forest */
 	{ "minecraft:deep_cold_ocean", 49 },
+	{ "minecraft:deep_dark", 1 },
 	{ "minecraft:deep_frozen_ocean", 50 },
 	{ "minecraft:deep_lukewarm_ocean", 48 },
 	{ "minecraft:deep_ocean", 24 },
@@ -383,6 +386,7 @@ const std::unordered_map<std::string, uint8_t> Biome::Names = {
 	{ "minecraft:jungle_hills", 22 }, /* 1.18: Merged into jungle */
 	{ "minecraft:lukewarm_ocean", 45 },
 	{ "minecraft:lush_caves", 175 },
+	{ "minecraft:mangrove_swamp", 56 },
 	{ "minecraft:meadow", 51 }, /* 1.18: New */
 	{ "minecraft:modified_badlands_plateau", 167 }, /* 1.18: Merged into badlands */
 	{ "minecraft:modified_gravelly_mountains", 162 }, /* 1.18: Merged into gravelly_mountains */
