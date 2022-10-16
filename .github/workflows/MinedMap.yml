@@ -39,7 +39,7 @@ jobs:
         id: 'tag'
         run: |
           set -o pipefail
-          git fetch --prune --unshallow
+          git fetch --prune --unshallow --tags -f
           git describe --abbrev=7 --match='v*' | sed 's/^v/::set-output name=tag::/'
 
       - name: 'Dependencies (apt)'
@@ -101,7 +101,7 @@ jobs:
         id: 'tag'
         run: |
           set -o pipefail
-          git fetch --prune --unshallow
+          git fetch --prune --unshallow --tags -f
           git describe --abbrev=7 --match='v*' | sed 's/^v/::set-output name=tag::/'
 
       - name: 'Install'
