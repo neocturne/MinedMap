@@ -89,7 +89,7 @@ impl<R: Read + Seek> Region<R> {
 	{
 		let Region { mut reader } = self;
 
-		let chunk_map = {
+		let mut chunk_map = {
 			let mut header = [0u8; BLOCKSIZE];
 			reader
 				.read_exact(&mut header)
@@ -99,11 +99,10 @@ impl<R: Read + Seek> Region<R> {
 		};
 
 		let mut index = 1;
-		let mut count = 0;
 		let mut seen = [[false; CHUNKS_PER_REGION as usize]; CHUNKS_PER_REGION as usize];
 
-		while count < chunk_map.len() {
-			let Some(&ChunkDesc { x, z, len }) = chunk_map.get(&index) else {
+		while !chunk_map.is_empty() {
+			let Some(ChunkDesc { x, z, len }) = chunk_map.remove(&index) else {
 				reader.seek(SeekFrom::Current(BLOCKSIZE as i64)).context("Failed to seek chunk data")?;
 				index += 1;
 				continue;
@@ -113,9 +112,7 @@ impl<R: Read + Seek> Region<R> {
 			if *chunk_seen {
 				bail!("Duplicate chunk");
 			}
-
 			*chunk_seen = true;
-			count += 1;
 
 			let mut buffer = vec![0; (len as usize) * BLOCKSIZE];
 			reader
