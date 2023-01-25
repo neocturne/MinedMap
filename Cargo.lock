@@ -190,6 +190,7 @@ dependencies = [
  "clap",
  "fastnbt",
  "flate2",
+ "serde",
 ]
 
 [[package]]
