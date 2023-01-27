@@ -51,11 +51,11 @@ where
 
 	let buf = &buf[..len];
 	let (format, buf) = buf.split_at(1);
-	if format.get(0) != Some(&2) {
+	if !matches!(format, [2]) {
 		bail!("Unknown chunk format");
 	}
 
-	let mut decoder = ZlibDecoder::new(&buf[..]);
+	let mut decoder = ZlibDecoder::new(buf);
 	let mut decode_buffer = vec![];
 	decoder
 		.read_to_end(&mut decode_buffer)

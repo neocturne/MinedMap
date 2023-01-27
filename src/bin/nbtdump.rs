@@ -12,7 +12,7 @@ struct Args {
 fn main() -> Result<()> {
 	let args = Args::parse();
 
-	let value: fastnbt::Value = minedmap::io::data::from_file(&args.file)?;
+	let value: fastnbt::Value = minedmap::io::data::from_file(args.file.as_path())?;
 	println!("{:#x?}", value);
 
 	Ok(())
