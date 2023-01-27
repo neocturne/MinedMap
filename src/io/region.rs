@@ -19,20 +19,18 @@ struct ChunkDesc {
 	len: u8,
 }
 
-fn parse_header(header: &[u8; BLOCKSIZE]) -> HashMap<u32, ChunkDesc> {
+fn parse_header(header: &ChunkArray<u32>) -> HashMap<u32, ChunkDesc> {
 	let mut map = HashMap::new();
 
-	for coords in ChunkArray::<()>::keys() {
-		let chunk = &header[(4
-			* (usize::from(CHUNKS_PER_REGION) * usize::from(coords.z.0)
-				+ usize::from(coords.x.0)))..];
+	for (coords, &chunk) in header.iter() {
+		let offset_len = u32::from_be(chunk);
 
-		let offset = u32::from(chunk[0]) << 16 | u32::from(chunk[1]) << 8 | u32::from(chunk[2]);
+		let offset = offset_len >> 8;
 		if offset == 0 {
 			continue;
 		}
 
-		let len = chunk[3];
+		let len = offset_len as u8;
 
 		map.insert(offset, ChunkDesc { coords, len });
 	}
@@ -81,9 +79,9 @@ impl<R: Read + Seek> Region<R> {
 		let Region { mut reader } = self;
 
 		let mut chunk_map = {
-			let mut header = [0u8; BLOCKSIZE];
+			let mut header = ChunkArray::<u32>::default();
 			reader
-				.read_exact(&mut header)
+				.read_exact(bytemuck::cast_mut::<_, [u8; BLOCKSIZE]>(&mut header.0))
 				.context("Failed to read region header")?;
 
 			parse_header(&header)
