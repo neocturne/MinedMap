@@ -22,29 +22,19 @@ struct ChunkDesc {
 fn parse_header(header: &[u8; BLOCKSIZE]) -> HashMap<u32, ChunkDesc> {
 	let mut map = HashMap::new();
 
-	for z in 0..CHUNKS_PER_REGION {
-		for x in 0..CHUNKS_PER_REGION {
-			let chunk =
-				&header[(4 * (usize::from(CHUNKS_PER_REGION) * usize::from(z) + usize::from(x)))..];
+	for coords in ChunkArray::<()>::keys() {
+		let chunk = &header[(4
+			* (usize::from(CHUNKS_PER_REGION) * usize::from(coords.z.0)
+				+ usize::from(coords.x.0)))..];
 
-			let offset = u32::from(chunk[0]) << 16 | u32::from(chunk[1]) << 8 | u32::from(chunk[2]);
-			if offset == 0 {
-				continue;
-			}
-
-			let len = chunk[3];
-
-			map.insert(
-				offset,
-				ChunkDesc {
-					coords: ChunkCoords {
-						x: ChunkX(x),
-						z: ChunkZ(z),
-					},
-					len,
-				},
-			);
+		let offset = u32::from(chunk[0]) << 16 | u32::from(chunk[1]) << 8 | u32::from(chunk[2]);
+		if offset == 0 {
+			continue;
 		}
+
+		let len = chunk[3];
+
+		map.insert(offset, ChunkDesc { coords, len });
 	}
 
 	map
@@ -100,7 +90,7 @@ impl<R: Read + Seek> Region<R> {
 		};
 
 		let mut index = 1;
-		let mut seen = [[false; CHUNKS_PER_REGION as usize]; CHUNKS_PER_REGION as usize];
+		let mut seen = ChunkArray::<bool>::default();
 
 		while !chunk_map.is_empty() {
 			let Some(ChunkDesc { coords, len }) = chunk_map.remove(&index) else {
@@ -109,11 +99,10 @@ impl<R: Read + Seek> Region<R> {
 				continue;
 			};
 
-			let chunk_seen = &mut seen[coords.x.0 as usize][coords.z.0 as usize];
-			if *chunk_seen {
+			if seen[coords] {
 				bail!("Duplicate chunk");
 			}
-			*chunk_seen = true;
+			seen[coords] = true;
 
 			let mut buffer = vec![0; (len as usize) * BLOCKSIZE];
 			reader
