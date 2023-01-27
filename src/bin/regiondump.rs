@@ -12,7 +12,7 @@ struct Args {
 fn main() -> Result<()> {
 	let args = Args::parse();
 
-	minedmap::io::region::from_file(&args.file)?.foreach_chunk(|x, z, value: fastnbt::Value| {
-		println!("Chunk({}, {}): {:#x?}", x.0, z.0, value);
+	minedmap::io::region::from_file(&args.file)?.foreach_chunk(|coords, value: fastnbt::Value| {
+		println!("Chunk {:?}: {:#x?}", coords, value);
 	})
 }

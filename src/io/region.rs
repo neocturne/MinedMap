@@ -15,8 +15,7 @@ const BLOCKSIZE: usize = 4096;
 
 #[derive(Debug)]
 struct ChunkDesc {
-	x: ChunkX,
-	z: ChunkZ,
+	coords: ChunkCoords,
 	len: u8,
 }
 
@@ -38,8 +37,10 @@ fn parse_header(header: &[u8; BLOCKSIZE]) -> HashMap<u32, ChunkDesc> {
 			map.insert(
 				offset,
 				ChunkDesc {
-					x: ChunkX(x),
-					z: ChunkZ(z),
+					coords: ChunkCoords {
+						x: ChunkX(x),
+						z: ChunkZ(z),
+					},
 					len,
 				},
 			);
@@ -85,7 +86,7 @@ impl<R: Read + Seek> Region<R> {
 	where
 		R: Read + Seek,
 		T: DeserializeOwned,
-		F: FnMut(ChunkX, ChunkZ, T),
+		F: FnMut(ChunkCoords, T),
 	{
 		let Region { mut reader } = self;
 
@@ -102,13 +103,13 @@ impl<R: Read + Seek> Region<R> {
 		let mut seen = [[false; CHUNKS_PER_REGION as usize]; CHUNKS_PER_REGION as usize];
 
 		while !chunk_map.is_empty() {
-			let Some(ChunkDesc { x, z, len }) = chunk_map.remove(&index) else {
+			let Some(ChunkDesc { coords, len }) = chunk_map.remove(&index) else {
 				reader.seek(SeekFrom::Current(BLOCKSIZE as i64)).context("Failed to seek chunk data")?;
 				index += 1;
 				continue;
 			};
 
-			let chunk_seen = &mut seen[x.0 as usize][z.0 as usize];
+			let chunk_seen = &mut seen[coords.x.0 as usize][coords.z.0 as usize];
 			if *chunk_seen {
 				bail!("Duplicate chunk");
 			}
@@ -119,7 +120,7 @@ impl<R: Read + Seek> Region<R> {
 				.read_exact(&mut buffer[..])
 				.context("Failed to read chunk data")?;
 
-			f(x, z, decode_chunk(&buffer[..])?);
+			f(coords, decode_chunk(&buffer[..])?);
 
 			index += len as u32;
 		}
