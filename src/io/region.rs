@@ -104,10 +104,10 @@ impl<R: Read + Seek> Region<R> {
 
 			let mut buffer = vec![0; (len as usize) * BLOCKSIZE];
 			reader
-				.read_exact(&mut buffer[..])
+				.read_exact(&mut buffer)
 				.context("Failed to read chunk data")?;
 
-			f(coords, decode_chunk(&buffer[..])?);
+			f(coords, decode_chunk(&buffer)?);
 
 			index += len as u32;
 		}

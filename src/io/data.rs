@@ -15,7 +15,7 @@ where
 		.read_to_end(&mut buf)
 		.context("Failed to read file")?;
 
-	fastnbt::from_bytes(&buf[..]).context("Failed to decode NBT data")
+	fastnbt::from_bytes(&buf).context("Failed to decode NBT data")
 }
 
 pub fn from_file<P, T>(path: P) -> Result<T>
