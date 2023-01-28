@@ -26,11 +26,11 @@ fn parse_header(header: &ChunkArray<u32>) -> HashMap<u32, ChunkDesc> {
 		let offset_len = u32::from_be(chunk);
 
 		let offset = offset_len >> 8;
-		if offset == 0 {
+		let len = offset_len as u8;
+
+		if offset == 0 || len == 0 {
 			continue;
 		}
-
-		let len = offset_len as u8;
 
 		map.insert(offset, ChunkDesc { coords, len });
 	}
@@ -49,7 +49,11 @@ where
 			.context("Failed to decode chunk size")?,
 	) as usize;
 
+	if len < 1 || len > buf.len() {
+		bail!("Invalid chunk size");
+	}
 	let buf = &buf[..len];
+
 	let (format, buf) = buf.split_at(1);
 	if !matches!(format, [2]) {
 		bail!("Unknown chunk format");
