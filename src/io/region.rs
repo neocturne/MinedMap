@@ -43,11 +43,7 @@ where
 	T: DeserializeOwned,
 {
 	let (len_bytes, buf) = buf.split_at(4);
-	let len = u32::from_be_bytes(
-		len_bytes
-			.try_into()
-			.context("Failed to decode chunk size")?,
-	) as usize;
+	let len = u32::from_be_bytes(len_bytes.try_into().unwrap()) as usize;
 
 	if len < 1 || len > buf.len() {
 		bail!("Invalid chunk size");
@@ -55,7 +51,7 @@ where
 	let buf = &buf[..len];
 
 	let (format, buf) = buf.split_at(1);
-	if !matches!(format, [2]) {
+	if format[0] != 2 {
 		bail!("Unknown chunk format");
 	}
 
