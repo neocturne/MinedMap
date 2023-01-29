@@ -98,16 +98,18 @@ impl<R: Read + Seek> Region<R> {
 			};
 
 			if seen[coords] {
-				bail!("Duplicate chunk");
+				bail!("Duplicate chunk {:?}", coords);
 			}
 			seen[coords] = true;
 
 			let mut buffer = vec![0; (len as usize) * BLOCKSIZE];
 			reader
 				.read_exact(&mut buffer)
-				.context("Failed to read chunk data")?;
+				.with_context(|| format!("Failed to read data for chunk {:?}", coords))?;
+			let chunk = decode_chunk(&buffer)
+				.with_context(|| format!("Failed to decode data for chunk {:?}", coords))?;
 
-			f(coords, decode_chunk(&buffer)?);
+			f(coords, chunk);
 
 			index += len as u32;
 		}
