@@ -42,14 +42,6 @@ fn decode_chunk<T>(buf: &[u8]) -> Result<T>
 where
 	T: DeserializeOwned,
 {
-	let (len_bytes, buf) = buf.split_at(4);
-	let len = u32::from_be_bytes(len_bytes.try_into().unwrap()) as usize;
-
-	if len < 1 || len > buf.len() {
-		bail!("Invalid chunk size");
-	}
-	let buf = &buf[..len];
-
 	let (format, buf) = buf.split_at(1);
 	if format[0] != 2 {
 		bail!("Unknown chunk format");
@@ -92,7 +84,6 @@ impl<R: Read + Seek> Region<R> {
 
 		while !chunk_map.is_empty() {
 			let Some(ChunkDesc { coords, len }) = chunk_map.remove(&index) else {
-				reader.seek(SeekFrom::Current(BLOCKSIZE as i64)).context("Failed to seek chunk data")?;
 				index += 1;
 				continue;
 			};
@@ -102,7 +93,20 @@ impl<R: Read + Seek> Region<R> {
 			}
 			seen[coords] = true;
 
-			let mut buffer = vec![0; (len as usize) * BLOCKSIZE];
+			reader
+				.seek(SeekFrom::Start(index as u64 * BLOCKSIZE as u64))
+				.context("Failed to seek chunk data")?;
+
+			let mut len_buf = [0u8; 4];
+			reader
+				.read_exact(&mut len_buf)
+				.with_context(|| format!("Failed to read length for chunk {:?}", coords))?;
+			let byte_len = u32::from_be_bytes(len_buf) as usize;
+			if byte_len < 1 || byte_len > (len as usize) * BLOCKSIZE - 4 {
+				bail!("Invalid length for chunk {:?}", coords);
+			}
+
+			let mut buffer = vec![0; byte_len];
 			reader
 				.read_exact(&mut buffer)
 				.with_context(|| format!("Failed to read data for chunk {:?}", coords))?;
