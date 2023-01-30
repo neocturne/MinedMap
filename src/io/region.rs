@@ -1,5 +1,4 @@
 use std::{
-	collections::HashMap,
 	fs::File,
 	io::{prelude::*, SeekFrom},
 	path::Path,
@@ -15,27 +14,35 @@ const BLOCKSIZE: usize = 4096;
 
 #[derive(Debug)]
 struct ChunkDesc {
-	coords: ChunkCoords,
+	offset: u32,
 	len: u8,
+	coords: ChunkCoords,
 }
 
-fn parse_header(header: &ChunkArray<u32>) -> HashMap<u32, ChunkDesc> {
-	let mut map = HashMap::new();
+fn parse_header(header: &ChunkArray<u32>) -> Vec<ChunkDesc> {
+	let mut chunks: Vec<_> = header
+		.iter()
+		.filter_map(|(coords, &chunk)| {
+			let offset_len = u32::from_be(chunk);
 
-	for (coords, &chunk) in header.iter() {
-		let offset_len = u32::from_be(chunk);
+			let offset = offset_len >> 8;
+			let len = offset_len as u8;
 
-		let offset = offset_len >> 8;
-		let len = offset_len as u8;
+			if offset == 0 || len == 0 {
+				return None;
+			}
 
-		if offset == 0 || len == 0 {
-			continue;
-		}
+			Some(ChunkDesc {
+				offset,
+				len,
+				coords,
+			})
+		})
+		.collect();
 
-		map.insert(offset, ChunkDesc { coords, len });
-	}
+	chunks.sort_by_key(|chunk| chunk.offset);
 
-	map
+	chunks
 }
 
 fn decode_chunk<T>(buf: &[u8]) -> Result<T>
@@ -70,7 +77,7 @@ impl<R: Read + Seek> Region<R> {
 	{
 		let Region { mut reader } = self;
 
-		let mut chunk_map = {
+		let chunks = {
 			let mut header = ChunkArray::<u32>::default();
 			reader
 				.read_exact(bytemuck::cast_mut::<_, [u8; BLOCKSIZE]>(&mut header.0))
@@ -79,22 +86,21 @@ impl<R: Read + Seek> Region<R> {
 			parse_header(&header)
 		};
 
-		let mut index = 1;
 		let mut seen = ChunkArray::<bool>::default();
 
-		while !chunk_map.is_empty() {
-			let Some(ChunkDesc { coords, len }) = chunk_map.remove(&index) else {
-				index += 1;
-				continue;
-			};
-
+		for ChunkDesc {
+			offset,
+			len,
+			coords,
+		} in chunks
+		{
 			if seen[coords] {
 				bail!("Duplicate chunk {:?}", coords);
 			}
 			seen[coords] = true;
 
 			reader
-				.seek(SeekFrom::Start(index as u64 * BLOCKSIZE as u64))
+				.seek(SeekFrom::Start(offset as u64 * BLOCKSIZE as u64))
 				.context("Failed to seek chunk data")?;
 
 			let mut len_buf = [0u8; 4];
@@ -114,8 +120,6 @@ impl<R: Read + Seek> Region<R> {
 				.with_context(|| format!("Failed to decode data for chunk {:?}", coords))?;
 
 			f(coords, chunk);
-
-			index += len as u32;
 		}
 
 		Ok(())
