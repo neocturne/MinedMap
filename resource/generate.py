@@ -6,7 +6,7 @@ import sys
 
 
 if len(sys.argv) != 3:
-	sys.exit('Usage: extract.py <colors.json> <BlockType.inc.cpp>')
+	sys.exit('Usage: extract.py <colors.json> <block_types.rs>')
 
 with open(sys.argv[1]) as f:
 	colors = json.load(f)
@@ -14,29 +14,33 @@ with open(sys.argv[1]) as f:
 output = {}
 
 with open(sys.argv[2], 'w') as f:
+	print('use enumflags2::make_bitflags;', file=f);
+	print('', file=f)
+	print('use super::*;', file=f)
+	print('', file=f)
+	print('pub const BLOCK_TYPES: &[(&str, BlockType)] = &[', file=f)
+
 	for name, info in colors.items():
 		flags = []
 		if info['opaque']:
-			flags.append('BLOCK_OPAQUE')
+			flags.append('Opaque')
 		if info['grass']:
-			flags.append('BLOCK_GRASS')
+			flags.append('Grass')
 		if info['foliage']:
-			flags.append('BLOCK_FOLIAGE')
+			flags.append('Foliage')
 		if info['birch']:
-			flags.append('BLOCK_BIRCH')
+			flags.append('Birch')
 		if info['spruce']:
-			flags.append('BLOCK_SPRUCE')
+			flags.append('Spruce')
 		if info['water']:
-			flags.append('BLOCK_WATER')
-		if flags:
-			flags = '|'.join(flags)
-		else:
-			flags = '0'
+			flags.append('Water')
+		flags = 'make_bitflags!(BlockFlags::{' + '|'.join(flags) + '})'
 
-		print('{"%s", {%s, {%u, %u, %u}}},' % (
+		print('\t("%s", BlockType { flags: %s, color: BlockColor(%u, %u, %u) }),' % (
 			name,
 			flags,
 			info['color']['r'],
 			info['color']['g'],
 			info['color']['b'],
 		), file=f)
+	print('];', file=f)

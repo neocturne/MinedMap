@@ -11,6 +11,7 @@ default-run = "minedmap"
 anyhow = "1.0.68"
 bytemuck = "1.13.0"
 clap = { version = "4.1.4", features = ["derive"] }
+enumflags2 = "0.7.5"
 fastnbt = "2.3.2"
 flate2 = "1.0.25"
 itertools = "0.10.5"
