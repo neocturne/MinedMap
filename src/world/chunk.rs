@@ -11,41 +11,62 @@ use super::{
 };
 use crate::types::*;
 
+/// Chunk data structure wrapping a [de::Chunk] for convenient access to
+/// block and biome data
+#[derive(Debug)]
 pub enum Chunk<'a> {
+	/// Minecraft v1.18+ chunk with biome data moved into sections
 	V1_18 {
 		section_map: BTreeMap<SectionY, (PaletteSection<'a>, PaletteSectionBiomes<'a>)>,
 	},
+	/// Minecraft v1.13+ chunk
+	///
+	/// Block data is stored in an indexed format with variable bit width
+	/// (depending on the total numer of distinct block types used in a
+	/// section), and a palette mapping these indices to namespaced
+	/// block IDs
 	V1_13 {
 		section_map: BTreeMap<SectionY, PaletteSection<'a>>,
 		biomes: &'a de::BiomesOld,
 	},
+	/// Original pre-1.13 chunk
+	///
+	/// The original chunk format with fixed 8-bit numeric block IDs
 	Old {
 		section_map: BTreeMap<SectionY, OldSection<'a>>,
 		biomes: &'a de::BiomesOld,
 	},
+	/// Unpopulated chunk without any block data
 	Empty,
 }
 
+/// Inner data structure of [SectionIter]
 #[derive(Debug, Clone)]
 enum SectionIterInner<'a> {
+	/// Iterator over sections of [Chunk::V1_18]
 	V1_18 {
 		iter: btree_map::Iter<'a, SectionY, (PaletteSection<'a>, PaletteSectionBiomes<'a>)>,
 	},
+	/// Iterator over sections of [Chunk::V1_13]
 	V1_13 {
 		iter: btree_map::Iter<'a, SectionY, PaletteSection<'a>>,
 	},
+	/// Iterator over sections of [Chunk::Old]
 	Old {
 		iter: btree_map::Iter<'a, SectionY, OldSection<'a>>,
 	},
+	/// Empty iterator over an unpopulated chunk ([Chunk::Empty])
 	Empty,
 }
 
+/// Iterator over the sections of a [Chunk]
 #[derive(Debug, Clone)]
 pub struct SectionIter<'a> {
 	inner: SectionIterInner<'a>,
 }
 
 impl<'a> Chunk<'a> {
+	/// Creates a new [Chunk] from a deserialized [de::Chunk]
 	pub fn new(data: &'a de::Chunk) -> Result<Self> {
 		let data_version = data.data_version.unwrap_or_default();
 
@@ -55,6 +76,7 @@ impl<'a> Chunk<'a> {
 		}
 	}
 
+	/// [Chunk::new] implementation for Minecraft v1.18+ chunks
 	fn new_v1_18(data_version: u32, sections: &'a Vec<de::SectionV1_18>) -> Result<Self> {
 		let mut section_map = BTreeMap::new();
 
@@ -80,6 +102,7 @@ impl<'a> Chunk<'a> {
 		Ok(Chunk::V1_18 { section_map })
 	}
 
+	/// [Chunk::new] implementation for all pre-1.18 chunk variants
 	fn new_old(data_version: u32, level: &'a de::LevelOld) -> Result<Self> {
 		let mut section_map_v1_13 = BTreeMap::new();
 		let mut section_map_old = BTreeMap::new();
@@ -131,6 +154,7 @@ impl<'a> Chunk<'a> {
 		)
 	}
 
+	/// Returns an interator over the chunk's sections and their Y coordinates
 	pub fn sections(&self) -> SectionIter {
 		use SectionIterInner::*;
 		SectionIter {

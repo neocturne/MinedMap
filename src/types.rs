@@ -19,6 +19,7 @@ pub struct BlockY(pub u8);
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockZ(pub u8);
 
+/// X, Y and Z coordinates of a block in a chunk section
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct BlockCoords {
 	pub x: BlockX,
@@ -27,6 +28,11 @@ pub struct BlockCoords {
 }
 
 impl BlockCoords {
+	/// Computes a block's offset in various data structures
+	///
+	/// Many chunk data structures store block and biome data in the same
+	/// order. [BlockCoords::offset] computes the offset at which the data
+	/// for the block at a given coordinate is stored.
 	pub fn offset(&self) -> usize {
 		use BLOCKS_PER_CHUNK as N;
 		let x = self.x.0 as usize;
@@ -69,6 +75,9 @@ impl Debug for ChunkCoords {
 	}
 }
 
+/// Generic array for data stored per chunk of a region
+///
+/// Includes various convenient iteration functions.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct ChunkArray<T>(pub [[T; CHUNKS_PER_REGION]; CHUNKS_PER_REGION]);
 
@@ -105,11 +114,14 @@ impl<T> IndexMut<ChunkCoords> for ChunkArray<T> {
 	}
 }
 
+/// Calculate division and remainder at the same time
 pub trait DivRem<Rhs>
 where
 	Self: Div<Rhs>,
 	Self: Rem<Rhs>,
 {
+	/// Returns the result of the division and remainder operations
+	/// with the same inputs
 	fn div_rem(self, rhs: Rhs) -> (<Self as Div<Rhs>>::Output, <Self as Rem<Rhs>>::Output);
 }
 

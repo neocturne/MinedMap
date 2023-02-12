@@ -3,6 +3,11 @@ use anyhow::{bail, Context, Result};
 use super::de;
 use crate::{resource, types::*};
 
+/// Determine the number of bits required for indexing into a palette of a given length
+///
+/// This is basically a base-2 logarithm, with clamping to a minimum value and
+/// check against a maximum value. If the result would be greater than the passed
+/// `max` value, [None] is returned.
 fn palette_bits(len: usize, min: u8, max: u8) -> Option<u8> {
 	let mut bits = min;
 	while (1 << bits) < len {
@@ -16,10 +21,16 @@ fn palette_bits(len: usize, min: u8, max: u8) -> Option<u8> {
 	Some(bits)
 }
 
+/// Trait for common functions of [PaletteSection] and [OldSection]
 pub trait Section {
 	fn get_block_id(&self, coords: BlockCoords) -> Result<&str>;
 }
 
+/// Minecraft v1.18+ section biome data
+///
+/// The biome data is part of the section structure in Minecraft v1.18+, with
+/// the biomes laid out as an array of indices into a palette, similar to the
+/// v1.13+ block data.
 #[derive(Debug)]
 pub struct PaletteSectionBiomes<'a> {
 	_biomes: Option<&'a fastnbt::LongArray>,
@@ -28,6 +39,7 @@ pub struct PaletteSectionBiomes<'a> {
 }
 
 impl<'a> PaletteSectionBiomes<'a> {
+	/// Constructs a new [PaletteSectionBiomes] from deserialized data structures
 	pub fn new(biomes: Option<&'a fastnbt::LongArray>, palette: &'a Vec<String>) -> Result<Self> {
 		let bits = palette_bits(palette.len(), 1, 6).context("Unsupported block palette size")?;
 
@@ -47,6 +59,7 @@ impl<'a> PaletteSectionBiomes<'a> {
 	}
 }
 
+/// Minecraft v1.13+ section block data
 #[derive(Debug)]
 pub struct PaletteSection<'a> {
 	block_states: Option<&'a fastnbt::LongArray>,
@@ -56,6 +69,7 @@ pub struct PaletteSection<'a> {
 }
 
 impl<'a> PaletteSection<'a> {
+	/// Constructs a new [PaletteSection] from deserialized data structures
 	pub fn new(
 		data_version: u32,
 		block_states: Option<&'a fastnbt::LongArray>,
@@ -85,6 +99,7 @@ impl<'a> PaletteSection<'a> {
 		})
 	}
 
+	/// Looks up the block type palette index at the given coordinates
 	fn get_palette_index(&self, coords: BlockCoords) -> usize {
 		let Some(block_states) = self.block_states else {
 			return 0;
@@ -127,6 +142,7 @@ impl<'a> Section for PaletteSection<'a> {
 	}
 }
 
+/// Pre-1.13 section block data
 #[derive(Debug)]
 pub struct OldSection<'a> {
 	blocks: &'a fastnbt::ByteArray,
@@ -134,6 +150,7 @@ pub struct OldSection<'a> {
 }
 
 impl<'a> OldSection<'a> {
+	/// Constructs a new [OldSection] from deserialized data structures
 	pub fn new(blocks: &'a fastnbt::ByteArray, data: &'a fastnbt::ByteArray) -> Result<Self> {
 		use BLOCKS_PER_CHUNK as N;
 
