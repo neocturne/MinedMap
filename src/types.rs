@@ -1,23 +1,43 @@
 use std::{
 	fmt::Debug,
+	iter::FusedIterator,
 	ops::{Index, IndexMut},
 };
 
 use itertools::iproduct;
+
+macro_rules! coord_impl {
+	($t:ident, $max:expr) => {
+		impl $t {
+			/// Returns an iterator over all possible values of the type
+			pub fn iter() -> impl Iterator<Item = $t>
+			       + DoubleEndedIterator
+			       + ExactSizeIterator
+			       + FusedIterator
+			       + Clone
+			       + Debug {
+				(0..$max as u8).map($t)
+			}
+		}
+	};
+}
 
 pub const BLOCKS_PER_CHUNK: usize = 16;
 
 /// A block X coordinate relative to a chunk
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockX(pub u8);
+coord_impl!(BlockX, BLOCKS_PER_CHUNK);
 
 /// A block Y coordinate relative to a chunk section
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockY(pub u8);
+coord_impl!(BlockY, BLOCKS_PER_CHUNK);
 
 /// A block Z coordinate relative to a chunk
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockZ(pub u8);
+coord_impl!(BlockZ, BLOCKS_PER_CHUNK);
 
 /// X, Y and Z coordinates of a block in a chunk section
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -57,10 +77,12 @@ pub const CHUNKS_PER_REGION: usize = 32;
 /// A chunk X coordinate relative to a region
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ChunkX(pub u8);
+coord_impl!(ChunkX, CHUNKS_PER_REGION);
 
 /// A chunk Z coordinate relative to a region
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ChunkZ(pub u8);
+coord_impl!(ChunkZ, CHUNKS_PER_REGION);
 
 /// A pair of chunk coordinates relative to a region
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -83,12 +105,7 @@ pub struct ChunkArray<T>(pub [[T; CHUNKS_PER_REGION]; CHUNKS_PER_REGION]);
 
 impl<T> ChunkArray<T> {
 	pub fn keys() -> impl Iterator<Item = ChunkCoords> {
-		iproduct!(0..(CHUNKS_PER_REGION as u8), 0..(CHUNKS_PER_REGION as u8)).map(|(z, x)| {
-			ChunkCoords {
-				x: ChunkX(x),
-				z: ChunkZ(z),
-			}
-		})
+		iproduct!(ChunkZ::iter(), ChunkX::iter()).map(|(z, x)| ChunkCoords { x, z })
 	}
 
 	pub fn values(&self) -> impl Iterator<Item = &T> {
