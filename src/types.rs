@@ -5,6 +5,47 @@ use std::{
 
 use itertools::iproduct;
 
+pub const BLOCKS_PER_CHUNK: u8 = 16;
+
+/// A block X coordinate relative to a chunk
+#[derive(Debug, Clone, Copy)]
+pub struct BlockX(pub u8);
+
+/// A block Y coordinate relative to a chunk section
+#[derive(Debug, Clone, Copy)]
+pub struct BlockY(pub u8);
+
+/// A block Z coordinate relative to a chunk
+#[derive(Debug, Clone, Copy)]
+pub struct BlockZ(pub u8);
+
+#[derive(Clone, Copy)]
+pub struct BlockCoords {
+	pub x: BlockX,
+	pub y: BlockY,
+	pub z: BlockZ,
+}
+
+impl BlockCoords {
+	pub fn offset(&self) -> usize {
+		const N: usize = BLOCKS_PER_CHUNK as usize;
+		let x = self.x.0 as usize;
+		let y = self.y.0 as usize;
+		let z = self.z.0 as usize;
+		((y * N) + z) * N + x
+	}
+}
+
+impl Debug for BlockCoords {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "({}, {}, {})", self.x.0, self.y.0, self.z.0)
+	}
+}
+
+/// A section Y coordinate
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct SectionY(pub i32);
+
 pub const CHUNKS_PER_REGION: u8 = 32;
 
 /// A chunk X coordinate relative to a region
