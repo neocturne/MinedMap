@@ -1,6 +1,6 @@
 use std::{
 	fmt::Debug,
-	ops::{Div, Index, IndexMut, Rem},
+	ops::{Index, IndexMut},
 };
 
 use itertools::iproduct;
@@ -111,28 +111,5 @@ impl<T> Index<ChunkCoords> for ChunkArray<T> {
 impl<T> IndexMut<ChunkCoords> for ChunkArray<T> {
 	fn index_mut(&mut self, index: ChunkCoords) -> &mut Self::Output {
 		&mut self.0[index.z.0 as usize][index.x.0 as usize]
-	}
-}
-
-/// Calculate division and remainder at the same time
-pub trait DivRem<Rhs>
-where
-	Self: Div<Rhs>,
-	Self: Rem<Rhs>,
-{
-	/// Returns the result of the division and remainder operations
-	/// with the same inputs
-	fn div_rem(self, rhs: Rhs) -> (<Self as Div<Rhs>>::Output, <Self as Rem<Rhs>>::Output);
-}
-
-impl<Lhs, Rhs> DivRem<Rhs> for Lhs
-where
-	Self: Div<Rhs>,
-	Self: Rem<Rhs>,
-	Self: Copy,
-	Rhs: Copy,
-{
-	fn div_rem(self, rhs: Rhs) -> (<Self as Div<Rhs>>::Output, <Self as Rem<Rhs>>::Output) {
-		(self / rhs, self % rhs)
 	}
 }

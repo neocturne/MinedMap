@@ -1,4 +1,5 @@
 use anyhow::{bail, Context, Result};
+use num_integer::div_rem;
 
 use super::de;
 use crate::{resource, types::*};
@@ -112,11 +113,11 @@ impl<'a> SectionV1_13<'a> {
 
 		let shifted = if self.aligned_blocks {
 			let blocks_per_word = 64 / bits;
-			let (word, shift) = offset.div_rem(blocks_per_word);
+			let (word, shift) = div_rem(offset, blocks_per_word);
 			block_states[word] as u64 >> (shift * bits)
 		} else {
 			let bit_offset = offset * bits;
-			let (word, bit_shift) = bit_offset.div_rem(64);
+			let (word, bit_shift) = div_rem(bit_offset, 64);
 
 			if bit_shift + bits <= 64 {
 				block_states[word] as u64 >> bit_shift
@@ -170,7 +171,7 @@ impl<'a> Section for SectionV0<'a> {
 		let offset = coords.offset();
 		let block = self.blocks[offset] as u8;
 
-		let (data_offset, data_nibble) = offset.div_rem(2);
+		let (data_offset, data_nibble) = div_rem(offset, 2);
 		let data_byte = self.data[data_offset] as u8;
 		let data = if data_nibble == 1 {
 			data_byte >> 4
