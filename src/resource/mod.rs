@@ -1,8 +1,11 @@
 mod block_types;
+mod legacy_block_types;
 
 use std::collections::HashMap;
 
 use enumflags2::{bitflags, BitFlags};
+
+pub use legacy_block_types::LEGACY_BLOCK_TYPES;
 
 #[bitflags]
 #[repr(u8)]
