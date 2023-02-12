@@ -1,6 +1,6 @@
 use std::{
 	fmt::Debug,
-	ops::{Index, IndexMut},
+	ops::{Div, Index, IndexMut, Rem},
 };
 
 use itertools::iproduct;
@@ -59,5 +59,27 @@ impl<T> Index<ChunkCoords> for ChunkArray<T> {
 impl<T> IndexMut<ChunkCoords> for ChunkArray<T> {
 	fn index_mut(&mut self, index: ChunkCoords) -> &mut Self::Output {
 		&mut self.0[index.z.0 as usize][index.x.0 as usize]
+	}
+}
+
+pub trait DivRem<Rhs> {
+	type DivOutput;
+	type RemOutput;
+
+	fn div_rem(self, rhs: Rhs) -> (Self::DivOutput, Self::RemOutput);
+}
+
+impl<Lhs, Rhs> DivRem<Rhs> for Lhs
+where
+	Self: Div<Rhs>,
+	Self: Rem<Rhs>,
+	Self: Copy,
+	Rhs: Copy,
+{
+	type DivOutput = <Self as Div<Rhs>>::Output;
+	type RemOutput = <Self as Rem<Rhs>>::Output;
+
+	fn div_rem(self, rhs: Rhs) -> (Self::DivOutput, Self::RemOutput) {
+		(self / rhs, self % rhs)
 	}
 }
