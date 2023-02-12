@@ -15,6 +15,8 @@ fn palette_bits(len: usize, min: u8, max: u8) -> Option<u8> {
 	Some(bits)
 }
 
+pub trait Section {}
+
 #[derive(Debug)]
 pub struct PaletteSectionBiomes<'a> {
 	biomes: Option<&'a fastnbt::LongArray>,
@@ -81,6 +83,8 @@ impl<'a> PaletteSection<'a> {
 	}
 }
 
+impl<'a> Section for PaletteSection<'a> {}
+
 #[derive(Debug)]
 pub struct OldSection<'a> {
 	blocks: &'a fastnbt::ByteArray,
@@ -93,3 +97,5 @@ impl<'a> OldSection<'a> {
 		Ok(Self { blocks, data })
 	}
 }
+
+impl<'a> Section for OldSection<'a> {}

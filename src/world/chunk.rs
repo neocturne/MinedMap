@@ -1,10 +1,13 @@
-use std::collections::BTreeMap;
+use std::{
+	collections::{btree_map, BTreeMap},
+	iter::{self, FusedIterator},
+};
 
 use anyhow::{bail, Context, Result};
 
 use super::{
 	de,
-	section::{OldSection, PaletteSection, PaletteSectionBiomes},
+	section::{OldSection, PaletteSection, PaletteSectionBiomes, Section},
 };
 use crate::types::*;
 
@@ -21,6 +24,25 @@ pub enum Chunk<'a> {
 		biomes: &'a de::BiomesOld,
 	},
 	Empty,
+}
+
+#[derive(Debug, Clone)]
+enum SectionIterInner<'a> {
+	V1_18 {
+		iter: btree_map::Iter<'a, SectionY, (PaletteSection<'a>, PaletteSectionBiomes<'a>)>,
+	},
+	V1_13 {
+		iter: btree_map::Iter<'a, SectionY, PaletteSection<'a>>,
+	},
+	Old {
+		iter: btree_map::Iter<'a, SectionY, OldSection<'a>>,
+	},
+	Empty,
+}
+
+#[derive(Debug, Clone)]
+pub struct SectionIter<'a> {
+	inner: SectionIterInner<'a>,
 }
 
 impl<'a> Chunk<'a> {
@@ -108,4 +130,98 @@ impl<'a> Chunk<'a> {
 			},
 		)
 	}
+
+	pub fn sections(&self) -> SectionIter {
+		use SectionIterInner::*;
+		SectionIter {
+			inner: match self {
+				Chunk::V1_18 { section_map } => V1_18 {
+					iter: section_map.iter(),
+				},
+				Chunk::V1_13 { section_map, .. } => V1_13 {
+					iter: section_map.iter(),
+				},
+				Chunk::Old { section_map, .. } => Old {
+					iter: section_map.iter(),
+				},
+				Chunk::Empty => Empty,
+			},
+		}
+	}
 }
+
+trait SectionIterTrait<'a>:
+	Iterator<Item = (SectionY, &'a dyn Section)>
+	+ DoubleEndedIterator
+	+ ExactSizeIterator
+	+ FusedIterator
+{
+}
+
+impl<'a, T> SectionIterTrait<'a> for T where
+	T: Iterator<Item = (SectionY, &'a dyn Section)>
+		+ DoubleEndedIterator
+		+ ExactSizeIterator
+		+ FusedIterator
+{
+}
+
+impl<'a> SectionIter<'a> {
+	fn with_iter<F, T>(&mut self, f: F) -> T
+	where
+		F: FnOnce(&mut dyn SectionIterTrait<'a>) -> T,
+	{
+		match &mut self.inner {
+			SectionIterInner::V1_18 { iter } => f(
+				&mut iter.map(|(y, section)| -> (SectionY, &'a dyn Section) { (*y, &section.0) })
+			),
+			SectionIterInner::V1_13 { iter } => {
+				f(&mut iter.map(|(y, section)| -> (SectionY, &'a dyn Section) { (*y, section) }))
+			}
+			SectionIterInner::Old { iter } => {
+				f(&mut iter.map(|(y, section)| -> (SectionY, &'a dyn Section) { (*y, section) }))
+			}
+			SectionIterInner::Empty => f(&mut iter::empty()),
+		}
+	}
+}
+
+impl<'a> Iterator for SectionIter<'a> {
+	type Item = (SectionY, &'a dyn Section);
+
+	fn next(&mut self) -> Option<Self::Item> {
+		self.with_iter(|iter| iter.next())
+	}
+
+	fn size_hint(&self) -> (usize, Option<usize>) {
+		match &self.inner {
+			SectionIterInner::V1_18 { iter } => iter.size_hint(),
+			SectionIterInner::V1_13 { iter } => iter.size_hint(),
+			SectionIterInner::Old { iter } => iter.size_hint(),
+			SectionIterInner::Empty => (0, Some(0)),
+		}
+	}
+
+	fn last(mut self) -> Option<Self::Item> {
+		self.with_iter(|iter| iter.last())
+	}
+}
+
+impl<'a> DoubleEndedIterator for SectionIter<'a> {
+	fn next_back(&mut self) -> Option<Self::Item> {
+		self.with_iter(|iter| iter.next_back())
+	}
+}
+
+impl<'a> ExactSizeIterator for SectionIter<'a> {
+	fn len(&self) -> usize {
+		match &self.inner {
+			SectionIterInner::V1_18 { iter } => iter.len(),
+			SectionIterInner::V1_13 { iter } => iter.len(),
+			SectionIterInner::Old { iter } => iter.len(),
+			SectionIterInner::Empty => 0,
+		}
+	}
+}
+
+impl<'a> FusedIterator for SectionIter<'a> {}
