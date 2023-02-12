@@ -21,7 +21,7 @@ fn palette_bits(len: usize, min: u8, max: u8) -> Option<u8> {
 	Some(bits)
 }
 
-/// Trait for common functions of [PaletteSection] and [OldSection]
+/// Trait for common functions of [SectionV1_13] and [SectionV0]
 pub trait Section {
 	fn get_block_id(&self, coords: BlockCoords) -> Result<&str>;
 }
@@ -32,14 +32,14 @@ pub trait Section {
 /// the biomes laid out as an array of indices into a palette, similar to the
 /// v1.13+ block data.
 #[derive(Debug)]
-pub struct PaletteSectionBiomes<'a> {
+pub struct BiomesV18<'a> {
 	_biomes: Option<&'a fastnbt::LongArray>,
 	_palette: &'a Vec<String>,
 	_bits: u8,
 }
 
-impl<'a> PaletteSectionBiomes<'a> {
-	/// Constructs a new [PaletteSectionBiomes] from deserialized data structures
+impl<'a> BiomesV18<'a> {
+	/// Constructs a new [BiomesV18] from deserialized data structures
 	pub fn new(biomes: Option<&'a fastnbt::LongArray>, palette: &'a Vec<String>) -> Result<Self> {
 		let bits = palette_bits(palette.len(), 1, 6).context("Unsupported block palette size")?;
 
@@ -51,7 +51,7 @@ impl<'a> PaletteSectionBiomes<'a> {
 			}
 		}
 
-		Ok(PaletteSectionBiomes {
+		Ok(BiomesV18 {
 			_biomes: biomes,
 			_palette: palette,
 			_bits: bits,
@@ -61,15 +61,15 @@ impl<'a> PaletteSectionBiomes<'a> {
 
 /// Minecraft v1.13+ section block data
 #[derive(Debug)]
-pub struct PaletteSection<'a> {
+pub struct SectionV1_13<'a> {
 	block_states: Option<&'a fastnbt::LongArray>,
 	palette: &'a Vec<de::BlockStatePaletteEntry>,
 	bits: u8,
 	aligned_blocks: bool,
 }
 
-impl<'a> PaletteSection<'a> {
-	/// Constructs a new [PaletteSection] from deserialized data structures
+impl<'a> SectionV1_13<'a> {
+	/// Constructs a new [SectionV1_13] from deserialized data structures
 	pub fn new(
 		data_version: u32,
 		block_states: Option<&'a fastnbt::LongArray>,
@@ -131,7 +131,7 @@ impl<'a> PaletteSection<'a> {
 	}
 }
 
-impl<'a> Section for PaletteSection<'a> {
+impl<'a> Section for SectionV1_13<'a> {
 	fn get_block_id(&self, coords: BlockCoords) -> Result<&str> {
 		let index = self.get_palette_index(coords);
 		let entry = self
@@ -144,13 +144,13 @@ impl<'a> Section for PaletteSection<'a> {
 
 /// Pre-1.13 section block data
 #[derive(Debug)]
-pub struct OldSection<'a> {
+pub struct SectionV0<'a> {
 	blocks: &'a fastnbt::ByteArray,
 	data: &'a fastnbt::ByteArray,
 }
 
-impl<'a> OldSection<'a> {
-	/// Constructs a new [OldSection] from deserialized data structures
+impl<'a> SectionV0<'a> {
+	/// Constructs a new [SectionV0] from deserialized data structures
 	pub fn new(blocks: &'a fastnbt::ByteArray, data: &'a fastnbt::ByteArray) -> Result<Self> {
 		use BLOCKS_PER_CHUNK as N;
 
@@ -161,11 +161,11 @@ impl<'a> OldSection<'a> {
 			bail!("Invalid section extra data");
 		}
 
-		Ok(OldSection { blocks, data })
+		Ok(SectionV0 { blocks, data })
 	}
 }
 
-impl<'a> Section for OldSection<'a> {
+impl<'a> Section for SectionV0<'a> {
 	fn get_block_id(&self, coords: BlockCoords) -> Result<&str> {
 		let offset = coords.offset();
 		let block = self.blocks[offset] as u8;

@@ -7,7 +7,7 @@ use anyhow::{bail, Context, Result};
 
 use super::{
 	de,
-	section::{OldSection, PaletteSection, PaletteSectionBiomes, Section},
+	section::{BiomesV18, Section, SectionV0, SectionV1_13},
 };
 use crate::types::*;
 
@@ -17,7 +17,7 @@ use crate::types::*;
 pub enum Chunk<'a> {
 	/// Minecraft v1.18+ chunk with biome data moved into sections
 	V1_18 {
-		section_map: BTreeMap<SectionY, (PaletteSection<'a>, PaletteSectionBiomes<'a>)>,
+		section_map: BTreeMap<SectionY, (SectionV1_13<'a>, BiomesV18<'a>)>,
 	},
 	/// Minecraft v1.13+ chunk
 	///
@@ -26,15 +26,15 @@ pub enum Chunk<'a> {
 	/// section), and a palette mapping these indices to namespaced
 	/// block IDs
 	V1_13 {
-		section_map: BTreeMap<SectionY, PaletteSection<'a>>,
-		biomes: &'a de::BiomesOld,
+		section_map: BTreeMap<SectionY, SectionV1_13<'a>>,
+		biomes: &'a de::BiomesV0,
 	},
 	/// Original pre-1.13 chunk
 	///
 	/// The original chunk format with fixed 8-bit numeric block IDs
-	Old {
-		section_map: BTreeMap<SectionY, OldSection<'a>>,
-		biomes: &'a de::BiomesOld,
+	V0 {
+		section_map: BTreeMap<SectionY, SectionV0<'a>>,
+		biomes: &'a de::BiomesV0,
 	},
 	/// Unpopulated chunk without any block data
 	Empty,
@@ -45,15 +45,15 @@ pub enum Chunk<'a> {
 enum SectionIterInner<'a> {
 	/// Iterator over sections of [Chunk::V1_18]
 	V1_18 {
-		iter: btree_map::Iter<'a, SectionY, (PaletteSection<'a>, PaletteSectionBiomes<'a>)>,
+		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BiomesV18<'a>)>,
 	},
 	/// Iterator over sections of [Chunk::V1_13]
 	V1_13 {
-		iter: btree_map::Iter<'a, SectionY, PaletteSection<'a>>,
+		iter: btree_map::Iter<'a, SectionY, SectionV1_13<'a>>,
 	},
-	/// Iterator over sections of [Chunk::Old]
-	Old {
-		iter: btree_map::Iter<'a, SectionY, OldSection<'a>>,
+	/// Iterator over sections of [Chunk::V0]
+	V0 {
+		iter: btree_map::Iter<'a, SectionY, SectionV0<'a>>,
 	},
 	/// Empty iterator over an unpopulated chunk ([Chunk::Empty])
 	Empty,
@@ -72,7 +72,7 @@ impl<'a> Chunk<'a> {
 
 		match &data.chunk {
 			de::ChunkVariants::V1_18 { sections } => Self::new_v1_18(data_version, sections),
-			de::ChunkVariants::Old { level } => Self::new_old(data_version, level),
+			de::ChunkVariants::V0 { level } => Self::new_v0(data_version, level),
 		}
 	}
 
@@ -84,17 +84,16 @@ impl<'a> Chunk<'a> {
 			section_map.insert(
 				SectionY(section.y),
 				(
-					PaletteSection::new(
+					SectionV1_13::new(
 						data_version,
 						section.block_states.data.as_ref(),
 						&section.block_states.palette,
 					)
 					.with_context(|| format!("Failed to load section at Y={}", section.y))?,
-					PaletteSectionBiomes::new(
-						section.biomes.data.as_ref(),
-						&section.biomes.palette,
-					)
-					.with_context(|| format!("Failed to load section biomes at Y={}", section.y))?,
+					BiomesV18::new(section.biomes.data.as_ref(), &section.biomes.palette)
+						.with_context(|| {
+							format!("Failed to load section biomes at Y={}", section.y)
+						})?,
 				),
 			);
 		}
@@ -103,33 +102,32 @@ impl<'a> Chunk<'a> {
 	}
 
 	/// [Chunk::new] implementation for all pre-1.18 chunk variants
-	fn new_old(data_version: u32, level: &'a de::LevelOld) -> Result<Self> {
+	fn new_v0(data_version: u32, level: &'a de::LevelV0) -> Result<Self> {
 		let mut section_map_v1_13 = BTreeMap::new();
-		let mut section_map_old = BTreeMap::new();
+		let mut section_map_v0 = BTreeMap::new();
 
 		for section in &level.sections {
 			match &section.section {
-				de::SectionOldVariants::V1_13 {
+				de::SectionV0Variants::V1_13 {
 					block_states,
 					palette,
 				} => {
 					section_map_v1_13.insert(
 						SectionY(section.y.into()),
-						PaletteSection::new(data_version, Some(block_states), palette)
-							.with_context(|| {
-								format!("Failed to load section at Y={}", section.y)
-							})?,
+						SectionV1_13::new(data_version, Some(block_states), palette).with_context(
+							|| format!("Failed to load section at Y={}", section.y),
+						)?,
 					);
 				}
-				de::SectionOldVariants::Old { blocks, data } => {
-					section_map_old.insert(
+				de::SectionV0Variants::V0 { blocks, data } => {
+					section_map_v0.insert(
 						SectionY(section.y.into()),
-						OldSection::new(blocks, data).with_context(|| {
+						SectionV0::new(blocks, data).with_context(|| {
 							format!("Failed to load section at Y={}", section.y)
 						})?,
 					);
 				}
-				de::SectionOldVariants::Empty {} => {}
+				de::SectionV0Variants::Empty {} => {}
 			}
 		}
 
@@ -137,14 +135,14 @@ impl<'a> Chunk<'a> {
 		let biomes = level.biomes.as_ref().context("Invalid biome data");
 
 		Ok(
-			match (section_map_v1_13.is_empty(), section_map_old.is_empty()) {
+			match (section_map_v1_13.is_empty(), section_map_v0.is_empty()) {
 				(true, true) => Chunk::Empty,
 				(false, true) => Chunk::V1_13 {
 					section_map: section_map_v1_13,
 					biomes: biomes?,
 				},
-				(true, false) => Chunk::Old {
-					section_map: section_map_old,
+				(true, false) => Chunk::V0 {
+					section_map: section_map_v0,
 					biomes: biomes?,
 				},
 				(false, false) => {
@@ -165,7 +163,7 @@ impl<'a> Chunk<'a> {
 				Chunk::V1_13 { section_map, .. } => V1_13 {
 					iter: section_map.iter(),
 				},
-				Chunk::Old { section_map, .. } => Old {
+				Chunk::V0 { section_map, .. } => V0 {
 					iter: section_map.iter(),
 				},
 				Chunk::Empty => Empty,
@@ -202,7 +200,7 @@ impl<'a> SectionIter<'a> {
 			SectionIterInner::V1_13 { iter } => {
 				f(&mut iter.map(|(y, section)| -> (SectionY, &'a dyn Section) { (*y, section) }))
 			}
-			SectionIterInner::Old { iter } => {
+			SectionIterInner::V0 { iter } => {
 				f(&mut iter.map(|(y, section)| -> (SectionY, &'a dyn Section) { (*y, section) }))
 			}
 			SectionIterInner::Empty => f(&mut iter::empty()),
@@ -221,7 +219,7 @@ impl<'a> Iterator for SectionIter<'a> {
 		match &self.inner {
 			SectionIterInner::V1_18 { iter } => iter.size_hint(),
 			SectionIterInner::V1_13 { iter } => iter.size_hint(),
-			SectionIterInner::Old { iter } => iter.size_hint(),
+			SectionIterInner::V0 { iter } => iter.size_hint(),
 			SectionIterInner::Empty => (0, Some(0)),
 		}
 	}
@@ -242,7 +240,7 @@ impl<'a> ExactSizeIterator for SectionIter<'a> {
 		match &self.inner {
 			SectionIterInner::V1_18 { iter } => iter.len(),
 			SectionIterInner::V1_13 { iter } => iter.len(),
-			SectionIterInner::Old { iter } => iter.len(),
+			SectionIterInner::V0 { iter } => iter.len(),
 			SectionIterInner::Empty => 0,
 		}
 	}

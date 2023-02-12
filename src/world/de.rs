@@ -34,37 +34,37 @@ pub struct SectionV1_18 {
 	pub block_light: Option<fastnbt::ByteArray>,
 }
 
-/// Version-specific part of a pre-1.18 [Section](SectionOld)
+/// Version-specific part of a pre-1.18 [Section](SectionV0)
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
-pub enum SectionOldVariants {
+pub enum SectionV0Variants {
 	#[serde(rename_all = "PascalCase")]
 	V1_13 {
 		block_states: fastnbt::LongArray,
 		palette: Vec<BlockStatePaletteEntry>,
 	},
 	#[serde(rename_all = "PascalCase")]
-	Old {
+	V0 {
 		blocks: fastnbt::ByteArray,
 		data: fastnbt::ByteArray,
 	},
 	Empty {},
 }
 
-/// Pre-1.18 section element found in the [Level](LevelOld) compound
+/// Pre-1.18 section element found in the [Level](LevelV0) compound
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
-pub struct SectionOld {
+pub struct SectionV0 {
 	pub y: i8,
 	pub block_light: Option<fastnbt::ByteArray>,
 	#[serde(flatten)]
-	pub section: SectionOldVariants,
+	pub section: SectionV0Variants,
 }
 
-/// Pre-1.18 biome fields found in the [Level](LevelOld) compound
+/// Pre-1.18 biome fields found in the [Level](LevelV0) compound
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
-pub enum BiomesOld {
+pub enum BiomesV0 {
 	IntArray(fastnbt::IntArray),
 	ByteArray(fastnbt::ByteArray),
 }
@@ -72,10 +72,10 @@ pub enum BiomesOld {
 /// `Level` compound element found in pre-1.18 [chunks](Chunk)
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
-pub struct LevelOld {
+pub struct LevelV0 {
 	#[serde(default)]
-	pub sections: Vec<SectionOld>,
-	pub biomes: Option<BiomesOld>,
+	pub sections: Vec<SectionV0>,
+	pub biomes: Option<BiomesV0>,
 }
 
 /// Version-specific part of a [Chunk] compound
@@ -86,8 +86,8 @@ pub enum ChunkVariants {
 		sections: Vec<SectionV1_18>,
 	},
 	#[serde(rename_all = "PascalCase")]
-	Old {
-		level: LevelOld,
+	V0 {
+		level: LevelV0,
 	},
 }
 
