@@ -8,18 +8,18 @@ use itertools::iproduct;
 pub const BLOCKS_PER_CHUNK: u8 = 16;
 
 /// A block X coordinate relative to a chunk
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockX(pub u8);
 
 /// A block Y coordinate relative to a chunk section
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockY(pub u8);
 
 /// A block Z coordinate relative to a chunk
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockZ(pub u8);
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct BlockCoords {
 	pub x: BlockX,
 	pub y: BlockY,
@@ -49,15 +49,15 @@ pub struct SectionY(pub i32);
 pub const CHUNKS_PER_REGION: u8 = 32;
 
 /// A chunk X coordinate relative to a region
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ChunkX(pub u8);
 
 /// A chunk Z coordinate relative to a region
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ChunkZ(pub u8);
 
 /// A pair of chunk coordinates relative to a region
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct ChunkCoords {
 	pub x: ChunkX,
 	pub z: ChunkZ,
