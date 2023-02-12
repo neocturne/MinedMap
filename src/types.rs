@@ -5,7 +5,7 @@ use std::{
 
 use itertools::iproduct;
 
-pub const BLOCKS_PER_CHUNK: u8 = 16;
+pub const BLOCKS_PER_CHUNK: usize = 16;
 
 /// A block X coordinate relative to a chunk
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,7 +28,7 @@ pub struct BlockCoords {
 
 impl BlockCoords {
 	pub fn offset(&self) -> usize {
-		const N: usize = BLOCKS_PER_CHUNK as usize;
+		use BLOCKS_PER_CHUNK as N;
 		let x = self.x.0 as usize;
 		let y = self.y.0 as usize;
 		let z = self.z.0 as usize;
@@ -46,7 +46,7 @@ impl Debug for BlockCoords {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SectionY(pub i32);
 
-pub const CHUNKS_PER_REGION: u8 = 32;
+pub const CHUNKS_PER_REGION: usize = 32;
 
 /// A chunk X coordinate relative to a region
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -70,13 +70,15 @@ impl Debug for ChunkCoords {
 }
 
 #[derive(Debug, Clone, Copy, Default)]
-pub struct ChunkArray<T>(pub [[T; CHUNKS_PER_REGION as usize]; CHUNKS_PER_REGION as usize]);
+pub struct ChunkArray<T>(pub [[T; CHUNKS_PER_REGION]; CHUNKS_PER_REGION]);
 
 impl<T> ChunkArray<T> {
 	pub fn keys() -> impl Iterator<Item = ChunkCoords> {
-		iproduct!(0..CHUNKS_PER_REGION, 0..CHUNKS_PER_REGION).map(|(z, x)| ChunkCoords {
-			x: ChunkX(x),
-			z: ChunkZ(z),
+		iproduct!(0..(CHUNKS_PER_REGION as u8), 0..(CHUNKS_PER_REGION as u8)).map(|(z, x)| {
+			ChunkCoords {
+				x: ChunkX(x),
+				z: ChunkZ(z),
+			}
 		})
 	}
 

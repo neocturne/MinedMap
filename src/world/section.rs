@@ -135,7 +135,8 @@ pub struct OldSection<'a> {
 
 impl<'a> OldSection<'a> {
 	pub fn new(blocks: &'a fastnbt::ByteArray, data: &'a fastnbt::ByteArray) -> Result<Self> {
-		const N: usize = BLOCKS_PER_CHUNK as usize;
+		use BLOCKS_PER_CHUNK as N;
+
 		if blocks.len() != N * N * N {
 			bail!("Invalid section block data");
 		}
