@@ -22,9 +22,9 @@ pub trait Section {
 
 #[derive(Debug)]
 pub struct PaletteSectionBiomes<'a> {
-	biomes: Option<&'a fastnbt::LongArray>,
-	palette: &'a Vec<String>,
-	bits: u8,
+	_biomes: Option<&'a fastnbt::LongArray>,
+	_palette: &'a Vec<String>,
+	_bits: u8,
 }
 
 impl<'a> PaletteSectionBiomes<'a> {
@@ -40,9 +40,9 @@ impl<'a> PaletteSectionBiomes<'a> {
 		}
 
 		Ok(PaletteSectionBiomes {
-			biomes,
-			palette,
-			bits,
+			_biomes: biomes,
+			_palette: palette,
+			_bits: bits,
 		})
 	}
 }
