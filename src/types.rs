@@ -105,11 +105,12 @@ impl<T> IndexMut<ChunkCoords> for ChunkArray<T> {
 	}
 }
 
-pub trait DivRem<Rhs> {
-	type DivOutput;
-	type RemOutput;
-
-	fn div_rem(self, rhs: Rhs) -> (Self::DivOutput, Self::RemOutput);
+pub trait DivRem<Rhs>
+where
+	Self: Div<Rhs>,
+	Self: Rem<Rhs>,
+{
+	fn div_rem(self, rhs: Rhs) -> (<Self as Div<Rhs>>::Output, <Self as Rem<Rhs>>::Output);
 }
 
 impl<Lhs, Rhs> DivRem<Rhs> for Lhs
@@ -119,10 +120,7 @@ where
 	Self: Copy,
 	Rhs: Copy,
 {
-	type DivOutput = <Self as Div<Rhs>>::Output;
-	type RemOutput = <Self as Rem<Rhs>>::Output;
-
-	fn div_rem(self, rhs: Rhs) -> (Self::DivOutput, Self::RemOutput) {
+	fn div_rem(self, rhs: Rhs) -> (<Self as Div<Rhs>>::Output, <Self as Rem<Rhs>>::Output) {
 		(self / rhs, self % rhs)
 	}
 }
