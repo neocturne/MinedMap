@@ -10,7 +10,7 @@ pub use legacy_block_types::LEGACY_BLOCK_TYPES;
 #[bitflags]
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum BlockFlags {
+pub enum BlockFlag {
 	Opaque,
 	Grass,
 	Foliage,
@@ -24,7 +24,7 @@ pub struct BlockColor(pub u8, pub u8, pub u8);
 
 #[derive(Debug, Clone, Copy)]
 pub struct BlockType {
-	pub flags: BitFlags<BlockFlags>,
+	pub flags: BitFlags<BlockFlag>,
 	pub color: BlockColor,
 }
 
