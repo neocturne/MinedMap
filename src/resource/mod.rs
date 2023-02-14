@@ -28,6 +28,12 @@ pub struct BlockType {
 	pub color: BlockColor,
 }
 
+impl BlockType {
+	pub fn is(&self, flag: BlockFlag) -> bool {
+		self.flags.contains(flag)
+	}
+}
+
 pub type BlockTypeMap = HashMap<String, BlockType>;
 
 pub fn block_types() -> BlockTypeMap {
