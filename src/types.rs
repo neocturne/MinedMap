@@ -116,15 +116,15 @@ impl Debug for ChunkCoords {
 pub struct ChunkArray<T>(pub [[T; CHUNKS_PER_REGION]; CHUNKS_PER_REGION]);
 
 impl<T> ChunkArray<T> {
-	pub fn keys() -> impl Iterator<Item = ChunkCoords> {
+	pub fn keys() -> impl Iterator<Item = ChunkCoords> + Clone + Debug {
 		iproduct!(ChunkZ::iter(), ChunkX::iter()).map(|(z, x)| ChunkCoords { x, z })
 	}
 
-	pub fn values(&self) -> impl Iterator<Item = &T> {
+	pub fn values(&self) -> impl Iterator<Item = &T> + Clone + Debug {
 		Self::keys().map(|k| &self[k])
 	}
 
-	pub fn iter(&self) -> impl Iterator<Item = (ChunkCoords, &T)> {
+	pub fn iter(&self) -> impl Iterator<Item = (ChunkCoords, &T)> + Clone + Debug {
 		Self::keys().map(|k| (k, &self[k]))
 	}
 }
