@@ -28,7 +28,9 @@ pub struct BlockType {
 	pub color: BlockColor,
 }
 
-pub fn block_types() -> HashMap<String, BlockType> {
+pub type BlockTypeMap = HashMap<String, BlockType>;
+
+pub fn block_types() -> BlockTypeMap {
 	block_types::BLOCK_TYPES
 		.iter()
 		.map(|(k, v)| (String::from(*k), *v))
