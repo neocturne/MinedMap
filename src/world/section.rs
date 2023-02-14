@@ -24,7 +24,7 @@ fn palette_bits(len: usize, min: u8, max: u8) -> Option<u8> {
 
 /// Trait for common functions of [SectionV1_13] and [SectionV0]
 pub trait Section {
-	fn block_id_at(&self, coords: BlockCoords) -> Result<&str>;
+	fn block_id_at(&self, coords: SectionBlockCoords) -> Result<&str>;
 }
 
 /// Minecraft v1.18+ section biome data
@@ -101,7 +101,7 @@ impl<'a> SectionV1_13<'a> {
 	}
 
 	/// Looks up the block type palette index at the given coordinates
-	fn palette_index_at(&self, coords: BlockCoords) -> usize {
+	fn palette_index_at(&self, coords: SectionBlockCoords) -> usize {
 		let Some(block_states) = self.block_states else {
 			return 0;
 		};
@@ -133,7 +133,7 @@ impl<'a> SectionV1_13<'a> {
 }
 
 impl<'a> Section for SectionV1_13<'a> {
-	fn block_id_at(&self, coords: BlockCoords) -> Result<&str> {
+	fn block_id_at(&self, coords: SectionBlockCoords) -> Result<&str> {
 		let index = self.palette_index_at(coords);
 		let entry = self
 			.palette
@@ -167,7 +167,7 @@ impl<'a> SectionV0<'a> {
 }
 
 impl<'a> Section for SectionV0<'a> {
-	fn block_id_at(&self, coords: BlockCoords) -> Result<&str> {
+	fn block_id_at(&self, coords: SectionBlockCoords) -> Result<&str> {
 		let offset = coords.offset();
 		let block = self.blocks[offset] as u8;
 

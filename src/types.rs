@@ -39,15 +39,27 @@ coord_impl!(BlockY, BLOCKS_PER_CHUNK);
 pub struct BlockZ(pub u8);
 coord_impl!(BlockZ, BLOCKS_PER_CHUNK);
 
-/// X, Y and Z coordinates of a block in a chunk section
+/// X and Z coordinates of a block in a chunk
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub struct BlockCoords {
+pub struct LayerBlockCoords {
 	pub x: BlockX,
-	pub y: BlockY,
 	pub z: BlockZ,
 }
 
-impl BlockCoords {
+impl Debug for LayerBlockCoords {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "({}, {})", self.x.0, self.z.0)
+	}
+}
+
+/// X, Y and Z coordinates of a block in a chunk section
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct SectionBlockCoords {
+	pub xz: LayerBlockCoords,
+	pub y: BlockY,
+}
+
+impl SectionBlockCoords {
 	/// Computes a block's offset in various data structures
 	///
 	/// Many chunk data structures store block and biome data in the same
@@ -55,16 +67,16 @@ impl BlockCoords {
 	/// for the block at a given coordinate is stored.
 	pub fn offset(&self) -> usize {
 		use BLOCKS_PER_CHUNK as N;
-		let x = self.x.0 as usize;
+		let x = self.xz.x.0 as usize;
 		let y = self.y.0 as usize;
-		let z = self.z.0 as usize;
+		let z = self.xz.z.0 as usize;
 		((y * N) + z) * N + x
 	}
 }
 
-impl Debug for BlockCoords {
+impl Debug for SectionBlockCoords {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		write!(f, "({}, {}, {})", self.x.0, self.y.0, self.z.0)
+		write!(f, "({}, {}, {})", self.xz.x.0, self.y.0, self.xz.z.0)
 	}
 }
 
