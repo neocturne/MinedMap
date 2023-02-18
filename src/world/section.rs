@@ -119,13 +119,11 @@ impl<'a> SectionV1_13<'a> {
 			let bit_offset = offset * bits;
 			let (word, bit_shift) = div_rem(bit_offset, 64);
 
-			if bit_shift + bits <= 64 {
-				block_states[word] as u64 >> bit_shift
-			} else {
-				let tmp = (block_states[word + 1] as u64 as u128) << 64
-					| block_states[word] as u64 as u128;
-				(tmp >> bit_shift) as u64
+			let mut tmp = (block_states[word] as u64) >> bit_shift;
+			if bit_shift + bits > 64 {
+				tmp |= (block_states[word + 1] as u64) << (64 - bit_shift);
 			}
+			tmp
 		};
 
 		(shifted & mask) as usize
