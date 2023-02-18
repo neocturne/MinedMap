@@ -97,8 +97,8 @@ impl SectionBlockCoords {
 	/// Computes a block's offset in various data structures
 	///
 	/// Many chunk data structures store block and biome data in the same
-	/// order. [BlockCoords::offset] computes the offset at which the data
-	/// for the block at a given coordinate is stored.
+	/// order. This method computes the offset at which the data for the
+	/// block at a given coordinate is stored.
 	pub fn offset(&self) -> usize {
 		use BLOCKS_PER_CHUNK as N;
 		let x = self.xz.x.0 as usize;
