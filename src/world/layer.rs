@@ -1,5 +1,6 @@
 use anyhow::{Context, Result};
 use itertools::iproduct;
+use serde::{Deserialize, Serialize};
 
 use super::chunk::Chunk;
 use crate::{
@@ -7,7 +8,7 @@ use crate::{
 	types::*,
 };
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BlockHeight(i32);
 
 impl BlockHeight {
@@ -25,7 +26,7 @@ impl BlockHeight {
 	}
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct BlockInfo {
 	block_type: BlockType,
 	y: BlockHeight,

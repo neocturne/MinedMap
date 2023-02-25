@@ -5,6 +5,7 @@ use std::{
 };
 
 use itertools::iproduct;
+use serde::{Deserialize, Serialize};
 
 macro_rules! coord_impl {
 	($t:ident, $max:expr) => {
@@ -55,7 +56,7 @@ impl Debug for LayerBlockCoords {
 /// Generic array for data stored per block of a chunk layer
 ///
 /// Includes various convenient iteration functions.
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct LayerBlockArray<T>(pub [[T; BLOCKS_PER_CHUNK]; BLOCKS_PER_CHUNK]);
 
 impl<T> LayerBlockArray<T> {
@@ -146,7 +147,7 @@ impl Debug for ChunkCoords {
 /// Generic array for data stored per chunk of a region
 ///
 /// Includes various convenient iteration functions.
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct ChunkArray<T>(pub [[T; CHUNKS_PER_REGION]; CHUNKS_PER_REGION]);
 
 impl<T> ChunkArray<T> {
