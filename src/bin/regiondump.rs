@@ -15,6 +15,7 @@ fn main() -> Result<()> {
 	minedmap::io::region::from_file(args.file.as_path())?.foreach_chunk(
 		|coords, value: fastnbt::Value| {
 			println!("Chunk {:?}: {:#x?}", coords, value);
+			Ok(())
 		},
 	)
 }

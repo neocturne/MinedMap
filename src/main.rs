@@ -41,14 +41,15 @@ impl RegionProcessor {
 				Ok(chunk) => chunk,
 				Err(err) => {
 					eprintln!("Chunk {:?}: {}", coords, err);
-					return;
+					return Ok(());
 				}
 			};
 
 			match world::layer::top_layer(&chunk, &self.block_types) {
 				Ok(_) => {}
 				Err(err) => println!("{:?}", err),
-			}
+			};
+			Ok(())
 		})
 	}
 

@@ -73,7 +73,7 @@ impl<R: Read + Seek> Region<R> {
 	where
 		R: Read + Seek,
 		T: DeserializeOwned,
-		F: FnMut(ChunkCoords, T),
+		F: FnMut(ChunkCoords, T) -> Result<()>,
 	{
 		let Region { mut reader } = self;
 
@@ -119,7 +119,7 @@ impl<R: Read + Seek> Region<R> {
 			let chunk = decode_chunk(&buffer)
 				.with_context(|| format!("Failed to decode data for chunk {:?}", coords))?;
 
-			f(coords, chunk);
+			f(coords, chunk)?;
 		}
 
 		Ok(())
