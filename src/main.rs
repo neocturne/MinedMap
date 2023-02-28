@@ -44,7 +44,9 @@ impl RegionProcessor {
 	}
 
 	/// Processes a single region file
-	fn process_region(&self, path: &Path, _coords: RegionCoords) -> Result<()> {
+	fn process_region(&self, path: &Path, coords: RegionCoords) -> Result<()> {
+		println!("Processing region r.{}.{}.mca", coords.0, coords.1);
+
 		minedmap::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
 				(|| -> Result<()> {
