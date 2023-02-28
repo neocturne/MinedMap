@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+	fs,
+	path::{Path, PathBuf},
+};
 
 use anyhow::{Context, Result};
 use clap::Parser;
@@ -9,6 +12,8 @@ use minedmap::{resource, world};
 struct Args {
 	/// Minecraft save directory
 	input_dir: PathBuf,
+	/// MinedMap data directory
+	output_dir: PathBuf,
 }
 
 type RegionCoords = (i32, i32);
@@ -16,12 +21,14 @@ type RegionCoords = (i32, i32);
 /// Type with methods for processing the regions of a Minecraft save directory
 struct RegionProcessor {
 	block_types: resource::BlockTypeMap,
+	processed_dir: PathBuf,
 }
 
 impl RegionProcessor {
-	fn new() -> Self {
+	fn new(output_dir: &Path) -> Self {
 		RegionProcessor {
 			block_types: resource::block_types(),
+			processed_dir: [output_dir, Path::new("processed")].iter().collect(),
 		}
 	}
 
@@ -58,6 +65,13 @@ impl RegionProcessor {
 			.read_dir()
 			.with_context(|| format!("Failed to read directory {}", regiondir.display()))?;
 
+		fs::create_dir_all(&self.processed_dir).with_context(|| {
+			format!(
+				"Failed to create directory {}",
+				self.processed_dir.display(),
+			)
+		})?;
+
 		for entry in read_dir.filter_map(|entry| entry.ok()).filter(|entry| {
 			// We are only interested in regular files
 			entry
@@ -87,7 +101,7 @@ fn main() -> Result<()> {
 
 	let regiondir: PathBuf = [&args.input_dir, Path::new("region")].iter().collect();
 
-	let region_processor = RegionProcessor::new();
+	let region_processor = RegionProcessor::new(&args.output_dir);
 	region_processor.process_region_dir(&regiondir)?;
 
 	Ok(())
