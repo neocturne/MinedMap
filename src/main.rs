@@ -43,20 +43,22 @@ impl RegionProcessor {
 		Some((x.parse().ok()?, z.parse().ok()?))
 	}
 
+	/// Processes a single chunk
+	fn process_chunk(&self, data: world::de::Chunk) -> Result<Box<world::layer::BlockInfoArray>> {
+		let chunk = world::chunk::Chunk::new(&data)?;
+		world::layer::top_layer(&chunk, &self.block_types)
+	}
+
 	/// Processes a single region file
 	fn process_region(&self, path: &Path, coords: RegionCoords) -> Result<()> {
 		println!("Processing region r.{}.{}.mca", coords.0, coords.1);
 
 		minedmap::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
-				(|| -> Result<()> {
-					let chunk = world::chunk::Chunk::new(&data)?;
-
-					let _top_layer = world::layer::top_layer(&chunk, &self.block_types)?;
-
-					Ok(())
-				})()
-				.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))
+				let _processed_chunk = self
+					.process_chunk(data)
+					.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?;
+				Ok(())
 			},
 		)
 	}
