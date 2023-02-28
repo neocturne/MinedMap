@@ -6,7 +6,7 @@ use std::{
 use anyhow::{Context, Result};
 use clap::Parser;
 
-use minedmap::{resource, world};
+use minedmap::{resource, types::*, world};
 
 #[derive(Debug, Parser)]
 struct Args {
@@ -53,11 +53,15 @@ impl RegionProcessor {
 	fn process_region(&self, path: &Path, coords: RegionCoords) -> Result<()> {
 		println!("Processing region r.{}.{}.mca", coords.0, coords.1);
 
+		let mut processed_data: ChunkArray<Option<Box<world::layer::BlockInfoArray>>> =
+			Default::default();
+
 		minedmap::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
-				let _processed_chunk = self
+				let processed_chunk = self
 					.process_chunk(data)
 					.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?;
+				processed_data[chunk_coords] = Some(processed_chunk);
 				Ok(())
 			},
 		)
