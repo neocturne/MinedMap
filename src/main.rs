@@ -8,7 +8,7 @@ use minedmap::{resource, world};
 #[derive(Debug, Parser)]
 struct Args {
 	/// Minecraft save directory
-	savedir: PathBuf,
+	input_dir: PathBuf,
 }
 
 /// Type with methods for processing the regions of a Minecraft save directory
@@ -78,7 +78,7 @@ impl RegionProcessor {
 fn main() -> Result<()> {
 	let args = Args::parse();
 
-	let regiondir: PathBuf = [&args.savedir, Path::new("region")].iter().collect();
+	let regiondir: PathBuf = [&args.input_dir, Path::new("region")].iter().collect();
 
 	let region_processor = RegionProcessor::new();
 	region_processor.process_region_dir(&regiondir)?;
