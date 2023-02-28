@@ -11,6 +11,8 @@ struct Args {
 	input_dir: PathBuf,
 }
 
+type RegionCoords = (i32, i32);
+
 /// Type with methods for processing the regions of a Minecraft save directory
 struct RegionProcessor {
 	block_types: resource::BlockTypeMap,
@@ -24,7 +26,7 @@ impl RegionProcessor {
 	}
 
 	/// Parses a filename in the format r.X.Z.mca into the contained X and Z values
-	fn parse_region_filename(path: &Path) -> Option<(i32, i32)> {
+	fn parse_region_filename(path: &Path) -> Option<RegionCoords> {
 		let file_name = path.file_name()?.to_str()?;
 		let parts: Vec<_> = file_name.split('.').collect();
 		let &["r", x, z, "mca"] = parts.as_slice() else {
@@ -35,17 +37,19 @@ impl RegionProcessor {
 	}
 
 	/// Processes a single region file
-	fn process_region(&self, path: &Path, _x: i32, _z: i32) -> Result<()> {
-		minedmap::io::region::from_file(path)?.foreach_chunk(|coords, data: world::de::Chunk| {
-			(|| -> Result<()> {
-				let chunk = world::chunk::Chunk::new(&data)?;
+	fn process_region(&self, path: &Path, _coords: RegionCoords) -> Result<()> {
+		minedmap::io::region::from_file(path)?.foreach_chunk(
+			|chunk_coords, data: world::de::Chunk| {
+				(|| -> Result<()> {
+					let chunk = world::chunk::Chunk::new(&data)?;
 
-				let _top_layer = world::layer::top_layer(&chunk, &self.block_types)?;
+					let _top_layer = world::layer::top_layer(&chunk, &self.block_types)?;
 
-				Ok(())
-			})()
-			.with_context(|| format!("Failed to process chunk {:?}", coords))
-		})
+					Ok(())
+				})()
+				.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))
+			},
+		)
 	}
 
 	/// Iterates over all region files of a Minecraft save directory
@@ -62,12 +66,15 @@ impl RegionProcessor {
 				.unwrap_or_default()
 		}) {
 			let path = entry.path();
-			let Some((x, z)) = Self::parse_region_filename(&path) else {
+			let Some(coords) = Self::parse_region_filename(&path) else {
 			continue;
 		};
 
-			if let Err(err) = self.process_region(&path, x, z) {
-				eprintln!("Failed to process region r.{}.{}.mca: {}", x, z, err);
+			if let Err(err) = self.process_region(&path, coords) {
+				eprintln!(
+					"Failed to process region r.{}.{}.mca: {}",
+					coords.0, coords.1, err,
+				);
 			}
 		}
 
