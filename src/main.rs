@@ -6,7 +6,7 @@ use std::{
 use anyhow::{Context, Result};
 use clap::Parser;
 
-use minedmap::{resource, types::*, world};
+use minedmap::{io::storage, resource, types::*, world};
 
 #[derive(Debug, Parser)]
 struct Args {
@@ -43,10 +43,40 @@ impl RegionProcessor {
 		Some((x.parse().ok()?, z.parse().ok()?))
 	}
 
+	fn processed_path(&self, coords: RegionCoords, temp: bool) -> PathBuf {
+		let filename = format!(
+			"r.{}.{}.bin{}",
+			coords.0,
+			coords.1,
+			if temp { ".tmp" } else { "" },
+		);
+		[&self.processed_dir, Path::new(&filename)].iter().collect()
+	}
+
 	/// Processes a single chunk
 	fn process_chunk(&self, data: world::de::Chunk) -> Result<Box<world::layer::BlockInfoArray>> {
 		let chunk = world::chunk::Chunk::new(&data)?;
 		world::layer::top_layer(&chunk, &self.block_types)
+	}
+
+	fn save_region(
+		&self,
+		region: RegionCoords,
+		processed_data: &ChunkArray<Option<Box<world::layer::BlockInfoArray>>>,
+	) -> Result<()> {
+		let tmp_path = self.processed_path(region, true);
+		storage::write(&tmp_path, processed_data)?;
+
+		let output_path = self.processed_path(region, false);
+		fs::rename(&tmp_path, &output_path).with_context(|| {
+			format!(
+				"Failed to rename {} to {}",
+				tmp_path.display(),
+				output_path.display(),
+			)
+		})?;
+
+		Ok(())
 	}
 
 	/// Processes a single region file
@@ -64,7 +94,11 @@ impl RegionProcessor {
 				processed_data[chunk_coords] = Some(processed_chunk);
 				Ok(())
 			},
-		)
+		)?;
+
+		self.save_region(coords, &processed_data)?;
+
+		Ok(())
 	}
 
 	/// Iterates over all region files of a Minecraft save directory
