@@ -67,8 +67,8 @@ impl RegionProcessor {
 		}) {
 			let path = entry.path();
 			let Some(coords) = Self::parse_region_filename(&path) else {
-			continue;
-		};
+				continue;
+			};
 
 			if let Err(err) = self.process_region(&path, coords) {
 				eprintln!(
