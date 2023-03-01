@@ -110,7 +110,7 @@ pub fn top_layer(chunk: &Chunk, block_types: &BlockTypeMap) -> Result<Box<BlockI
 
 		let coords = SectionBlockCoords { xz, y };
 		let block_id = section.block_id_at(coords)?;
-		let Some(&block_type) = block_types.get(block_id) else {
+		let Some(block_type) = block_types.get(block_id) else {
 			eprintln!("Unknown block type: {}", block_id);
 			continue;
 		};

@@ -53,11 +53,20 @@ impl BlockType {
 	}
 }
 
-pub type BlockTypeMap = HashMap<String, BlockType>;
+pub struct BlockTypeMap(HashMap<String, BlockType>);
+
+impl BlockTypeMap {
+	#[inline]
+	pub fn get(&self, id: &str) -> Option<BlockType> {
+		self.0.get(id).copied()
+	}
+}
 
 pub fn block_types() -> BlockTypeMap {
-	block_types::BLOCK_TYPES
-		.iter()
-		.map(|(k, v)| (String::from(*k), *v))
-		.collect()
+	BlockTypeMap(
+		block_types::BLOCK_TYPES
+			.iter()
+			.map(|(k, v)| (String::from(*k), *v))
+			.collect(),
+	)
 }
