@@ -67,8 +67,7 @@ impl<'a> BiomesV18<'a> {
 #[derive(Debug)]
 pub struct SectionV1_13<'a> {
 	block_states: Option<&'a fastnbt::LongArray>,
-	palette: &'a Vec<de::BlockStatePaletteEntry>,
-	block_types: &'a BlockTypes,
+	palette: Vec<Option<BlockType>>,
 	bits: u8,
 	aligned_blocks: bool,
 }
@@ -97,10 +96,20 @@ impl<'a> SectionV1_13<'a> {
 			}
 		}
 
+		let palette_types = palette
+			.iter()
+			.map(|entry| {
+				let block_type = block_types.get(&entry.name);
+				if block_type.is_none() {
+					eprintln!("Unknown block type: {}", entry.name);
+				}
+				block_type
+			})
+			.collect();
+
 		Ok(Self {
 			block_states,
-			palette,
-			block_types,
+			palette: palette_types,
 			bits,
 			aligned_blocks,
 		})
@@ -139,16 +148,10 @@ impl<'a> SectionV1_13<'a> {
 impl<'a> Section for SectionV1_13<'a> {
 	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<BlockType>> {
 		let index = self.palette_index_at(coords);
-		let entry = self
+		Ok(*self
 			.palette
 			.get(index)
-			.context("Palette index out of bounds")?;
-
-		let block_type = self.block_types.get(&entry.name);
-		if block_type.is_none() {
-			eprintln!("Unknown block type: {}", entry.name);
-		}
-		Ok(block_type)
+			.context("Palette index out of bounds")?)
 	}
 }
 
