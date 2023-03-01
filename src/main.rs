@@ -102,7 +102,9 @@ impl RegionProcessor {
 	}
 
 	/// Iterates over all region files of a Minecraft save directory
-	fn process_region_dir(&self, regiondir: &Path) -> Result<()> {
+	///
+	/// Returns a list of the coordinates of all processed regions
+	fn process_region_dir(&self, regiondir: &Path) -> Result<Vec<RegionCoords>> {
 		let read_dir = regiondir
 			.read_dir()
 			.with_context(|| format!("Failed to read directory {}", regiondir.display()))?;
@@ -113,6 +115,8 @@ impl RegionProcessor {
 				self.processed_dir.display(),
 			)
 		})?;
+
+		let mut ret = Vec::new();
 
 		for entry in read_dir.filter_map(|entry| entry.ok()).filter(|entry| {
 			// We are only interested in regular files
@@ -132,9 +136,11 @@ impl RegionProcessor {
 					coords.0, coords.1, err,
 				);
 			}
+
+			ret.push(coords);
 		}
 
-		Ok(())
+		Ok(ret)
 	}
 }
 
