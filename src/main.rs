@@ -18,19 +18,44 @@ struct Args {
 
 type RegionCoords = (i32, i32);
 
+struct Paths {
+	region_dir: PathBuf,
+	processed_dir: PathBuf,
+}
+
+impl Paths {
+	fn new(args: Args) -> Self {
+		let region_dir = [&args.input_dir, Path::new("region")].iter().collect();
+		let processed_dir = [&args.output_dir, Path::new("processed")].iter().collect();
+
+		Paths {
+			region_dir,
+			processed_dir,
+		}
+	}
+
+	fn processed_path(&self, coords: RegionCoords, temp: bool) -> PathBuf {
+		let filename = format!(
+			"r.{}.{}.bin{}",
+			coords.0,
+			coords.1,
+			if temp { ".tmp" } else { "" },
+		);
+		[&self.processed_dir, Path::new(&filename)].iter().collect()
+	}
+}
+
 /// Type with methods for processing the regions of a Minecraft save directory
 struct RegionProcessor<'a> {
 	block_types: resource::BlockTypeMap,
-	region_dir: &'a Path,
-	processed_dir: &'a Path,
+	paths: &'a Paths,
 }
 
 impl<'a> RegionProcessor<'a> {
-	fn new(region_dir: &'a Path, processed_dir: &'a Path) -> Self {
+	fn new(paths: &'a Paths) -> Self {
 		RegionProcessor {
 			block_types: resource::block_types(),
-			region_dir,
-			processed_dir,
+			paths,
 		}
 	}
 
@@ -45,16 +70,6 @@ impl<'a> RegionProcessor<'a> {
 		Some((x.parse().ok()?, z.parse().ok()?))
 	}
 
-	fn processed_path(&self, coords: RegionCoords, temp: bool) -> PathBuf {
-		let filename = format!(
-			"r.{}.{}.bin{}",
-			coords.0,
-			coords.1,
-			if temp { ".tmp" } else { "" },
-		);
-		[&self.processed_dir, Path::new(&filename)].iter().collect()
-	}
-
 	/// Processes a single chunk
 	fn process_chunk(&self, data: world::de::Chunk) -> Result<Box<world::layer::BlockInfoArray>> {
 		let chunk = world::chunk::Chunk::new(&data)?;
@@ -66,10 +81,10 @@ impl<'a> RegionProcessor<'a> {
 		region: RegionCoords,
 		processed_data: &ChunkArray<Option<Box<world::layer::BlockInfoArray>>>,
 	) -> Result<()> {
-		let tmp_path = self.processed_path(region, true);
+		let tmp_path = self.paths.processed_path(region, true);
 		storage::write(&tmp_path, processed_data)?;
 
-		let output_path = self.processed_path(region, false);
+		let output_path = self.paths.processed_path(region, false);
 		fs::rename(&tmp_path, &output_path).with_context(|| {
 			format!(
 				"Failed to rename {} to {}",
@@ -107,15 +122,17 @@ impl<'a> RegionProcessor<'a> {
 	///
 	/// Returns a list of the coordinates of all processed regions
 	fn run(self) -> Result<Vec<RegionCoords>> {
-		let read_dir = self
-			.region_dir
-			.read_dir()
-			.with_context(|| format!("Failed to read directory {}", self.region_dir.display()))?;
+		let read_dir = self.paths.region_dir.read_dir().with_context(|| {
+			format!(
+				"Failed to read directory {}",
+				self.paths.region_dir.display()
+			)
+		})?;
 
-		fs::create_dir_all(&self.processed_dir).with_context(|| {
+		fs::create_dir_all(&self.paths.processed_dir).with_context(|| {
 			format!(
 				"Failed to create directory {}",
-				self.processed_dir.display(),
+				self.paths.processed_dir.display(),
 			)
 		})?;
 
@@ -149,11 +166,9 @@ impl<'a> RegionProcessor<'a> {
 
 fn main() -> Result<()> {
 	let args = Args::parse();
+	let paths = Paths::new(args);
 
-	let region_dir: PathBuf = [&args.input_dir, Path::new("region")].iter().collect();
-	let processed_dir: PathBuf = [&args.output_dir, Path::new("processed")].iter().collect();
-
-	RegionProcessor::new(&region_dir, &processed_dir).run()?;
+	RegionProcessor::new(&paths).run()?;
 
 	Ok(())
 }
