@@ -35,7 +35,7 @@ with open(sys.argv[1]) as f:
 output = {}
 
 for name, info in blocks.items():
-	id = 'minecraft:' + name
+	id = name
 
 	output[id] = {
 		'color': {'r': 0, 'g': 0, 'b': 0},

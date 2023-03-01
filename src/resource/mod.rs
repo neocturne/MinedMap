@@ -58,7 +58,8 @@ pub struct BlockTypeMap(HashMap<String, BlockType>);
 impl BlockTypeMap {
 	#[inline]
 	pub fn get(&self, id: &str) -> Option<BlockType> {
-		self.0.get(id).copied()
+		let suffix = id.strip_prefix("minecraft:")?;
+		self.0.get(suffix).copied()
 	}
 }
 
