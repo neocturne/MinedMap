@@ -21,16 +21,19 @@ type RegionCoords = (i32, i32);
 struct Paths {
 	region_dir: PathBuf,
 	processed_dir: PathBuf,
+	map_dir: PathBuf,
 }
 
 impl Paths {
 	fn new(args: Args) -> Self {
 		let region_dir = [&args.input_dir, Path::new("region")].iter().collect();
 		let processed_dir = [&args.output_dir, Path::new("processed")].iter().collect();
+		let map_dir = [&args.output_dir, Path::new("map/0")].iter().collect();
 
 		Paths {
 			region_dir,
 			processed_dir,
+			map_dir,
 		}
 	}
 
@@ -164,11 +167,43 @@ impl<'a> RegionProcessor<'a> {
 	}
 }
 
+struct TileRenderer<'a> {
+	paths: &'a Paths,
+}
+
+impl<'a> TileRenderer<'a> {
+	fn new(paths: &'a Paths) -> Self {
+		TileRenderer { paths }
+	}
+
+	fn render_tile(&self, coords: RegionCoords) -> Result<()> {
+		println!("Rendering tile r.{}.{}.png", coords.0, coords.1);
+
+		Ok(())
+	}
+
+	fn run(self, regions: &[RegionCoords]) -> Result<()> {
+		fs::create_dir_all(&self.paths.map_dir).with_context(|| {
+			format!(
+				"Failed to create directory {}",
+				self.paths.map_dir.display(),
+			)
+		})?;
+
+		for &coords in regions {
+			self.render_tile(coords)?;
+		}
+
+		Ok(())
+	}
+}
+
 fn main() -> Result<()> {
 	let args = Args::parse();
 	let paths = Paths::new(args);
 
-	RegionProcessor::new(&paths).run()?;
+	let regions = RegionProcessor::new(&paths).run()?;
+	TileRenderer::new(&paths).run(&regions)?;
 
 	Ok(())
 }
