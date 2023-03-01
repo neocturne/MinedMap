@@ -104,10 +104,10 @@ impl RegionProcessor {
 	/// Iterates over all region files of a Minecraft save directory
 	///
 	/// Returns a list of the coordinates of all processed regions
-	fn process_region_dir(&self, regiondir: &Path) -> Result<Vec<RegionCoords>> {
-		let read_dir = regiondir
+	fn process_region_dir(&self, region_dir: &Path) -> Result<Vec<RegionCoords>> {
+		let read_dir = region_dir
 			.read_dir()
-			.with_context(|| format!("Failed to read directory {}", regiondir.display()))?;
+			.with_context(|| format!("Failed to read directory {}", region_dir.display()))?;
 
 		fs::create_dir_all(&self.processed_dir).with_context(|| {
 			format!(
@@ -147,10 +147,10 @@ impl RegionProcessor {
 fn main() -> Result<()> {
 	let args = Args::parse();
 
-	let regiondir: PathBuf = [&args.input_dir, Path::new("region")].iter().collect();
+	let region_dir: PathBuf = [&args.input_dir, Path::new("region")].iter().collect();
 
 	let region_processor = RegionProcessor::new(&args.output_dir);
-	region_processor.process_region_dir(&regiondir)?;
+	region_processor.process_region_dir(&region_dir)?;
 
 	Ok(())
 }
