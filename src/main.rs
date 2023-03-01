@@ -19,16 +19,16 @@ struct Args {
 type RegionCoords = (i32, i32);
 
 /// Type with methods for processing the regions of a Minecraft save directory
-struct RegionProcessor {
+struct RegionProcessor<'a> {
 	block_types: resource::BlockTypeMap,
-	processed_dir: PathBuf,
+	processed_dir: &'a Path,
 }
 
-impl RegionProcessor {
-	fn new(output_dir: &Path) -> Self {
+impl<'a> RegionProcessor<'a> {
+	fn new(processed_dir: &'a Path) -> Self {
 		RegionProcessor {
 			block_types: resource::block_types(),
-			processed_dir: [output_dir, Path::new("processed")].iter().collect(),
+			processed_dir,
 		}
 	}
 
@@ -148,8 +148,9 @@ fn main() -> Result<()> {
 	let args = Args::parse();
 
 	let region_dir: PathBuf = [&args.input_dir, Path::new("region")].iter().collect();
+	let processed_dir: PathBuf = [&args.output_dir, Path::new("processed")].iter().collect();
 
-	let region_processor = RegionProcessor::new(&args.output_dir);
+	let region_processor = RegionProcessor::new(&processed_dir);
 	region_processor.process_region_dir(&region_dir)?;
 
 	Ok(())
