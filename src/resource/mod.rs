@@ -5,7 +5,6 @@ use std::collections::HashMap;
 
 use enumflags2::{bitflags, BitFlags};
 
-pub use legacy_block_types::LEGACY_BLOCK_TYPES;
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 
 #[bitflags]
@@ -65,12 +64,8 @@ impl Default for BlockTypes {
 			.iter()
 			.map(|(k, v)| (String::from(*k), *v))
 			.collect();
-		let legacy_block_types = Box::new(LEGACY_BLOCK_TYPES.map(|inner| {
-			inner.map(|id| {
-				*id.strip_prefix("minecraft:")
-					.and_then(|suffix| block_type_map.get(suffix))
-					.expect("Unknown legacy block type")
-			})
+		let legacy_block_types = Box::new(legacy_block_types::LEGACY_BLOCK_TYPES.map(|inner| {
+			inner.map(|id| *block_type_map.get(id).expect("Unknown legacy block type"))
 		}));
 
 		BlockTypes {

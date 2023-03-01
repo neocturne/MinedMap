@@ -4,21 +4,21 @@ const fn simple(id: &str) -> [&str; 16] {
 	]
 }
 
-const DEF: &str = "minecraft:air";
+const DEF: &str = "air";
 const EMPTY: [&str; 16] = simple(DEF);
 
 pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 	/* 0 */
-	simple("minecraft:air"),
+	simple("air"),
 	/* 1 */
 	[
-		"minecraft:stone",
-		"minecraft:granite",
-		"minecraft:polished_granite",
-		"minecraft:diorite",
-		"minecraft:polished_diorite",
-		"minecraft:andesite",
-		"minecraft:polished_andesite",
+		"stone",
+		"granite",
+		"polished_granite",
+		"diorite",
+		"polished_diorite",
+		"andesite",
+		"polished_andesite",
 		DEF,
 		DEF,
 		DEF,
@@ -30,12 +30,12 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 		DEF,
 	],
 	/* 2 */
-	simple("minecraft:grass_block"),
+	simple("grass_block"),
 	/* 3 */
 	[
-		"minecraft:dirt",
-		"minecraft:coarse_dirt",
-		"minecraft:podzol",
+		"dirt",
+		"coarse_dirt",
+		"podzol",
 		DEF,
 		DEF,
 		DEF,
@@ -51,15 +51,15 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 		DEF,
 	],
 	/* 4 */
-	simple("minecraft:cobblestone"),
+	simple("cobblestone"),
 	/* 5 */
 	[
-		"minecraft:oak_planks",
-		"minecraft:spruce_planks",
-		"minecraft:birch_planks",
-		"minecraft:jungle_planks",
-		"minecraft:acacia_planks",
-		"minecraft:dark_oak_planks",
+		"oak_planks",
+		"spruce_planks",
+		"birch_planks",
+		"jungle_planks",
+		"acacia_planks",
+		"dark_oak_planks",
 		DEF,
 		DEF,
 		DEF,
@@ -73,181 +73,151 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 	],
 	/* 6 */
 	[
-		"minecraft:oak_sapling",
-		"minecraft:spruce_sapling",
-		"minecraft:birch_sapling",
-		"minecraft:jungle_sapling",
-		"minecraft:acacia_sapling",
-		"minecraft:dark_oak_sapling",
+		"oak_sapling",
+		"spruce_sapling",
+		"birch_sapling",
+		"jungle_sapling",
+		"acacia_sapling",
+		"dark_oak_sapling",
 		DEF,
 		DEF,
-		"minecraft:oak_sapling",
-		"minecraft:spruce_sapling",
-		"minecraft:birch_sapling",
-		"minecraft:jungle_sapling",
-		"minecraft:acacia_sapling",
-		"minecraft:dark_oak_sapling",
+		"oak_sapling",
+		"spruce_sapling",
+		"birch_sapling",
+		"jungle_sapling",
+		"acacia_sapling",
+		"dark_oak_sapling",
 		DEF,
 		DEF,
 	],
 	/* 7 */
-	simple("minecraft:bedrock"),
+	simple("bedrock"),
 	/* 8 */
-	simple("minecraft:water"),
+	simple("water"),
 	/* 9 */
-	simple("minecraft:water"),
+	simple("water"),
 	/* 10 */
-	simple("minecraft:lava"),
+	simple("lava"),
 	/* 11 */
-	simple("minecraft:lava"),
+	simple("lava"),
 	/* 12 */
 	[
-		"minecraft:sand",
-		"minecraft:red_sand",
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
+		"sand", "red_sand", DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF,
 	],
 	/* 13 */
-	simple("minecraft:gravel"),
+	simple("gravel"),
 	/* 14 */
-	simple("minecraft:gold_ore"),
+	simple("gold_ore"),
 	/* 15 */
-	simple("minecraft:iron_ore"),
+	simple("iron_ore"),
 	/* 16 */
-	simple("minecraft:coal_ore"),
+	simple("coal_ore"),
 	/* 17 */
 	[
-		"minecraft:oak_log",
-		"minecraft:spruce_log",
-		"minecraft:birch_log",
-		"minecraft:jungle_log",
-		"minecraft:oak_log",
-		"minecraft:spruce_log",
-		"minecraft:birch_log",
-		"minecraft:jungle_log",
-		"minecraft:oak_log",
-		"minecraft:spruce_log",
-		"minecraft:birch_log",
-		"minecraft:jungle_log",
-		"minecraft:oak_log",
-		"minecraft:spruce_log",
-		"minecraft:birch_log",
-		"minecraft:jungle_log",
+		"oak_log",
+		"spruce_log",
+		"birch_log",
+		"jungle_log",
+		"oak_log",
+		"spruce_log",
+		"birch_log",
+		"jungle_log",
+		"oak_log",
+		"spruce_log",
+		"birch_log",
+		"jungle_log",
+		"oak_log",
+		"spruce_log",
+		"birch_log",
+		"jungle_log",
 	],
 	/* 18 */
 	[
-		"minecraft:oak_leaves",
-		"minecraft:spruce_leaves",
-		"minecraft:birch_leaves",
-		"minecraft:jungle_leaves",
-		"minecraft:oak_leaves",
-		"minecraft:spruce_leaves",
-		"minecraft:birch_leaves",
-		"minecraft:jungle_leaves",
-		"minecraft:oak_leaves",
-		"minecraft:spruce_leaves",
-		"minecraft:birch_leaves",
-		"minecraft:jungle_leaves",
-		"minecraft:oak_leaves",
-		"minecraft:spruce_leaves",
-		"minecraft:birch_leaves",
-		"minecraft:jungle_leaves",
+		"oak_leaves",
+		"spruce_leaves",
+		"birch_leaves",
+		"jungle_leaves",
+		"oak_leaves",
+		"spruce_leaves",
+		"birch_leaves",
+		"jungle_leaves",
+		"oak_leaves",
+		"spruce_leaves",
+		"birch_leaves",
+		"jungle_leaves",
+		"oak_leaves",
+		"spruce_leaves",
+		"birch_leaves",
+		"jungle_leaves",
 	],
 	/* 19 */
-	simple("minecraft:sponge"),
+	simple("sponge"),
 	/* 20 */
-	simple("minecraft:glass"),
+	simple("glass"),
 	/* 21 */
-	simple("minecraft:lapis_ore"),
+	simple("lapis_ore"),
 	/* 22 */
-	simple("minecraft:lapis_block"),
+	simple("lapis_block"),
 	/* 23 */
-	simple("minecraft:dispenser"),
+	simple("dispenser"),
 	/* 24 */
-	simple("minecraft:sandstone"),
+	simple("sandstone"),
 	/* 25 */
-	simple("minecraft:note_block"),
+	simple("note_block"),
 	/* 26 */
 	EMPTY, // bed
 	/* 27 */
-	simple("minecraft:powered_rail"),
+	simple("powered_rail"),
 	/* 28 */
-	simple("minecraft:detector_rail"),
+	simple("detector_rail"),
 	/* 29 */
-	simple("minecraft:sticky_piston"),
+	simple("sticky_piston"),
 	/* 30 */
-	simple("minecraft:cobweb"),
+	simple("cobweb"),
 	/* 31 */
 	[
-		"minecraft:grass",
-		"minecraft:fern",
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
-		DEF,
+		"grass", "fern", DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF, DEF,
 	],
 	/* 32 */
-	simple("minecraft:dead_bush"),
+	simple("dead_bush"),
 	/* 33 */
-	simple("minecraft:piston"),
+	simple("piston"),
 	/* 34 */
-	simple("minecraft:piston_head"),
+	simple("piston_head"),
 	/* 35 */
 	[
-		"minecraft:white_wool",
-		"minecraft:orange_wool",
-		"minecraft:magenta_wool",
-		"minecraft:light_blue_wool",
-		"minecraft:yellow_wool",
-		"minecraft:lime_wool",
-		"minecraft:pink_wool",
-		"minecraft:gray_wool",
-		"minecraft:light_gray_wool",
-		"minecraft:cyan_wool",
-		"minecraft:purple_wool",
-		"minecraft:blue_wool",
-		"minecraft:brown_wool",
-		"minecraft:green_wool",
-		"minecraft:red_wool",
-		"minecraft:black_wool",
+		"white_wool",
+		"orange_wool",
+		"magenta_wool",
+		"light_blue_wool",
+		"yellow_wool",
+		"lime_wool",
+		"pink_wool",
+		"gray_wool",
+		"light_gray_wool",
+		"cyan_wool",
+		"purple_wool",
+		"blue_wool",
+		"brown_wool",
+		"green_wool",
+		"red_wool",
+		"black_wool",
 	],
 	/* 36 */
-	simple("minecraft:moving_piston"),
+	simple("moving_piston"),
 	/* 37 */
-	simple("minecraft:dandelion"),
+	simple("dandelion"),
 	/* 38 */
 	[
-		"minecraft:poppy",
-		"minecraft:blue_orchid",
-		"minecraft:allium",
-		"minecraft:azure_bluet",
-		"minecraft:red_tulip",
-		"minecraft:orange_tulip",
-		"minecraft:white_tulip",
-		"minecraft:pink_tulip",
-		"minecraft:oxeye_daisy",
+		"poppy",
+		"blue_orchid",
+		"allium",
+		"azure_bluet",
+		"red_tulip",
+		"orange_tulip",
+		"white_tulip",
+		"pink_tulip",
+		"oxeye_daisy",
 		DEF,
 		DEF,
 		DEF,
@@ -257,23 +227,23 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 		DEF,
 	],
 	/* 39 */
-	simple("minecraft:brown_mushroom"),
+	simple("brown_mushroom"),
 	/* 40 */
-	simple("minecraft:red_mushroom"),
+	simple("red_mushroom"),
 	/* 41 */
-	simple("minecraft:gold_block"),
+	simple("gold_block"),
 	/* 42 */
-	simple("minecraft:iron_block"),
+	simple("iron_block"),
 	/* 43 */
 	[
-		"minecraft:smooth_stone_slab",
-		"minecraft:sandstone_slab",
-		"minecraft:oak_slab",
-		"minecraft:cobblestone_slab",
-		"minecraft:brick_slab",
-		"minecraft:stone_brick_slab",
-		"minecraft:nether_brick_slab",
-		"minecraft:quartz_slab",
+		"smooth_stone_slab",
+		"sandstone_slab",
+		"oak_slab",
+		"cobblestone_slab",
+		"brick_slab",
+		"stone_brick_slab",
+		"nether_brick_slab",
+		"quartz_slab",
 		DEF,
 		DEF,
 		DEF,
@@ -285,41 +255,41 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 	],
 	/* 44 */
 	[
-		"minecraft:smooth_stone_slab",
-		"minecraft:sandstone_slab",
-		"minecraft:oak_slab",
-		"minecraft:cobblestone_slab",
-		"minecraft:brick_slab",
-		"minecraft:stone_brick_slab",
-		"minecraft:nether_brick_slab",
-		"minecraft:quartz_slab",
-		"minecraft:stone_slab",
-		"minecraft:sandstone_slab",
-		"minecraft:oak_slab",
-		"minecraft:cobblestone_slab",
-		"minecraft:brick_slab",
-		"minecraft:stone_brick_slab",
-		"minecraft:nether_brick_slab",
-		"minecraft:quartz_slab",
+		"smooth_stone_slab",
+		"sandstone_slab",
+		"oak_slab",
+		"cobblestone_slab",
+		"brick_slab",
+		"stone_brick_slab",
+		"nether_brick_slab",
+		"quartz_slab",
+		"stone_slab",
+		"sandstone_slab",
+		"oak_slab",
+		"cobblestone_slab",
+		"brick_slab",
+		"stone_brick_slab",
+		"nether_brick_slab",
+		"quartz_slab",
 	],
 	/* 45 */
-	simple("minecraft:bricks"),
+	simple("bricks"),
 	/* 46 */
-	simple("minecraft:tnt"),
+	simple("tnt"),
 	/* 47 */
-	simple("minecraft:bookshelf"),
+	simple("bookshelf"),
 	/* 48 */
-	simple("minecraft:mossy_cobblestone"),
+	simple("mossy_cobblestone"),
 	/* 49 */
-	simple("minecraft:obsidian"),
+	simple("obsidian"),
 	/* 50 */
 	[
 		DEF,
-		"minecraft:wall_torch",
-		"minecraft:wall_torch",
-		"minecraft:wall_torch",
-		"minecraft:wall_torch",
-		"minecraft:torch",
+		"wall_torch",
+		"wall_torch",
+		"wall_torch",
+		"wall_torch",
+		"torch",
 		DEF,
 		DEF,
 		DEF,
@@ -332,61 +302,61 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 		DEF,
 	],
 	/* 51 */
-	simple("minecraft:fire"),
+	simple("fire"),
 	/* 52 */
-	simple("minecraft:spawner"),
+	simple("spawner"),
 	/* 53 */
-	simple("minecraft:oak_stairs"),
+	simple("oak_stairs"),
 	/* 54 */
-	simple("minecraft:chest"),
+	simple("chest"),
 	/* 55 */
-	simple("minecraft:redstone_wire"),
+	simple("redstone_wire"),
 	/* 56 */
-	simple("minecraft:diamond_ore"),
+	simple("diamond_ore"),
 	/* 57 */
-	simple("minecraft:diamond_block"),
+	simple("diamond_block"),
 	/* 58 */
-	simple("minecraft:crafting_table"),
+	simple("crafting_table"),
 	/* 59 */
-	simple("minecraft:wheat"),
+	simple("wheat"),
 	/* 60 */
-	simple("minecraft:farmland"),
+	simple("farmland"),
 	/* 61 */
-	simple("minecraft:furnace"),
+	simple("furnace"),
 	/* 62 */
-	simple("minecraft:furnace"),
+	simple("furnace"),
 	/* 63 */
-	simple("minecraft:sign"),
+	simple("sign"),
 	/* 64 */
-	simple("minecraft:oak_door"),
+	simple("oak_door"),
 	/* 65 */
-	simple("minecraft:ladder"),
+	simple("ladder"),
 	/* 66 */
-	simple("minecraft:rail"),
+	simple("rail"),
 	/* 67 */
-	simple("minecraft:cobblestone_stairs"),
+	simple("cobblestone_stairs"),
 	/* 68 */
-	simple("minecraft:wall_sign"),
+	simple("wall_sign"),
 	/* 69 */
-	simple("minecraft:lever"),
+	simple("lever"),
 	/* 70 */
-	simple("minecraft:stone_pressure_plate"),
+	simple("stone_pressure_plate"),
 	/* 71 */
-	simple("minecraft:iron_door"),
+	simple("iron_door"),
 	/* 72 */
-	simple("minecraft:oak_pressure_plate"),
+	simple("oak_pressure_plate"),
 	/* 73 */
-	simple("minecraft:redstone_ore"),
+	simple("redstone_ore"),
 	/* 74 */
-	simple("minecraft:redstone_ore"),
+	simple("redstone_ore"),
 	/* 75 */
 	[
 		DEF,
-		"minecraft:redstone_wall_torch",
-		"minecraft:redstone_wall_torch",
-		"minecraft:redstone_wall_torch",
-		"minecraft:redstone_wall_torch",
-		"minecraft:redstone_torch",
+		"redstone_wall_torch",
+		"redstone_wall_torch",
+		"redstone_wall_torch",
+		"redstone_wall_torch",
+		"redstone_torch",
 		DEF,
 		DEF,
 		DEF,
@@ -401,11 +371,11 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 	/* 76 */
 	[
 		DEF,
-		"minecraft:redstone_wall_torch",
-		"minecraft:redstone_wall_torch",
-		"minecraft:redstone_wall_torch",
-		"minecraft:redstone_wall_torch",
-		"minecraft:redstone_torch",
+		"redstone_wall_torch",
+		"redstone_wall_torch",
+		"redstone_wall_torch",
+		"redstone_wall_torch",
+		"redstone_torch",
 		DEF,
 		DEF,
 		DEF,
@@ -418,70 +388,70 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 		DEF,
 	],
 	/* 77 */
-	simple("minecraft:stone_button"),
+	simple("stone_button"),
 	/* 78 */
-	simple("minecraft:snow"),
+	simple("snow"),
 	/* 79 */
-	simple("minecraft:ice"),
+	simple("ice"),
 	/* 80 */
-	simple("minecraft:snow_block"),
+	simple("snow_block"),
 	/* 81 */
-	simple("minecraft:cactus"),
+	simple("cactus"),
 	/* 82 */
-	simple("minecraft:clay"),
+	simple("clay"),
 	/* 83 */
-	simple("minecraft:sugar_cane"),
+	simple("sugar_cane"),
 	/* 84 */
-	simple("minecraft:jukebox"),
+	simple("jukebox"),
 	/* 85 */
-	simple("minecraft:oak_fence"),
+	simple("oak_fence"),
 	/* 86 */
-	simple("minecraft:pumpkin"),
+	simple("pumpkin"),
 	/* 87 */
-	simple("minecraft:netherrack"),
+	simple("netherrack"),
 	/* 88 */
-	simple("minecraft:soul_sand"),
+	simple("soul_sand"),
 	/* 89 */
-	simple("minecraft:glowstone"),
+	simple("glowstone"),
 	/* 90 */
-	simple("minecraft:nether_portal"),
+	simple("nether_portal"),
 	/* 91 */
-	simple("minecraft:pumpkin"),
+	simple("pumpkin"),
 	/* 92 */
-	simple("minecraft:cake"),
+	simple("cake"),
 	/* 93 */
-	simple("minecraft:repeater"),
+	simple("repeater"),
 	/* 94 */
-	simple("minecraft:repeater"),
+	simple("repeater"),
 	/* 95 */
 	[
-		"minecraft:white_stained_glass",
-		"minecraft:orange_stained_glass",
-		"minecraft:magenta_stained_glass",
-		"minecraft:light_blue_stained_glass",
-		"minecraft:yellow_stained_glass",
-		"minecraft:lime_stained_glass",
-		"minecraft:pink_stained_glass",
-		"minecraft:gray_stained_glass",
-		"minecraft:light_gray_stained_glass",
-		"minecraft:cyan_stained_glass",
-		"minecraft:purple_stained_glass",
-		"minecraft:blue_stained_glass",
-		"minecraft:brown_stained_glass",
-		"minecraft:green_stained_glass",
-		"minecraft:red_stained_glass",
-		"minecraft:black_stained_glass",
+		"white_stained_glass",
+		"orange_stained_glass",
+		"magenta_stained_glass",
+		"light_blue_stained_glass",
+		"yellow_stained_glass",
+		"lime_stained_glass",
+		"pink_stained_glass",
+		"gray_stained_glass",
+		"light_gray_stained_glass",
+		"cyan_stained_glass",
+		"purple_stained_glass",
+		"blue_stained_glass",
+		"brown_stained_glass",
+		"green_stained_glass",
+		"red_stained_glass",
+		"black_stained_glass",
 	],
 	/* 96 */
-	simple("minecraft:oak_trapdoor"),
+	simple("oak_trapdoor"),
 	/* 97 */
 	[
-		"minecraft:infested_stone",
-		"minecraft:infested_cobblestone",
-		"minecraft:infested_stone_bricks",
-		"minecraft:infested_mossy_stone_bricks",
-		"minecraft:infested_cracked_stone_bricks",
-		"minecraft:infested_chiseled_stone_bricks",
+		"infested_stone",
+		"infested_cobblestone",
+		"infested_stone_bricks",
+		"infested_mossy_stone_bricks",
+		"infested_cracked_stone_bricks",
+		"infested_chiseled_stone_bricks",
 		DEF,
 		DEF,
 		DEF,
@@ -495,10 +465,10 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 	],
 	/* 98 */
 	[
-		"minecraft:stone_bricks",
-		"minecraft:mossy_stone_bricks",
-		"minecraft:cracked_stone_bricks",
-		"minecraft:chiseled_stone_bricks",
+		"stone_bricks",
+		"mossy_stone_bricks",
+		"cracked_stone_bricks",
+		"chiseled_stone_bricks",
 		DEF,
 		DEF,
 		DEF,
@@ -513,65 +483,65 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 		DEF,
 	],
 	/* 99 */
-	simple("minecraft:brown_mushroom_block"),
+	simple("brown_mushroom_block"),
 	/* 100 */
-	simple("minecraft:red_mushroom_block"),
+	simple("red_mushroom_block"),
 	/* 101 */
-	simple("minecraft:iron_bars"),
+	simple("iron_bars"),
 	/* 102 */
-	simple("minecraft:glass_pane"),
+	simple("glass_pane"),
 	/* 103 */
-	simple("minecraft:melon"),
+	simple("melon"),
 	/* 104 */
-	simple("minecraft:pumpkin_stem"),
+	simple("pumpkin_stem"),
 	/* 105 */
-	simple("minecraft:melon_stem"),
+	simple("melon_stem"),
 	/* 106 */
-	simple("minecraft:vine"),
+	simple("vine"),
 	/* 107 */
-	simple("minecraft:oak_fence_gate"),
+	simple("oak_fence_gate"),
 	/* 108 */
-	simple("minecraft:brick_stairs"),
+	simple("brick_stairs"),
 	/* 109 */
-	simple("minecraft:stone_brick_stairs"),
+	simple("stone_brick_stairs"),
 	/* 110 */
-	simple("minecraft:mycelium"),
+	simple("mycelium"),
 	/* 111 */
-	simple("minecraft:lily_pad"),
+	simple("lily_pad"),
 	/* 112 */
-	simple("minecraft:nether_bricks"),
+	simple("nether_bricks"),
 	/* 113 */
-	simple("minecraft:nether_brick_fence"),
+	simple("nether_brick_fence"),
 	/* 114 */
-	simple("minecraft:nether_brick_stairs"),
+	simple("nether_brick_stairs"),
 	/* 115 */
-	simple("minecraft:nether_wart"),
+	simple("nether_wart"),
 	/* 116 */
-	simple("minecraft:enchanting_table"),
+	simple("enchanting_table"),
 	/* 117 */
-	simple("minecraft:brewing_stand"),
+	simple("brewing_stand"),
 	/* 118 */
-	simple("minecraft:cauldron"),
+	simple("cauldron"),
 	/* 119 */
-	simple("minecraft:end_portal"),
+	simple("end_portal"),
 	/* 120 */
-	simple("minecraft:end_portal_frame"),
+	simple("end_portal_frame"),
 	/* 121 */
-	simple("minecraft:end_stone"),
+	simple("end_stone"),
 	/* 122 */
-	simple("minecraft:dragon_egg"),
+	simple("dragon_egg"),
 	/* 123 */
-	simple("minecraft:redstone_lamp"),
+	simple("redstone_lamp"),
 	/* 124 */
-	simple("minecraft:redstone_lamp"),
+	simple("redstone_lamp"),
 	/* 125 */
 	[
-		"minecraft:oak_slab",
-		"minecraft:spruce_slab",
-		"minecraft:birch_slab",
-		"minecraft:jungle_slab",
-		"minecraft:acacia_slab",
-		"minecraft:dark_oak_slab",
+		"oak_slab",
+		"spruce_slab",
+		"birch_slab",
+		"jungle_slab",
+		"acacia_slab",
+		"dark_oak_slab",
 		DEF,
 		DEF,
 		DEF,
@@ -585,51 +555,51 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 	],
 	/* 126 */
 	[
-		"minecraft:oak_slab",
-		"minecraft:spruce_slab",
-		"minecraft:birch_slab",
-		"minecraft:jungle_slab",
-		"minecraft:acacia_slab",
-		"minecraft:dark_oak_slab",
+		"oak_slab",
+		"spruce_slab",
+		"birch_slab",
+		"jungle_slab",
+		"acacia_slab",
+		"dark_oak_slab",
 		DEF,
 		DEF,
-		"minecraft:oak_slab",
-		"minecraft:spruce_slab",
-		"minecraft:birch_slab",
-		"minecraft:jungle_slab",
-		"minecraft:acacia_slab",
-		"minecraft:dark_oak_slab",
+		"oak_slab",
+		"spruce_slab",
+		"birch_slab",
+		"jungle_slab",
+		"acacia_slab",
+		"dark_oak_slab",
 		DEF,
 		DEF,
 	],
 	/* 127 */
-	simple("minecraft:cocoa"),
+	simple("cocoa"),
 	/* 128 */
-	simple("minecraft:sandstone_stairs"),
+	simple("sandstone_stairs"),
 	/* 129 */
-	simple("minecraft:emerald_ore"),
+	simple("emerald_ore"),
 	/* 130 */
-	simple("minecraft:ender_chest"),
+	simple("ender_chest"),
 	/* 131 */
-	simple("minecraft:tripwire_hook"),
+	simple("tripwire_hook"),
 	/* 132 */
-	simple("minecraft:tripwire"),
+	simple("tripwire"),
 	/* 133 */
-	simple("minecraft:emerald_block"),
+	simple("emerald_block"),
 	/* 134 */
-	simple("minecraft:spruce_stairs"),
+	simple("spruce_stairs"),
 	/* 135 */
-	simple("minecraft:birch_stairs"),
+	simple("birch_stairs"),
 	/* 136 */
-	simple("minecraft:jungle_stairs"),
+	simple("jungle_stairs"),
 	/* 137 */
-	simple("minecraft:command_block"),
+	simple("command_block"),
 	/* 138 */
-	simple("minecraft:beacon"),
+	simple("beacon"),
 	/* 139 */
 	[
-		"minecraft:cobblestone_wall",
-		"minecraft:mossy_cobblestone_wall",
+		"cobblestone_wall",
+		"mossy_cobblestone_wall",
 		DEF,
 		DEF,
 		DEF,
@@ -646,151 +616,151 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 		DEF,
 	],
 	/* 140 */
-	simple("minecraft:flower_pot"),
+	simple("flower_pot"),
 	/* 141 */
-	simple("minecraft:carrots"),
+	simple("carrots"),
 	/* 142 */
-	simple("minecraft:potatoes"),
+	simple("potatoes"),
 	/* 143 */
 	EMPTY,
 	/* 144 */
 	EMPTY,
 	/* 145 */
 	[
-		"minecraft:anvil",
-		"minecraft:anvil",
-		"minecraft:anvil",
-		"minecraft:anvil",
-		"minecraft:chipped_anvil",
-		"minecraft:chipped_anvil",
-		"minecraft:chipped_anvil",
-		"minecraft:chipped_anvil",
-		"minecraft:damaged_anvil",
-		"minecraft:damaged_anvil",
-		"minecraft:damaged_anvil",
-		"minecraft:damaged_anvil",
+		"anvil",
+		"anvil",
+		"anvil",
+		"anvil",
+		"chipped_anvil",
+		"chipped_anvil",
+		"chipped_anvil",
+		"chipped_anvil",
+		"damaged_anvil",
+		"damaged_anvil",
+		"damaged_anvil",
+		"damaged_anvil",
 		DEF,
 		DEF,
 		DEF,
 		DEF,
 	],
 	/* 146 */
-	simple("minecraft:trapped_chest"),
+	simple("trapped_chest"),
 	/* 147 */
-	simple("minecraft:light_weighted_pressure_plate"),
+	simple("light_weighted_pressure_plate"),
 	/* 148 */
-	simple("minecraft:heavy_weighted_pressure_plate"),
+	simple("heavy_weighted_pressure_plate"),
 	/* 149 */
-	simple("minecraft:comparator"),
+	simple("comparator"),
 	/* 150 */
-	simple("minecraft:comparator"),
+	simple("comparator"),
 	/* 151 */
-	simple("minecraft:daylight_detector"),
+	simple("daylight_detector"),
 	/* 152 */
-	simple("minecraft:redstone_block"),
+	simple("redstone_block"),
 	/* 153 */
-	simple("minecraft:nether_quartz_ore"),
+	simple("nether_quartz_ore"),
 	/* 154 */
-	simple("minecraft:hopper"),
+	simple("hopper"),
 	/* 155 */
-	simple("minecraft:quartz_block"),
+	simple("quartz_block"),
 	/* 156 */
-	simple("minecraft:quartz_stairs"),
+	simple("quartz_stairs"),
 	/* 157 */
-	simple("minecraft:activator_rail"),
+	simple("activator_rail"),
 	/* 158 */
-	simple("minecraft:dropper"),
+	simple("dropper"),
 	/* 159 */
 	[
-		"minecraft:white_terracotta",
-		"minecraft:orange_terracotta",
-		"minecraft:magenta_terracotta",
-		"minecraft:light_blue_terracotta",
-		"minecraft:yellow_terracotta",
-		"minecraft:lime_terracotta",
-		"minecraft:pink_terracotta",
-		"minecraft:gray_terracotta",
-		"minecraft:light_gray_terracotta",
-		"minecraft:cyan_terracotta",
-		"minecraft:purple_terracotta",
-		"minecraft:blue_terracotta",
-		"minecraft:brown_terracotta",
-		"minecraft:green_terracotta",
-		"minecraft:red_terracotta",
-		"minecraft:black_terracotta",
+		"white_terracotta",
+		"orange_terracotta",
+		"magenta_terracotta",
+		"light_blue_terracotta",
+		"yellow_terracotta",
+		"lime_terracotta",
+		"pink_terracotta",
+		"gray_terracotta",
+		"light_gray_terracotta",
+		"cyan_terracotta",
+		"purple_terracotta",
+		"blue_terracotta",
+		"brown_terracotta",
+		"green_terracotta",
+		"red_terracotta",
+		"black_terracotta",
 	],
 	/* 160 */
 	[
-		"minecraft:white_stained_glass_pane",
-		"minecraft:orange_stained_glass_pane",
-		"minecraft:magenta_stained_glass_pane",
-		"minecraft:light_blue_stained_glass_pane",
-		"minecraft:yellow_stained_glass_pane",
-		"minecraft:lime_stained_glass_pane",
-		"minecraft:pink_stained_glass_pane",
-		"minecraft:gray_stained_glass_pane",
-		"minecraft:light_gray_stained_glass_pane",
-		"minecraft:cyan_stained_glass_pane",
-		"minecraft:purple_stained_glass_pane",
-		"minecraft:blue_stained_glass_pane",
-		"minecraft:brown_stained_glass_pane",
-		"minecraft:green_stained_glass_pane",
-		"minecraft:red_stained_glass_pane",
-		"minecraft:black_stained_glass_pane",
+		"white_stained_glass_pane",
+		"orange_stained_glass_pane",
+		"magenta_stained_glass_pane",
+		"light_blue_stained_glass_pane",
+		"yellow_stained_glass_pane",
+		"lime_stained_glass_pane",
+		"pink_stained_glass_pane",
+		"gray_stained_glass_pane",
+		"light_gray_stained_glass_pane",
+		"cyan_stained_glass_pane",
+		"purple_stained_glass_pane",
+		"blue_stained_glass_pane",
+		"brown_stained_glass_pane",
+		"green_stained_glass_pane",
+		"red_stained_glass_pane",
+		"black_stained_glass_pane",
 	],
 	/* 161 */
 	[
-		"minecraft:acacia_leaves",
-		"minecraft:dark_oak_leaves",
+		"acacia_leaves",
+		"dark_oak_leaves",
 		DEF,
 		DEF,
-		"minecraft:acacia_leaves",
-		"minecraft:dark_oak_leaves",
+		"acacia_leaves",
+		"dark_oak_leaves",
 		DEF,
 		DEF,
-		"minecraft:acacia_leaves",
-		"minecraft:dark_oak_leaves",
+		"acacia_leaves",
+		"dark_oak_leaves",
 		DEF,
 		DEF,
-		"minecraft:acacia_leaves",
-		"minecraft:dark_oak_leaves",
+		"acacia_leaves",
+		"dark_oak_leaves",
 		DEF,
 		DEF,
 	],
 	/* 162 */
 	[
-		"minecraft:acacia_log",
-		"minecraft:dark_oak_log",
+		"acacia_log",
+		"dark_oak_log",
 		DEF,
 		DEF,
-		"minecraft:acacia_log",
-		"minecraft:dark_oak_log",
+		"acacia_log",
+		"dark_oak_log",
 		DEF,
 		DEF,
-		"minecraft:acacia_log",
-		"minecraft:dark_oak_log",
+		"acacia_log",
+		"dark_oak_log",
 		DEF,
 		DEF,
-		"minecraft:acacia_log",
-		"minecraft:dark_oak_log",
+		"acacia_log",
+		"dark_oak_log",
 		DEF,
 		DEF,
 	],
 	/* 163 */
-	simple("minecraft:acacia_stairs"),
+	simple("acacia_stairs"),
 	/* 164 */
-	simple("minecraft:dark_oak_stairs"),
+	simple("dark_oak_stairs"),
 	/* 165 */
-	simple("minecraft:slime_block"),
+	simple("slime_block"),
 	/* 166 */
-	simple("minecraft:barrier"),
+	simple("barrier"),
 	/* 167 */
-	simple("minecraft:iron_trapdoor"),
+	simple("iron_trapdoor"),
 	/* 168 */
 	[
-		"minecraft:prismarine",
-		"minecraft:prismarine_bricks",
-		"minecraft:dark_prismarine",
+		"prismarine",
+		"prismarine_bricks",
+		"dark_prismarine",
 		DEF,
 		DEF,
 		DEF,
@@ -806,42 +776,42 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 		DEF,
 	],
 	/* 169 */
-	simple("minecraft:sea_lantern"),
+	simple("sea_lantern"),
 	/* 170 */
-	simple("minecraft:hay_block"),
+	simple("hay_block"),
 	/* 171 */
 	[
-		"minecraft:white_carpet",
-		"minecraft:orange_carpet",
-		"minecraft:magenta_carpet",
-		"minecraft:light_blue_carpet",
-		"minecraft:yellow_carpet",
-		"minecraft:lime_carpet",
-		"minecraft:pink_carpet",
-		"minecraft:gray_carpet",
-		"minecraft:light_gray_carpet",
-		"minecraft:cyan_carpet",
-		"minecraft:purple_carpet",
-		"minecraft:blue_carpet",
-		"minecraft:brown_carpet",
-		"minecraft:green_carpet",
-		"minecraft:red_carpet",
-		"minecraft:black_carpet",
+		"white_carpet",
+		"orange_carpet",
+		"magenta_carpet",
+		"light_blue_carpet",
+		"yellow_carpet",
+		"lime_carpet",
+		"pink_carpet",
+		"gray_carpet",
+		"light_gray_carpet",
+		"cyan_carpet",
+		"purple_carpet",
+		"blue_carpet",
+		"brown_carpet",
+		"green_carpet",
+		"red_carpet",
+		"black_carpet",
 	],
 	/* 172 */
-	simple("minecraft:terracotta"),
+	simple("terracotta"),
 	/* 173 */
-	simple("minecraft:coal_block"),
+	simple("coal_block"),
 	/* 174 */
-	simple("minecraft:packed_ice"),
+	simple("packed_ice"),
 	/* 175 */
 	[
-		"minecraft:sunflower",
-		"minecraft:lilac",
-		"minecraft:tall_grass",
-		"minecraft:large_fern",
-		"minecraft:rose_bush",
-		"minecraft:peony",
+		"sunflower",
+		"lilac",
+		"tall_grass",
+		"large_fern",
+		"rose_bush",
+		"peony",
 		DEF,
 		DEF,
 		DEF,
@@ -858,193 +828,193 @@ pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 	/* 177 */
 	EMPTY, // wall banner
 	/* 178 */
-	simple("minecraft:daylight_detector"),
+	simple("daylight_detector"),
 	/* 179 */
-	simple("minecraft:red_sandstone"),
+	simple("red_sandstone"),
 	/* 180 */
-	simple("minecraft:red_sandstone_stairs"),
+	simple("red_sandstone_stairs"),
 	/* 181 */
-	simple("minecraft:red_sandstone_slab"),
+	simple("red_sandstone_slab"),
 	/* 182 */
-	simple("minecraft:red_sandstone_slab"),
+	simple("red_sandstone_slab"),
 	/* 183 */
-	simple("minecraft:spruce_fence_gate"),
+	simple("spruce_fence_gate"),
 	/* 184 */
-	simple("minecraft:birch_fence_gate"),
+	simple("birch_fence_gate"),
 	/* 185 */
-	simple("minecraft:jungle_fence_gate"),
+	simple("jungle_fence_gate"),
 	/* 186 */
-	simple("minecraft:dark_oak_fence_gate"),
+	simple("dark_oak_fence_gate"),
 	/* 187 */
-	simple("minecraft:acacia_fence_gate"),
+	simple("acacia_fence_gate"),
 	/* 188 */
-	simple("minecraft:spruce_fence"),
+	simple("spruce_fence"),
 	/* 189 */
-	simple("minecraft:birch_fence"),
+	simple("birch_fence"),
 	/* 190 */
-	simple("minecraft:jungle_fence"),
+	simple("jungle_fence"),
 	/* 191 */
-	simple("minecraft:dark_oak_fence"),
+	simple("dark_oak_fence"),
 	/* 192 */
-	simple("minecraft:acacia_fence"),
+	simple("acacia_fence"),
 	/* 193 */
-	simple("minecraft:spruce_door"),
+	simple("spruce_door"),
 	/* 194 */
-	simple("minecraft:birch_door"),
+	simple("birch_door"),
 	/* 195 */
-	simple("minecraft:jungle_door"),
+	simple("jungle_door"),
 	/* 196 */
-	simple("minecraft:acacia_door"),
+	simple("acacia_door"),
 	/* 197 */
-	simple("minecraft:dark_oak_door"),
+	simple("dark_oak_door"),
 	/* 198 */
-	simple("minecraft:end_rod"),
+	simple("end_rod"),
 	/* 199 */
-	simple("minecraft:chorus_plant"),
+	simple("chorus_plant"),
 	/* 200 */
-	simple("minecraft:chorus_flower"),
+	simple("chorus_flower"),
 	/* 201 */
-	simple("minecraft:purpur_block"),
+	simple("purpur_block"),
 	/* 202 */
-	simple("minecraft:purpur_pillar"),
+	simple("purpur_pillar"),
 	/* 203 */
-	simple("minecraft:purpur_stairs"),
+	simple("purpur_stairs"),
 	/* 204 */
-	simple("minecraft:purpur_slab"),
+	simple("purpur_slab"),
 	/* 205 */
-	simple("minecraft:purpur_slab"),
+	simple("purpur_slab"),
 	/* 206 */
-	simple("minecraft:end_stone_bricks"),
+	simple("end_stone_bricks"),
 	/* 207 */
-	simple("minecraft:beetroots"),
+	simple("beetroots"),
 	/* 208 */
-	simple("minecraft:grass_path"),
+	simple("grass_path"),
 	/* 209 */
-	simple("minecraft:end_gateway"),
+	simple("end_gateway"),
 	/* 210 */
-	simple("minecraft:repeating_command_block"),
+	simple("repeating_command_block"),
 	/* 211 */
-	simple("minecraft:chain_command_block"),
+	simple("chain_command_block"),
 	/* 212 */
-	simple("minecraft:frosted_ice"),
+	simple("frosted_ice"),
 	/* 213 */
-	simple("minecraft:magma_block"),
+	simple("magma_block"),
 	/* 214 */
-	simple("minecraft:nether_wart_block"),
+	simple("nether_wart_block"),
 	/* 215 */
-	simple("minecraft:red_nether_bricks"),
+	simple("red_nether_bricks"),
 	/* 216 */
-	simple("minecraft:bone_block"),
+	simple("bone_block"),
 	/* 217 */
-	simple("minecraft:structure_void"),
+	simple("structure_void"),
 	/* 218 */
-	simple("minecraft:observer"),
+	simple("observer"),
 	/* 219 */
-	simple("minecraft:white_shulker_box"),
+	simple("white_shulker_box"),
 	/* 220 */
-	simple("minecraft:orange_shulker_box"),
+	simple("orange_shulker_box"),
 	/* 221 */
-	simple("minecraft:magenta_shulker_box"),
+	simple("magenta_shulker_box"),
 	/* 222 */
-	simple("minecraft:light_blue_shulker_box"),
+	simple("light_blue_shulker_box"),
 	/* 223 */
-	simple("minecraft:yellow_shulker_box"),
+	simple("yellow_shulker_box"),
 	/* 224 */
-	simple("minecraft:lime_shulker_box"),
+	simple("lime_shulker_box"),
 	/* 225 */
-	simple("minecraft:pink_shulker_box"),
+	simple("pink_shulker_box"),
 	/* 226 */
-	simple("minecraft:gray_shulker_box"),
+	simple("gray_shulker_box"),
 	/* 227 */
-	simple("minecraft:light_gray_shulker_box"),
+	simple("light_gray_shulker_box"),
 	/* 228 */
-	simple("minecraft:cyan_shulker_box"),
+	simple("cyan_shulker_box"),
 	/* 229 */
-	simple("minecraft:purple_shulker_box"),
+	simple("purple_shulker_box"),
 	/* 230 */
-	simple("minecraft:blue_shulker_box"),
+	simple("blue_shulker_box"),
 	/* 231 */
-	simple("minecraft:brown_shulker_box"),
+	simple("brown_shulker_box"),
 	/* 232 */
-	simple("minecraft:green_shulker_box"),
+	simple("green_shulker_box"),
 	/* 233 */
-	simple("minecraft:red_shulker_box"),
+	simple("red_shulker_box"),
 	/* 234 */
-	simple("minecraft:black_shulker_box"),
+	simple("black_shulker_box"),
 	/* 235 */
-	simple("minecraft:white_glazed_terracotta"),
+	simple("white_glazed_terracotta"),
 	/* 236 */
-	simple("minecraft:orange_glazed_terracotta"),
+	simple("orange_glazed_terracotta"),
 	/* 237 */
-	simple("minecraft:magenta_glazed_terracotta"),
+	simple("magenta_glazed_terracotta"),
 	/* 238 */
-	simple("minecraft:light_blue_glazed_terracotta"),
+	simple("light_blue_glazed_terracotta"),
 	/* 239 */
-	simple("minecraft:yellow_glazed_terracotta"),
+	simple("yellow_glazed_terracotta"),
 	/* 240 */
-	simple("minecraft:lime_glazed_terracotta"),
+	simple("lime_glazed_terracotta"),
 	/* 241 */
-	simple("minecraft:pink_glazed_terracotta"),
+	simple("pink_glazed_terracotta"),
 	/* 242 */
-	simple("minecraft:gray_glazed_terracotta"),
+	simple("gray_glazed_terracotta"),
 	/* 243 */
-	simple("minecraft:light_gray_glazed_terracotta"),
+	simple("light_gray_glazed_terracotta"),
 	/* 244 */
-	simple("minecraft:cyan_glazed_terracotta"),
+	simple("cyan_glazed_terracotta"),
 	/* 245 */
-	simple("minecraft:purple_glazed_terracotta"),
+	simple("purple_glazed_terracotta"),
 	/* 246 */
-	simple("minecraft:blue_glazed_terracotta"),
+	simple("blue_glazed_terracotta"),
 	/* 247 */
-	simple("minecraft:brown_glazed_terracotta"),
+	simple("brown_glazed_terracotta"),
 	/* 248 */
-	simple("minecraft:green_glazed_terracotta"),
+	simple("green_glazed_terracotta"),
 	/* 249 */
-	simple("minecraft:red_glazed_terracotta"),
+	simple("red_glazed_terracotta"),
 	/* 250 */
-	simple("minecraft:black_glazed_terracotta"),
+	simple("black_glazed_terracotta"),
 	/* 251 */
 	[
-		"minecraft:white_concrete",
-		"minecraft:orange_concrete",
-		"minecraft:magenta_concrete",
-		"minecraft:light_blue_concrete",
-		"minecraft:yellow_concrete",
-		"minecraft:lime_concrete",
-		"minecraft:pink_concrete",
-		"minecraft:gray_concrete",
-		"minecraft:light_gray_concrete",
-		"minecraft:cyan_concrete",
-		"minecraft:purple_concrete",
-		"minecraft:blue_concrete",
-		"minecraft:brown_concrete",
-		"minecraft:green_concrete",
-		"minecraft:red_concrete",
-		"minecraft:black_concrete",
+		"white_concrete",
+		"orange_concrete",
+		"magenta_concrete",
+		"light_blue_concrete",
+		"yellow_concrete",
+		"lime_concrete",
+		"pink_concrete",
+		"gray_concrete",
+		"light_gray_concrete",
+		"cyan_concrete",
+		"purple_concrete",
+		"blue_concrete",
+		"brown_concrete",
+		"green_concrete",
+		"red_concrete",
+		"black_concrete",
 	],
 	/* 252 */
 	[
-		"minecraft:white_concrete_powder",
-		"minecraft:orange_concrete_powder",
-		"minecraft:magenta_concrete_powder",
-		"minecraft:light_blue_concrete_powder",
-		"minecraft:yellow_concrete_powder",
-		"minecraft:lime_concrete_powder",
-		"minecraft:pink_concrete_powder",
-		"minecraft:gray_concrete_powder",
-		"minecraft:light_gray_concrete_powder",
-		"minecraft:cyan_concrete_powder",
-		"minecraft:purple_concrete_powder",
-		"minecraft:blue_concrete_powder",
-		"minecraft:brown_concrete_powder",
-		"minecraft:green_concrete_powder",
-		"minecraft:red_concrete_powder",
-		"minecraft:black_concrete_powder",
+		"white_concrete_powder",
+		"orange_concrete_powder",
+		"magenta_concrete_powder",
+		"light_blue_concrete_powder",
+		"yellow_concrete_powder",
+		"lime_concrete_powder",
+		"pink_concrete_powder",
+		"gray_concrete_powder",
+		"light_gray_concrete_powder",
+		"cyan_concrete_powder",
+		"purple_concrete_powder",
+		"blue_concrete_powder",
+		"brown_concrete_powder",
+		"green_concrete_powder",
+		"red_concrete_powder",
+		"black_concrete_powder",
 	],
 	/* 253 */
 	EMPTY,
 	/* 254 */
 	EMPTY,
 	/* 255 */
-	simple("minecraft:structure_block"),
+	simple("structure_block"),
 ];
