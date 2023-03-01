@@ -707,7 +707,7 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		"minecraft:brewing_stand",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
-			color: BlockColor(123, 101, 81),
+			color: BlockColor(122, 100, 80),
 		},
 	),
 	(
@@ -1169,7 +1169,7 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		"minecraft:cocoa",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
-			color: BlockColor(156, 94, 43),
+			color: BlockColor(154, 91, 40),
 		},
 	),
 	(
@@ -2262,6 +2262,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: BlockColor(99, 111, 60),
+		},
+	),
+	(
+		"minecraft:frogspawn",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(105, 90, 82),
 		},
 	),
 	(
@@ -3427,6 +3434,118 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"minecraft:mangrove_button",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: BlockColor(0, 0, 0),
+		},
+	),
+	(
+		"minecraft:mangrove_door",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(112, 48, 46),
+		},
+	),
+	(
+		"minecraft:mangrove_fence",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(117, 54, 48),
+		},
+	),
+	(
+		"minecraft:mangrove_fence_gate",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(117, 54, 48),
+		},
+	),
+	(
+		"minecraft:mangrove_leaves",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque|Foliage}),
+			color: BlockColor(129, 128, 128),
+		},
+	),
+	(
+		"minecraft:mangrove_log",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(102, 48, 42),
+		},
+	),
+	(
+		"minecraft:mangrove_planks",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(117, 54, 48),
+		},
+	),
+	(
+		"minecraft:mangrove_pressure_plate",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(117, 54, 48),
+		},
+	),
+	(
+		"minecraft:mangrove_propagule",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(96, 174, 83),
+		},
+	),
+	(
+		"minecraft:mangrove_roots",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(74, 59, 38),
+		},
+	),
+	(
+		"minecraft:mangrove_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(117, 54, 48),
+		},
+	),
+	(
+		"minecraft:mangrove_slab",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(117, 54, 48),
+		},
+	),
+	(
+		"minecraft:mangrove_stairs",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(117, 54, 48),
+		},
+	),
+	(
+		"minecraft:mangrove_trapdoor",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(110, 46, 42),
+		},
+	),
+	(
+		"minecraft:mangrove_wall_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: BlockColor(0, 0, 0),
+		},
+	),
+	(
+		"minecraft:mangrove_wood",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(83, 66, 41),
+		},
+	),
+	(
 		"minecraft:medium_amethyst_bud",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{}),
@@ -3522,6 +3641,48 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{}),
 			color: BlockColor(0, 0, 0),
+		},
+	),
+	(
+		"minecraft:mud",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(60, 57, 60),
+		},
+	),
+	(
+		"minecraft:mud_brick_slab",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(137, 103, 79),
+		},
+	),
+	(
+		"minecraft:mud_brick_stairs",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(137, 103, 79),
+		},
+	),
+	(
+		"minecraft:mud_brick_wall",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(137, 103, 79),
+		},
+	),
+	(
+		"minecraft:mud_bricks",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(137, 103, 79),
+		},
+	),
+	(
+		"minecraft:muddy_mangrove_roots",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(70, 58, 45),
 		},
 	),
 	(
@@ -3756,6 +3917,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"minecraft:ochre_froglight",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(250, 245, 206),
+		},
+	),
+	(
 		"minecraft:orange_banner",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{}),
@@ -3903,6 +4071,20 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"minecraft:packed_mud",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(142, 106, 79),
+		},
+	),
+	(
+		"minecraft:pearlescent_froglight",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(245, 240, 239),
+		},
+	),
+	(
 		"minecraft:peony",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -4025,14 +4207,14 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		"minecraft:piston",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
-			color: BlockColor(110, 104, 96),
+			color: BlockColor(109, 104, 96),
 		},
 	),
 	(
 		"minecraft:piston_head",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
-			color: BlockColor(154, 127, 87),
+			color: BlockColor(153, 127, 85),
 		},
 	),
 	(
@@ -4376,6 +4558,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: BlockColor(123, 174, 95),
+		},
+	),
+	(
+		"minecraft:potted_mangrove_propagule",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(96, 174, 83),
 		},
 	),
 	(
@@ -4960,6 +5149,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"minecraft:reinforced_deepslate",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(80, 82, 78),
+		},
+	),
+	(
 		"minecraft:repeater",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -5037,10 +5233,38 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"minecraft:sculk",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(12, 29, 36),
+		},
+	),
+	(
+		"minecraft:sculk_catalyst",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(15, 31, 38),
+		},
+	),
+	(
 		"minecraft:sculk_sensor",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: BlockColor(7, 70, 84),
+		},
+	),
+	(
+		"minecraft:sculk_shrieker",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(198, 205, 169),
+		},
+	),
+	(
+		"minecraft:sculk_vein",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(7, 48, 57),
 		},
 	),
 	(
@@ -5411,7 +5635,7 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		"minecraft:sticky_piston",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
-			color: BlockColor(110, 104, 96),
+			color: BlockColor(109, 104, 96),
 		},
 	),
 	(
@@ -5552,6 +5776,20 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: BlockColor(171, 132, 84),
+		},
+	),
+	(
+		"minecraft:stripped_mangrove_log",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(109, 43, 43),
+		},
+	),
+	(
+		"minecraft:stripped_mangrove_wood",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(119, 54, 47),
 		},
 	),
 	(
@@ -5755,6 +5993,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: BlockColor(20, 135, 122),
+		},
+	),
+	(
+		"minecraft:verdant_froglight",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: BlockColor(229, 244, 228),
 		},
 	),
 	(
