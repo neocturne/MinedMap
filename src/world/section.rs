@@ -2,7 +2,10 @@ use anyhow::{bail, Context, Result};
 use num_integer::div_rem;
 
 use super::de;
-use crate::{resource, types::*};
+use crate::{
+	resource::{self, BlockTypes},
+	types::*,
+};
 
 /// Determine the number of bits required for indexing into a palette of a given length
 ///
@@ -65,6 +68,7 @@ impl<'a> BiomesV18<'a> {
 pub struct SectionV1_13<'a> {
 	block_states: Option<&'a fastnbt::LongArray>,
 	palette: &'a Vec<de::BlockStatePaletteEntry>,
+	_block_types: &'a BlockTypes,
 	bits: u8,
 	aligned_blocks: bool,
 }
@@ -75,6 +79,7 @@ impl<'a> SectionV1_13<'a> {
 		data_version: u32,
 		block_states: Option<&'a fastnbt::LongArray>,
 		palette: &'a Vec<de::BlockStatePaletteEntry>,
+		block_types: &'a BlockTypes,
 	) -> Result<Self> {
 		let aligned_blocks = data_version >= 2529;
 
@@ -95,6 +100,7 @@ impl<'a> SectionV1_13<'a> {
 		Ok(Self {
 			block_states,
 			palette,
+			_block_types: block_types,
 			bits,
 			aligned_blocks,
 		})
@@ -146,11 +152,16 @@ impl<'a> Section for SectionV1_13<'a> {
 pub struct SectionV0<'a> {
 	blocks: &'a fastnbt::ByteArray,
 	data: &'a fastnbt::ByteArray,
+	_block_types: &'a BlockTypes,
 }
 
 impl<'a> SectionV0<'a> {
 	/// Constructs a new [SectionV0] from deserialized data structures
-	pub fn new(blocks: &'a fastnbt::ByteArray, data: &'a fastnbt::ByteArray) -> Result<Self> {
+	pub fn new(
+		blocks: &'a fastnbt::ByteArray,
+		data: &'a fastnbt::ByteArray,
+		block_types: &'a BlockTypes,
+	) -> Result<Self> {
 		use BLOCKS_PER_CHUNK as N;
 
 		if blocks.len() != N * N * N {
@@ -160,7 +171,11 @@ impl<'a> SectionV0<'a> {
 			bail!("Invalid section extra data");
 		}
 
-		Ok(SectionV0 { blocks, data })
+		Ok(SectionV0 {
+			blocks,
+			data,
+			_block_types: block_types,
+		})
 	}
 }
 

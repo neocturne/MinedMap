@@ -9,7 +9,7 @@ use super::{
 	de,
 	section::{BiomesV18, Section, SectionV0, SectionV1_13},
 };
-use crate::types::*;
+use crate::{resource::BlockTypes, types::*};
 
 /// Chunk data structure wrapping a [de::Chunk] for convenient access to
 /// block and biome data
@@ -67,17 +67,23 @@ pub struct SectionIter<'a> {
 
 impl<'a> Chunk<'a> {
 	/// Creates a new [Chunk] from a deserialized [de::Chunk]
-	pub fn new(data: &'a de::Chunk) -> Result<Self> {
+	pub fn new(data: &'a de::Chunk, block_types: &'a BlockTypes) -> Result<Self> {
 		let data_version = data.data_version.unwrap_or_default();
 
 		match &data.chunk {
-			de::ChunkVariants::V1_18 { sections } => Self::new_v1_18(data_version, sections),
-			de::ChunkVariants::V0 { level } => Self::new_v0(data_version, level),
+			de::ChunkVariants::V1_18 { sections } => {
+				Self::new_v1_18(data_version, sections, block_types)
+			}
+			de::ChunkVariants::V0 { level } => Self::new_v0(data_version, level, block_types),
 		}
 	}
 
 	/// [Chunk::new] implementation for Minecraft v1.18+ chunks
-	fn new_v1_18(data_version: u32, sections: &'a Vec<de::SectionV1_18>) -> Result<Self> {
+	fn new_v1_18(
+		data_version: u32,
+		sections: &'a Vec<de::SectionV1_18>,
+		block_types: &'a BlockTypes,
+	) -> Result<Self> {
 		let mut section_map = BTreeMap::new();
 
 		for section in sections {
@@ -88,6 +94,7 @@ impl<'a> Chunk<'a> {
 						data_version,
 						section.block_states.data.as_ref(),
 						&section.block_states.palette,
+						block_types,
 					)
 					.with_context(|| format!("Failed to load section at Y={}", section.y))?,
 					BiomesV18::new(section.biomes.data.as_ref(), &section.biomes.palette)
@@ -102,7 +109,11 @@ impl<'a> Chunk<'a> {
 	}
 
 	/// [Chunk::new] implementation for all pre-1.18 chunk variants
-	fn new_v0(data_version: u32, level: &'a de::LevelV0) -> Result<Self> {
+	fn new_v0(
+		data_version: u32,
+		level: &'a de::LevelV0,
+		block_types: &'a BlockTypes,
+	) -> Result<Self> {
 		let mut section_map_v1_13 = BTreeMap::new();
 		let mut section_map_v0 = BTreeMap::new();
 
@@ -114,15 +125,14 @@ impl<'a> Chunk<'a> {
 				} => {
 					section_map_v1_13.insert(
 						SectionY(section.y.into()),
-						SectionV1_13::new(data_version, Some(block_states), palette).with_context(
-							|| format!("Failed to load section at Y={}", section.y),
-						)?,
+						SectionV1_13::new(data_version, Some(block_states), palette, block_types)
+							.with_context(|| format!("Failed to load section at Y={}", section.y))?,
 					);
 				}
 				de::SectionV0Variants::V0 { blocks, data } => {
 					section_map_v0.insert(
 						SectionY(section.y.into()),
-						SectionV0::new(blocks, data).with_context(|| {
+						SectionV0::new(blocks, data, block_types).with_context(|| {
 							format!("Failed to load section at Y={}", section.y)
 						})?,
 					);
