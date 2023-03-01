@@ -54,16 +54,29 @@ impl BlockType {
 }
 
 #[derive(Debug)]
-pub struct BlockTypes(HashMap<String, BlockType>);
+pub struct BlockTypes {
+	block_type_map: HashMap<String, BlockType>,
+	legacy_block_types: Box<[[BlockType; 16]; 256]>,
+}
 
 impl Default for BlockTypes {
 	fn default() -> Self {
-		BlockTypes(
-			block_types::BLOCK_TYPES
-				.iter()
-				.map(|(k, v)| (String::from(*k), *v))
-				.collect(),
-		)
+		let block_type_map: HashMap<_, _> = block_types::BLOCK_TYPES
+			.iter()
+			.map(|(k, v)| (String::from(*k), *v))
+			.collect();
+		let legacy_block_types = Box::new(LEGACY_BLOCK_TYPES.map(|inner| {
+			inner.map(|id| {
+				*id.strip_prefix("minecraft:")
+					.and_then(|suffix| block_type_map.get(suffix))
+					.expect("Unknown legacy block type")
+			})
+		}));
+
+		BlockTypes {
+			block_type_map,
+			legacy_block_types,
+		}
 	}
 }
 
@@ -71,6 +84,11 @@ impl BlockTypes {
 	#[inline]
 	pub fn get(&self, id: &str) -> Option<BlockType> {
 		let suffix = id.strip_prefix("minecraft:")?;
-		self.0.get(suffix).copied()
+		self.block_type_map.get(suffix).copied()
+	}
+
+	#[inline]
+	pub fn get_legacy(&self, id: u8, data: u8) -> Option<BlockType> {
+		Some(self.legacy_block_types[id as usize][data as usize])
 	}
 }
