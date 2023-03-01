@@ -76,7 +76,7 @@ impl<'a> RegionProcessor<'a> {
 	/// Processes a single chunk
 	fn process_chunk(&self, data: world::de::Chunk) -> Result<Box<world::layer::BlockInfoArray>> {
 		let chunk = world::chunk::Chunk::new(&data, &self.block_types)?;
-		world::layer::top_layer(&chunk, &self.block_types)
+		world::layer::top_layer(&chunk)
 	}
 
 	fn save_region(

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use super::chunk::Chunk;
 use crate::{
-	resource::{BlockFlag, BlockType, BlockTypes},
+	resource::{BlockFlag, BlockType},
 	types::*,
 };
 
@@ -92,7 +92,7 @@ pub type BlockInfoArray = LayerBlockArray<Option<BlockInfo>>;
 /// determined as the block that should be visible on the rendered
 /// map. For water blocks, the height of the first non-water block
 /// is additionally filled in as the water depth.
-pub fn top_layer(chunk: &Chunk, block_types: &BlockTypes) -> Result<Box<BlockInfoArray>> {
+pub fn top_layer(chunk: &Chunk) -> Result<Box<BlockInfoArray>> {
 	use BLOCKS_PER_CHUNK as N;
 
 	let mut done = 0;
@@ -109,9 +109,7 @@ pub fn top_layer(chunk: &Chunk, block_types: &BlockTypes) -> Result<Box<BlockInf
 		}
 
 		let coords = SectionBlockCoords { xz, y };
-		let block_id = section.block_id_at(coords)?;
-		let Some(block_type) = block_types.get(block_id) else {
-			eprintln!("Unknown block type: {}", block_id);
+		let Some(block_type) = section.block_at(coords)? else {
 			continue;
 		};
 		let height = BlockHeight::new(section_y, y)?;

@@ -3,7 +3,7 @@ use num_integer::div_rem;
 
 use super::de;
 use crate::{
-	resource::{self, BlockTypes},
+	resource::{BlockType, BlockTypes},
 	types::*,
 };
 
@@ -27,7 +27,7 @@ fn palette_bits(len: usize, min: u8, max: u8) -> Option<u8> {
 
 /// Trait for common functions of [SectionV1_13] and [SectionV0]
 pub trait Section {
-	fn block_id_at(&self, coords: SectionBlockCoords) -> Result<&str>;
+	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<BlockType>>;
 }
 
 /// Minecraft v1.18+ section biome data
@@ -68,7 +68,7 @@ impl<'a> BiomesV18<'a> {
 pub struct SectionV1_13<'a> {
 	block_states: Option<&'a fastnbt::LongArray>,
 	palette: &'a Vec<de::BlockStatePaletteEntry>,
-	_block_types: &'a BlockTypes,
+	block_types: &'a BlockTypes,
 	bits: u8,
 	aligned_blocks: bool,
 }
@@ -100,7 +100,7 @@ impl<'a> SectionV1_13<'a> {
 		Ok(Self {
 			block_states,
 			palette,
-			_block_types: block_types,
+			block_types,
 			bits,
 			aligned_blocks,
 		})
@@ -137,13 +137,18 @@ impl<'a> SectionV1_13<'a> {
 }
 
 impl<'a> Section for SectionV1_13<'a> {
-	fn block_id_at(&self, coords: SectionBlockCoords) -> Result<&str> {
+	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<BlockType>> {
 		let index = self.palette_index_at(coords);
 		let entry = self
 			.palette
 			.get(index)
 			.context("Palette index out of bounds")?;
-		Ok(&entry.name)
+
+		let block_type = self.block_types.get(&entry.name);
+		if block_type.is_none() {
+			eprintln!("Unknown block type: {}", entry.name);
+		}
+		Ok(block_type)
 	}
 }
 
@@ -152,7 +157,7 @@ impl<'a> Section for SectionV1_13<'a> {
 pub struct SectionV0<'a> {
 	blocks: &'a fastnbt::ByteArray,
 	data: &'a fastnbt::ByteArray,
-	_block_types: &'a BlockTypes,
+	block_types: &'a BlockTypes,
 }
 
 impl<'a> SectionV0<'a> {
@@ -174,13 +179,13 @@ impl<'a> SectionV0<'a> {
 		Ok(SectionV0 {
 			blocks,
 			data,
-			_block_types: block_types,
+			block_types,
 		})
 	}
 }
 
 impl<'a> Section for SectionV0<'a> {
-	fn block_id_at(&self, coords: SectionBlockCoords) -> Result<&str> {
+	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<BlockType>> {
 		let offset = coords.offset();
 		let block = self.blocks[offset] as u8;
 
@@ -192,6 +197,6 @@ impl<'a> Section for SectionV0<'a> {
 			data_byte & 0xf
 		};
 
-		Ok(resource::LEGACY_BLOCK_TYPES[block as usize][data as usize])
+		Ok(self.block_types.get_legacy(block, data))
 	}
 }
