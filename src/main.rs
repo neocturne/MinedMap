@@ -50,14 +50,14 @@ impl Paths {
 
 /// Type with methods for processing the regions of a Minecraft save directory
 struct RegionProcessor<'a> {
-	block_types: resource::BlockTypeMap,
+	block_types: resource::BlockTypes,
 	paths: &'a Paths,
 }
 
 impl<'a> RegionProcessor<'a> {
 	fn new(paths: &'a Paths) -> Self {
 		RegionProcessor {
-			block_types: resource::block_types(),
+			block_types: resource::BlockTypes::default(),
 			paths,
 		}
 	}

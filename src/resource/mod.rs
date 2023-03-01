@@ -53,21 +53,24 @@ impl BlockType {
 	}
 }
 
-pub struct BlockTypeMap(HashMap<String, BlockType>);
+#[derive(Debug)]
+pub struct BlockTypes(HashMap<String, BlockType>);
 
-impl BlockTypeMap {
+impl Default for BlockTypes {
+	fn default() -> Self {
+		BlockTypes(
+			block_types::BLOCK_TYPES
+				.iter()
+				.map(|(k, v)| (String::from(*k), *v))
+				.collect(),
+		)
+	}
+}
+
+impl BlockTypes {
 	#[inline]
 	pub fn get(&self, id: &str) -> Option<BlockType> {
 		let suffix = id.strip_prefix("minecraft:")?;
 		self.0.get(suffix).copied()
 	}
-}
-
-pub fn block_types() -> BlockTypeMap {
-	BlockTypeMap(
-		block_types::BLOCK_TYPES
-			.iter()
-			.map(|(k, v)| (String::from(*k), *v))
-			.collect(),
-	)
 }
