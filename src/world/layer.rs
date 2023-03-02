@@ -1,5 +1,4 @@
 use anyhow::{Context, Result};
-use itertools::iproduct;
 use serde::{Deserialize, Serialize};
 
 use super::chunk::Chunk;
@@ -98,30 +97,30 @@ pub fn top_layer(chunk: &Chunk) -> Result<Box<BlockInfoArray>> {
 	let mut done = 0;
 	let mut ret = Box::<BlockInfoArray>::default();
 
-	for ((section_y, section), y, xz) in iproduct!(
-		chunk.sections().rev(),
-		BlockY::iter().rev(),
-		BlockInfoArray::keys()
-	) {
-		let entry = &mut ret[xz];
-		if entry.done() {
-			continue;
-		}
+	for (section_y, section) in chunk.sections().rev() {
+		for y in BlockY::iter().rev() {
+			for xz in BlockInfoArray::keys() {
+				let entry = &mut ret[xz];
+				if entry.done() {
+					continue;
+				}
 
-		let coords = SectionBlockCoords { xz, y };
-		let Some(block_type) = section.block_at(coords)? else {
-			continue;
-		};
-		let height = BlockHeight::new(section_y, y)?;
-		if !entry.fill(height, block_type) {
-			continue;
-		}
+				let coords = SectionBlockCoords { xz, y };
+				let Some(block_type) = section.block_at(coords)? else {
+					continue;
+				};
+				let height = BlockHeight::new(section_y, y)?;
+				if !entry.fill(height, block_type) {
+					continue;
+				}
 
-		assert!(entry.done());
+				assert!(entry.done());
 
-		done += 1;
-		if done == N * N {
-			break;
+				done += 1;
+				if done == N * N {
+					break;
+				}
+			}
 		}
 	}
 
