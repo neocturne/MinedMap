@@ -155,8 +155,9 @@ impl<'a> RegionProcessor<'a> {
 
 			if let Err(err) = self.process_region(&path, coords) {
 				eprintln!(
-					"Failed to process region r.{}.{}.mca: {:?}",
-					coords.0, coords.1, err,
+					"Failed to process region {}: {:?}",
+					path.file_name().unwrap_or_default().to_string_lossy(),
+					err,
 				);
 			}
 
