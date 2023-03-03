@@ -188,7 +188,49 @@ impl<'a> TileRenderer<'a> {
 		storage::read(&processed_path).context("Failed to load processed region data")
 	}
 
+	fn render_chunk(
+		image: &mut image::RgbaImage,
+		coords: ChunkCoords,
+		chunk: &world::layer::BlockInfoArray,
+	) {
+		const N: u32 = BLOCKS_PER_CHUNK as u32;
+
+		let chunk_image = image::RgbaImage::from_fn(N, N, |x, z| {
+			image::Rgba(
+				match chunk[LayerBlockCoords {
+					x: BlockX(x as u8),
+					z: BlockZ(z as u8),
+				}] {
+					Some(block) => {
+						let c = block.block_type.color;
+						[c.0, c.1, c.2, 255]
+					}
+					None => [0, 0, 0, 0],
+				},
+			)
+		});
+		image::imageops::overlay(
+			image,
+			&chunk_image,
+			coords.x.0 as i64 * BLOCKS_PER_CHUNK as i64,
+			coords.z.0 as i64 * BLOCKS_PER_CHUNK as i64,
+		);
+	}
+
+	fn render_region(image: &mut image::RgbaImage, region: &ProcessedRegion) {
+		for (coords, chunk) in region.iter() {
+			let Some(chunk) = chunk else {
+				continue;
+			};
+
+			Self::render_chunk(image, coords, chunk);
+		}
+	}
+
 	fn render_tile(&self, coords: RegionCoords) -> Result<()> {
+		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
+
+		let tmp_path = self.config.map_path(coords, true);
 		let output_path = self.config.map_path(coords, false);
 		println!(
 			"Rendering tile {}",
@@ -198,7 +240,19 @@ impl<'a> TileRenderer<'a> {
 				.to_string_lossy(),
 		);
 
-		let _region = self.load_region(coords);
+		let region = self.load_region(coords)?;
+		let mut image = image::RgbaImage::new(N, N);
+		Self::render_region(&mut image, &region);
+		image
+			.save_with_format(&tmp_path, image::ImageFormat::Png)
+			.context("Failed to save image")?;
+		fs::rename(&tmp_path, &output_path).with_context(|| {
+			format!(
+				"Failed to rename {} to {}",
+				tmp_path.display(),
+				output_path.display(),
+			)
+		})?;
 
 		Ok(())
 	}
@@ -212,7 +266,9 @@ impl<'a> TileRenderer<'a> {
 		})?;
 
 		for &coords in regions {
-			self.render_tile(coords)?;
+			if let Err(err) = self.render_tile(coords) {
+				eprintln!("Failed to render tile {:?}: {:?}", coords, err,);
+			}
 		}
 
 		Ok(())
