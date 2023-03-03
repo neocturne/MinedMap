@@ -183,6 +183,11 @@ impl<'a> TileRenderer<'a> {
 		TileRenderer { config }
 	}
 
+	fn load_region(&self, coords: RegionCoords) -> Result<ProcessedRegion> {
+		let processed_path = self.config.processed_path(coords, false);
+		storage::read(&processed_path).context("Failed to load processed region data")
+	}
+
 	fn render_tile(&self, coords: RegionCoords) -> Result<()> {
 		let output_path = self.config.map_path(coords, false);
 		println!(
@@ -192,6 +197,8 @@ impl<'a> TileRenderer<'a> {
 				.unwrap_or_default()
 				.to_string_lossy(),
 		);
+
+		let _region = self.load_region(coords);
 
 		Ok(())
 	}
