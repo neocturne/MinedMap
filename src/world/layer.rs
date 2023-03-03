@@ -27,9 +27,9 @@ impl BlockHeight {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct BlockInfo {
-	block_type: BlockType,
-	y: BlockHeight,
-	depth: Option<BlockHeight>,
+	pub block_type: BlockType,
+	pub y: BlockHeight,
+	pub depth: Option<BlockHeight>,
 }
 
 /// Helper methods for [BlockInfo]
