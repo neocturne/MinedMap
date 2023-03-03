@@ -46,6 +46,16 @@ impl Config {
 		);
 		[&self.processed_dir, Path::new(&filename)].iter().collect()
 	}
+
+	fn map_path(&self, coords: RegionCoords, temp: bool) -> PathBuf {
+		let filename = format!(
+			"r.{}.{}.png{}",
+			coords.0,
+			coords.1,
+			if temp { ".tmp" } else { "" },
+		);
+		[&self.map_dir, Path::new(&filename)].iter().collect()
+	}
 }
 
 /// Type with methods for processing the regions of a Minecraft save directory
@@ -178,7 +188,14 @@ impl<'a> TileRenderer<'a> {
 	}
 
 	fn render_tile(&self, coords: RegionCoords) -> Result<()> {
-		println!("Rendering tile r.{}.{}.png", coords.0, coords.1);
+		let output_path = self.config.map_path(coords, false);
+		println!(
+			"Rendering tile {}",
+			output_path
+				.file_name()
+				.unwrap_or_default()
+				.to_string_lossy(),
+		);
 
 		Ok(())
 	}
