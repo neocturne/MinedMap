@@ -37,14 +37,14 @@ pub trait Section {
 /// v1.13+ block data.
 #[derive(Debug)]
 pub struct BiomesV18<'a> {
-	_biomes: Option<&'a fastnbt::LongArray>,
-	_palette: &'a Vec<String>,
+	_biomes: Option<&'a [i64]>,
+	_palette: &'a [String],
 	_bits: u8,
 }
 
 impl<'a> BiomesV18<'a> {
 	/// Constructs a new [BiomesV18] from deserialized data structures
-	pub fn new(biomes: Option<&'a fastnbt::LongArray>, palette: &'a Vec<String>) -> Result<Self> {
+	pub fn new(biomes: Option<&'a [i64]>, palette: &'a [String]) -> Result<Self> {
 		let bits = palette_bits(palette.len(), 1, 6).context("Unsupported block palette size")?;
 
 		if let Some(biomes) = biomes {
@@ -66,7 +66,7 @@ impl<'a> BiomesV18<'a> {
 /// Minecraft v1.13+ section block data
 #[derive(Debug)]
 pub struct SectionV1_13<'a> {
-	block_states: Option<&'a fastnbt::LongArray>,
+	block_states: Option<&'a [i64]>,
 	palette: Vec<Option<BlockType>>,
 	bits: u8,
 	aligned_blocks: bool,
@@ -76,8 +76,8 @@ impl<'a> SectionV1_13<'a> {
 	/// Constructs a new [SectionV1_13] from deserialized data structures
 	pub fn new(
 		data_version: u32,
-		block_states: Option<&'a fastnbt::LongArray>,
-		palette: &'a Vec<de::BlockStatePaletteEntry>,
+		block_states: Option<&'a [i64]>,
+		palette: &'a [de::BlockStatePaletteEntry],
 		block_types: &'a BlockTypes,
 	) -> Result<Self> {
 		let aligned_blocks = data_version >= 2529;
@@ -158,18 +158,14 @@ impl<'a> Section for SectionV1_13<'a> {
 /// Pre-1.13 section block data
 #[derive(Debug)]
 pub struct SectionV0<'a> {
-	blocks: &'a fastnbt::ByteArray,
-	data: &'a fastnbt::ByteArray,
+	blocks: &'a [i8],
+	data: &'a [i8],
 	block_types: &'a BlockTypes,
 }
 
 impl<'a> SectionV0<'a> {
 	/// Constructs a new [SectionV0] from deserialized data structures
-	pub fn new(
-		blocks: &'a fastnbt::ByteArray,
-		data: &'a fastnbt::ByteArray,
-		block_types: &'a BlockTypes,
-	) -> Result<Self> {
+	pub fn new(blocks: &'a [i8], data: &'a [i8], block_types: &'a BlockTypes) -> Result<Self> {
 		use BLOCKS_PER_CHUNK as N;
 
 		if blocks.len() != N * N * N {

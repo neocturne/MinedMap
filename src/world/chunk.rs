@@ -92,12 +92,12 @@ impl<'a> Chunk<'a> {
 				(
 					SectionV1_13::new(
 						data_version,
-						section.block_states.data.as_ref(),
+						section.block_states.data.as_deref(),
 						&section.block_states.palette,
 						block_types,
 					)
 					.with_context(|| format!("Failed to load section at Y={}", section.y))?,
-					BiomesV18::new(section.biomes.data.as_ref(), &section.biomes.palette)
+					BiomesV18::new(section.biomes.data.as_deref(), &section.biomes.palette)
 						.with_context(|| {
 							format!("Failed to load section biomes at Y={}", section.y)
 						})?,
