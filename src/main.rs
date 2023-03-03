@@ -91,13 +91,13 @@ impl<'a> RegionProcessor<'a> {
 
 	fn save_region(
 		&self,
-		region: RegionCoords,
+		coords: RegionCoords,
 		processed_data: &ChunkArray<Option<Box<world::layer::BlockInfoArray>>>,
 	) -> Result<()> {
-		let tmp_path = self.config.processed_path(region, true);
+		let tmp_path = self.config.processed_path(coords, true);
 		storage::write(&tmp_path, processed_data)?;
 
-		let output_path = self.config.processed_path(region, false);
+		let output_path = self.config.processed_path(coords, false);
 		fs::rename(&tmp_path, &output_path).with_context(|| {
 			format!(
 				"Failed to rename {} to {}",
