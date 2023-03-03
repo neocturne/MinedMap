@@ -1,6 +1,6 @@
 use std::{
 	fs::File,
-	io::{BufReader, BufWriter, Write},
+	io::{Read, Write},
 	path::Path,
 };
 
@@ -9,13 +9,16 @@ use serde::{de::DeserializeOwned, Serialize};
 
 pub fn write<T: Serialize>(path: &Path, value: &T) -> Result<()> {
 	(|| -> Result<()> {
-		let file = File::create(path)?;
-		let writer = BufWriter::new(file);
-		let mut compressor = zstd::Encoder::new(writer, 1)?;
-		bincode::serialize_into(&mut compressor, value)?;
-		let writer = compressor.finish()?;
-		let mut file = writer.into_inner()?;
+		let data = bincode::serialize(value)?;
+		let len = u32::try_from(data.len())?;
+		let compressed = zstd::bulk::compress(&data, 1)?;
+		drop(data);
+
+		let mut file = File::create(path)?;
+		file.write_all(&len.to_be_bytes())?;
+		file.write_all(&compressed)?;
 		file.flush()?;
+
 		Ok(())
 	})()
 	.with_context(|| format!("Failed to write file {}", path.display()))
@@ -23,10 +26,18 @@ pub fn write<T: Serialize>(path: &Path, value: &T) -> Result<()> {
 
 pub fn read<T: DeserializeOwned>(path: &Path) -> Result<T> {
 	(|| -> Result<T> {
-		let file = File::open(path)?;
-		let reader = BufReader::new(file);
-		let decompressor = zstd::Decoder::new(reader)?;
-		Ok(bincode::deserialize_from(decompressor)?)
+		let mut file = File::open(path)?;
+
+		let mut len_buf = [0u8; 4];
+		file.read_exact(&mut len_buf)?;
+		let len = usize::try_from(u32::from_be_bytes(len_buf))?;
+
+		let mut compressed = vec![];
+		file.read_to_end(&mut compressed)?;
+		let data = zstd::bulk::decompress(&compressed, len)?;
+		drop(compressed);
+
+		Ok(bincode::deserialize(&data)?)
 	})()
 	.with_context(|| format!("Failed to read file {}", path.display()))
 }
