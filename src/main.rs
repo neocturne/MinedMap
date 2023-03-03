@@ -17,6 +17,7 @@ struct Args {
 }
 
 type RegionCoords = (i32, i32);
+type ProcessedRegion = ChunkArray<Option<Box<world::layer::BlockInfoArray>>>;
 
 struct Config {
 	region_dir: PathBuf,
@@ -89,13 +90,9 @@ impl<'a> RegionProcessor<'a> {
 		world::layer::top_layer(&chunk)
 	}
 
-	fn save_region(
-		&self,
-		coords: RegionCoords,
-		processed_data: &ChunkArray<Option<Box<world::layer::BlockInfoArray>>>,
-	) -> Result<()> {
+	fn save_region(&self, coords: RegionCoords, processed_region: &ProcessedRegion) -> Result<()> {
 		let tmp_path = self.config.processed_path(coords, true);
-		storage::write(&tmp_path, processed_data)?;
+		storage::write(&tmp_path, processed_region)?;
 
 		let output_path = self.config.processed_path(coords, false);
 		fs::rename(&tmp_path, &output_path).with_context(|| {
@@ -113,20 +110,19 @@ impl<'a> RegionProcessor<'a> {
 	fn process_region(&self, path: &Path, coords: RegionCoords) -> Result<()> {
 		println!("Processing region r.{}.{}.mca", coords.0, coords.1);
 
-		let mut processed_data: ChunkArray<Option<Box<world::layer::BlockInfoArray>>> =
-			Default::default();
+		let mut processed_region = ProcessedRegion::default();
 
 		minedmap::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
 				let processed_chunk = self
 					.process_chunk(data)
 					.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?;
-				processed_data[chunk_coords] = Some(processed_chunk);
+				processed_region[chunk_coords] = Some(processed_chunk);
 				Ok(())
 			},
 		)?;
 
-		self.save_region(coords, &processed_data)?;
+		self.save_region(coords, &processed_region)?;
 
 		Ok(())
 	}
