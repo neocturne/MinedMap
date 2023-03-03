@@ -19,3 +19,7 @@ itertools = "0.10.5"
 num-integer = "0.1.45"
 serde = "1.0.152"
 zstd = "0.12.3"
+
+[features]
+default = ["zlib-ng"]
+zlib-ng = ["flate2/zlib-ng"]
