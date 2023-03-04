@@ -289,8 +289,8 @@ impl<'a> TileRenderer<'a> {
 					z: BlockZ(z as u8),
 				}] {
 					Some(block) => {
-						let c = block.block_type.color;
-						[c.0, c.1, c.2, 255]
+						let c = block.block_type.color.0;
+						[c[0], c[1], c[2], 255]
 					}
 					None => [0, 0, 0, 0],
 				},

@@ -34,7 +34,7 @@ where
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct BlockColor(pub u8, pub u8, pub u8);
+pub struct BlockColor(pub [u8; 3]);
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct BlockType {
