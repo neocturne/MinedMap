@@ -32,39 +32,6 @@ pub trait Section: Debug {
 	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<BlockType>>;
 }
 
-/// Minecraft v1.18+ section biome data
-///
-/// The biome data is part of the section structure in Minecraft v1.18+, with
-/// the biomes laid out as an array of indices into a palette, similar to the
-/// v1.13+ block data.
-#[derive(Debug)]
-pub struct BiomesV18<'a> {
-	_biomes: Option<&'a [i64]>,
-	_palette: &'a [String],
-	_bits: u8,
-}
-
-impl<'a> BiomesV18<'a> {
-	/// Constructs a new [BiomesV18] from deserialized data structures
-	pub fn new(biomes: Option<&'a [i64]>, palette: &'a [String]) -> Result<Self> {
-		let bits = palette_bits(palette.len(), 1, 6).context("Unsupported block palette size")?;
-
-		if let Some(biomes) = biomes {
-			let biomes_per_word = 64 / bits as usize;
-			let expected_length = (64 + biomes_per_word - 1) / biomes_per_word;
-			if biomes.len() != expected_length {
-				bail!("Invalid section biome data");
-			}
-		}
-
-		Ok(BiomesV18 {
-			_biomes: biomes,
-			_palette: palette,
-			_bits: bits,
-		})
-	}
-}
-
 /// Minecraft v1.13+ section block data
 #[derive(Debug)]
 pub struct SectionV1_13<'a> {
@@ -199,5 +166,38 @@ impl<'a> Section for SectionV0<'a> {
 		};
 
 		Ok(self.block_types.get_legacy(block, data))
+	}
+}
+
+/// Minecraft v1.18+ section biome data
+///
+/// The biome data is part of the section structure in Minecraft v1.18+, with
+/// the biomes laid out as an array of indices into a palette, similar to the
+/// v1.13+ block data.
+#[derive(Debug)]
+pub struct BiomesV18<'a> {
+	_biomes: Option<&'a [i64]>,
+	_palette: &'a [String],
+	_bits: u8,
+}
+
+impl<'a> BiomesV18<'a> {
+	/// Constructs a new [BiomesV18] from deserialized data structures
+	pub fn new(biomes: Option<&'a [i64]>, palette: &'a [String]) -> Result<Self> {
+		let bits = palette_bits(palette.len(), 1, 6).context("Unsupported block palette size")?;
+
+		if let Some(biomes) = biomes {
+			let biomes_per_word = 64 / bits as usize;
+			let expected_length = (64 + biomes_per_word - 1) / biomes_per_word;
+			if biomes.len() != expected_length {
+				bail!("Invalid section biome data");
+			}
+		}
+
+		Ok(BiomesV18 {
+			_biomes: biomes,
+			_palette: palette,
+			_bits: bits,
+		})
 	}
 }
