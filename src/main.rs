@@ -10,7 +10,10 @@ use minedmap::{
 	io::storage,
 	resource,
 	types::*,
-	world::{self, layer::BlockLightArray},
+	world::{
+		self,
+		layer::{BlockInfo, BlockLightArray},
+	},
 };
 
 #[derive(Debug, Parser)]
@@ -275,6 +278,19 @@ impl<'a> TileRenderer<'a> {
 		storage::read(&processed_path).context("Failed to load processed region data")
 	}
 
+	fn block_color(block: &BlockInfo) -> [u8; 4] {
+		let h = block
+			.depth
+			.map(|depth| 0.5 + 0.005 * depth.0 as f32)
+			.unwrap_or_default();
+		let c = block
+			.block_type
+			.color
+			.0
+			.map(|v| (f32::from(v) * h).clamp(0.0, 255.0) as u8);
+		[c[0], c[1], c[2], 255]
+	}
+
 	fn render_chunk(
 		image: &mut image::RgbaImage,
 		coords: ChunkCoords,
@@ -284,14 +300,11 @@ impl<'a> TileRenderer<'a> {
 
 		let chunk_image = image::RgbaImage::from_fn(N, N, |x, z| {
 			image::Rgba(
-				match chunk[LayerBlockCoords {
+				match &chunk[LayerBlockCoords {
 					x: BlockX(x as u8),
 					z: BlockZ(z as u8),
 				}] {
-					Some(block) => {
-						let c = block.block_type.color.0;
-						[c[0], c[1], c[2], 255]
-					}
+					Some(block) => Self::block_color(block),
 					None => [0, 0, 0, 0],
 				},
 			)

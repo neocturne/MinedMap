@@ -8,7 +8,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub struct BlockHeight(i32);
+pub struct BlockHeight(pub i32);
 
 impl BlockHeight {
 	/// Constructs a new [BlockHeight] from section and block Y indices
