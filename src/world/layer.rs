@@ -83,6 +83,7 @@ impl OptionBlockInfoExt for Option<BlockInfo> {
 }
 
 pub type BlockInfoArray = LayerBlockArray<Option<BlockInfo>>;
+pub type BlockLightArray = LayerBlockArray<u8>;
 
 /// Fills in a [BlockInfoArray] with the information of the chunk's top
 /// block layer
@@ -91,7 +92,7 @@ pub type BlockInfoArray = LayerBlockArray<Option<BlockInfo>>;
 /// determined as the block that should be visible on the rendered
 /// map. For water blocks, the height of the first non-water block
 /// is additionally filled in as the water depth.
-pub fn top_layer(chunk: &Chunk) -> Result<Option<Box<BlockInfoArray>>> {
+pub fn top_layer(chunk: &Chunk) -> Result<Option<(Box<BlockInfoArray>, Box<BlockLightArray>)>> {
 	use BLOCKS_PER_CHUNK as N;
 
 	if chunk.is_empty() {
@@ -99,33 +100,42 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<Box<BlockInfoArray>>> {
 	}
 
 	let mut done = 0;
-	let mut ret = Box::<BlockInfoArray>::default();
+	let mut blocks = Box::<BlockInfoArray>::default();
+	let mut light = Box::<BlockLightArray>::default();
 
 	for SectionIterItem {
 		y: section_y,
 		section,
-		block_light: _,
+		block_light,
 	} in chunk.sections().rev()
 	{
 		for y in BlockY::iter().rev() {
 			for xz in BlockInfoArray::keys() {
-				let entry = &mut ret[xz];
+				let entry = &mut blocks[xz];
 				if entry.done() {
 					continue;
 				}
 
 				let coords = SectionBlockCoords { xz, y };
-				let Some(block_type) = section.block_at(coords)? else {
-					continue;
+
+				'check_block: {
+					let Some(block_type) = section.block_at(coords)? else {
+						break 'check_block;
+					};
+
+					let height = BlockHeight::new(section_y, y)?;
+					if !entry.fill(height, block_type) {
+						break 'check_block;
+					}
+
+					assert!(entry.done());
+					done += 1;
 				};
-				let height = BlockHeight::new(section_y, y)?;
-				if !entry.fill(height, block_type) {
-					continue;
+
+				if entry.is_none() {
+					light[xz] = block_light.block_light_at(coords);
 				}
 
-				assert!(entry.done());
-
-				done += 1;
 				if done == N * N {
 					break;
 				}
@@ -133,5 +143,5 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<Box<BlockInfoArray>>> {
 		}
 	}
 
-	Ok(Some(ret))
+	Ok(Some((blocks, light)))
 }
