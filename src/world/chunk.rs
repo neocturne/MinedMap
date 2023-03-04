@@ -179,6 +179,15 @@ impl<'a> Chunk<'a> {
 		)
 	}
 
+	pub fn is_empty(&self) -> bool {
+		match self {
+			Chunk::V1_18 { section_map } => section_map.is_empty(),
+			Chunk::V1_13 { section_map, .. } => section_map.is_empty(),
+			Chunk::V0 { section_map, .. } => section_map.is_empty(),
+			Chunk::Empty => true,
+		}
+	}
+
 	/// Returns an interator over the chunk's sections and their Y coordinates
 	pub fn sections(&self) -> SectionIter {
 		use SectionIterInner::*;

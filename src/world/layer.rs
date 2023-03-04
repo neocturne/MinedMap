@@ -91,8 +91,12 @@ pub type BlockInfoArray = LayerBlockArray<Option<BlockInfo>>;
 /// determined as the block that should be visible on the rendered
 /// map. For water blocks, the height of the first non-water block
 /// is additionally filled in as the water depth.
-pub fn top_layer(chunk: &Chunk) -> Result<Box<BlockInfoArray>> {
+pub fn top_layer(chunk: &Chunk) -> Result<Option<Box<BlockInfoArray>>> {
 	use BLOCKS_PER_CHUNK as N;
+
+	if chunk.is_empty() {
+		return Ok(None);
+	}
 
 	let mut done = 0;
 	let mut ret = Box::<BlockInfoArray>::default();
@@ -129,5 +133,5 @@ pub fn top_layer(chunk: &Chunk) -> Result<Box<BlockInfoArray>> {
 		}
 	}
 
-	Ok(ret)
+	Ok(Some(ret))
 }
