@@ -201,3 +201,33 @@ impl<'a> BiomesV18<'a> {
 		})
 	}
 }
+
+#[derive(Debug, Clone, Copy)]
+pub struct BlockLight<'a>(Option<&'a [i8]>);
+
+impl<'a> BlockLight<'a> {
+	pub fn new(block_light: Option<&'a [i8]>) -> Result<Self> {
+		use BLOCKS_PER_CHUNK as N;
+		if let Some(block_light) = block_light {
+			if block_light.len() != N * N * N / 2 {
+				bail!("Invalid section block light data");
+			}
+		}
+		Ok(BlockLight(block_light))
+	}
+
+	pub fn block_light_at(&self, coords: SectionBlockCoords) -> u8 {
+		let Some(block_light) = self.0 else {
+			return 0;
+		};
+
+		let (offset, nibble) = div_rem(coords.offset(), 2);
+		let byte = block_light[offset] as u8;
+
+		if nibble == 1 {
+			byte >> 4
+		} else {
+			byte & 0xf
+		}
+	}
+}
