@@ -5,10 +5,7 @@ use std::{
 
 use anyhow::{bail, Context, Result};
 
-use super::{
-	de,
-	section::{BiomesV18, Section, SectionV0, SectionV1_13},
-};
+use super::{de, section::*};
 use crate::{resource::BlockTypes, types::*};
 
 /// Chunk data structure wrapping a [de::Chunk] for convenient access to
@@ -17,7 +14,7 @@ use crate::{resource::BlockTypes, types::*};
 pub enum Chunk<'a> {
 	/// Minecraft v1.18+ chunk with biome data moved into sections
 	V1_18 {
-		section_map: BTreeMap<SectionY, (SectionV1_13<'a>, BiomesV18<'a>)>,
+		section_map: BTreeMap<SectionY, (SectionV1_13<'a>, BiomesV18<'a>, BlockLight<'a>)>,
 	},
 	/// Minecraft v1.13+ chunk
 	///
@@ -26,14 +23,14 @@ pub enum Chunk<'a> {
 	/// section), and a palette mapping these indices to namespaced
 	/// block IDs
 	V1_13 {
-		section_map: BTreeMap<SectionY, SectionV1_13<'a>>,
+		section_map: BTreeMap<SectionY, (SectionV1_13<'a>, BlockLight<'a>)>,
 		biomes: &'a de::BiomesV0,
 	},
 	/// Original pre-1.13 chunk
 	///
 	/// The original chunk format with fixed 8-bit numeric block IDs
 	V0 {
-		section_map: BTreeMap<SectionY, SectionV0<'a>>,
+		section_map: BTreeMap<SectionY, (SectionV0<'a>, BlockLight<'a>)>,
 		biomes: &'a de::BiomesV0,
 	},
 	/// Unpopulated chunk without any block data
@@ -45,15 +42,15 @@ pub enum Chunk<'a> {
 enum SectionIterInner<'a> {
 	/// Iterator over sections of [Chunk::V1_18]
 	V1_18 {
-		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BiomesV18<'a>)>,
+		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BiomesV18<'a>, BlockLight<'a>)>,
 	},
 	/// Iterator over sections of [Chunk::V1_13]
 	V1_13 {
-		iter: btree_map::Iter<'a, SectionY, SectionV1_13<'a>>,
+		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BlockLight<'a>)>,
 	},
 	/// Iterator over sections of [Chunk::V0]
 	V0 {
-		iter: btree_map::Iter<'a, SectionY, SectionV0<'a>>,
+		iter: btree_map::Iter<'a, SectionY, (SectionV0<'a>, BlockLight<'a>)>,
 	},
 	/// Empty iterator over an unpopulated chunk ([Chunk::Empty])
 	Empty,
@@ -101,6 +98,9 @@ impl<'a> Chunk<'a> {
 						.with_context(|| {
 							format!("Failed to load section biomes at Y={}", section.y)
 						})?,
+					BlockLight::new(section.block_light.as_deref()).with_context(|| {
+						format!("Failed to load section block light at Y={}", section.y)
+					})?,
 				),
 			);
 		}
@@ -118,6 +118,10 @@ impl<'a> Chunk<'a> {
 		let mut section_map_v0 = BTreeMap::new();
 
 		for section in &level.sections {
+			let block_light =
+				BlockLight::new(section.block_light.as_deref()).with_context(|| {
+					format!("Failed to load section block light at Y={}", section.y)
+				})?;
 			match &section.section {
 				de::SectionV0Variants::V1_13 {
 					block_states,
@@ -125,16 +129,29 @@ impl<'a> Chunk<'a> {
 				} => {
 					section_map_v1_13.insert(
 						SectionY(section.y.into()),
-						SectionV1_13::new(data_version, Some(block_states), palette, block_types)
-							.with_context(|| format!("Failed to load section at Y={}", section.y))?,
+						(
+							SectionV1_13::new(
+								data_version,
+								Some(block_states),
+								palette,
+								block_types,
+							)
+							.with_context(|| {
+								format!("Failed to load section at Y={}", section.y)
+							})?,
+							block_light,
+						),
 					);
 				}
 				de::SectionV0Variants::V0 { blocks, data } => {
 					section_map_v0.insert(
 						SectionY(section.y.into()),
-						SectionV0::new(blocks, data, block_types).with_context(|| {
-							format!("Failed to load section at Y={}", section.y)
-						})?,
+						(
+							SectionV0::new(blocks, data, block_types).with_context(|| {
+								format!("Failed to load section at Y={}", section.y)
+							})?,
+							block_light,
+						),
 					);
 				}
 				de::SectionV0Variants::Empty {} => {}
@@ -207,15 +224,14 @@ impl<'a> SectionIter<'a> {
 		F: FnOnce(&mut dyn SectionIterTrait<'a>) -> T,
 	{
 		match &mut self.inner {
-			SectionIterInner::V1_18 { iter } => f(&mut iter.map(|(&y, section)| SectionIterItem {
-				y,
-				section: &section.0,
-			})),
+			SectionIterInner::V1_18 { iter } => {
+				f(&mut iter.map(|(&y, (section, _, _))| SectionIterItem { y, section }))
+			}
 			SectionIterInner::V1_13 { iter } => {
-				f(&mut iter.map(|(&y, section)| SectionIterItem { y, section }))
+				f(&mut iter.map(|(&y, (section, _))| SectionIterItem { y, section }))
 			}
 			SectionIterInner::V0 { iter } => {
-				f(&mut iter.map(|(&y, section)| SectionIterItem { y, section }))
+				f(&mut iter.map(|(&y, (section, _))| SectionIterItem { y, section }))
 			}
 			SectionIterInner::Empty => f(&mut iter::empty()),
 		}
