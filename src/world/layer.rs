@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
-use super::chunk::Chunk;
+use super::chunk::{Chunk, SectionIterItem};
 use crate::{
 	resource::{BlockFlag, BlockType},
 	types::*,
@@ -97,7 +97,11 @@ pub fn top_layer(chunk: &Chunk) -> Result<Box<BlockInfoArray>> {
 	let mut done = 0;
 	let mut ret = Box::<BlockInfoArray>::default();
 
-	for (section_y, section) in chunk.sections().rev() {
+	for SectionIterItem {
+		y: section_y,
+		section,
+	} in chunk.sections().rev()
+	{
 		for y in BlockY::iter().rev() {
 			for xz in BlockInfoArray::keys() {
 				let entry = &mut ret[xz];

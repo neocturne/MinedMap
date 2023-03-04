@@ -182,16 +182,19 @@ impl<'a> Chunk<'a> {
 	}
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct SectionIterItem<'a> {
+	pub y: SectionY,
+	pub section: &'a dyn Section,
+}
+
 trait SectionIterTrait<'a>:
-	Iterator<Item = (SectionY, &'a dyn Section)>
-	+ DoubleEndedIterator
-	+ ExactSizeIterator
-	+ FusedIterator
+	Iterator<Item = SectionIterItem<'a>> + DoubleEndedIterator + ExactSizeIterator + FusedIterator
 {
 }
 
 impl<'a, T> SectionIterTrait<'a> for T where
-	T: Iterator<Item = (SectionY, &'a dyn Section)>
+	T: Iterator<Item = SectionIterItem<'a>>
 		+ DoubleEndedIterator
 		+ ExactSizeIterator
 		+ FusedIterator
@@ -204,14 +207,15 @@ impl<'a> SectionIter<'a> {
 		F: FnOnce(&mut dyn SectionIterTrait<'a>) -> T,
 	{
 		match &mut self.inner {
-			SectionIterInner::V1_18 { iter } => f(
-				&mut iter.map(|(y, section)| -> (SectionY, &'a dyn Section) { (*y, &section.0) })
-			),
+			SectionIterInner::V1_18 { iter } => f(&mut iter.map(|(&y, section)| SectionIterItem {
+				y,
+				section: &section.0,
+			})),
 			SectionIterInner::V1_13 { iter } => {
-				f(&mut iter.map(|(y, section)| -> (SectionY, &'a dyn Section) { (*y, section) }))
+				f(&mut iter.map(|(&y, section)| SectionIterItem { y, section }))
 			}
 			SectionIterInner::V0 { iter } => {
-				f(&mut iter.map(|(y, section)| -> (SectionY, &'a dyn Section) { (*y, section) }))
+				f(&mut iter.map(|(&y, section)| SectionIterItem { y, section }))
 			}
 			SectionIterInner::Empty => f(&mut iter::empty()),
 		}
@@ -219,7 +223,7 @@ impl<'a> SectionIter<'a> {
 }
 
 impl<'a> Iterator for SectionIter<'a> {
-	type Item = (SectionY, &'a dyn Section);
+	type Item = SectionIterItem<'a>;
 
 	fn next(&mut self) -> Option<Self::Item> {
 		self.with_iter(|iter| iter.next())

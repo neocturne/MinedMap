@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use anyhow::{bail, Context, Result};
 use num_integer::div_rem;
 
@@ -26,7 +28,7 @@ fn palette_bits(len: usize, min: u8, max: u8) -> Option<u8> {
 }
 
 /// Trait for common functions of [SectionV1_13] and [SectionV0]
-pub trait Section {
+pub trait Section: Debug {
 	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<BlockType>>;
 }
 
