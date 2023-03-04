@@ -6,7 +6,12 @@ use std::{
 use anyhow::{Context, Result};
 use clap::Parser;
 
-use minedmap::{io::storage, resource, types::*, world};
+use minedmap::{
+	io::storage,
+	resource,
+	types::*,
+	world::{self, layer::BlockLightArray},
+};
 
 #[derive(Debug, Parser)]
 struct Args {
@@ -22,6 +27,7 @@ type ProcessedRegion = ChunkArray<Option<Box<world::layer::BlockInfoArray>>>;
 struct Config {
 	region_dir: PathBuf,
 	processed_dir: PathBuf,
+	light_dir: PathBuf,
 	map_dir: PathBuf,
 }
 
@@ -29,11 +35,13 @@ impl Config {
 	fn new(args: Args) -> Self {
 		let region_dir = [&args.input_dir, Path::new("region")].iter().collect();
 		let processed_dir = [&args.output_dir, Path::new("processed")].iter().collect();
+		let light_dir = [&args.output_dir, Path::new("light/0")].iter().collect();
 		let map_dir = [&args.output_dir, Path::new("map/0")].iter().collect();
 
 		Config {
 			region_dir,
 			processed_dir,
+			light_dir,
 			map_dir,
 		}
 	}
@@ -46,6 +54,16 @@ impl Config {
 			if temp { ".tmp" } else { "" },
 		);
 		[&self.processed_dir, Path::new(&filename)].iter().collect()
+	}
+
+	fn light_path(&self, coords: RegionCoords, temp: bool) -> PathBuf {
+		let filename = format!(
+			"r.{}.{}.png{}",
+			coords.0,
+			coords.1,
+			if temp { ".tmp" } else { "" },
+		);
+		[&self.light_dir, Path::new(&filename)].iter().collect()
 	}
 
 	fn map_path(&self, coords: RegionCoords, temp: bool) -> PathBuf {
@@ -101,9 +119,27 @@ impl<'a> RegionProcessor<'a> {
 	fn process_chunk(
 		&self,
 		data: world::de::Chunk,
-	) -> Result<Option<Box<world::layer::BlockInfoArray>>> {
+	) -> Result<
+		Option<(
+			Box<world::layer::BlockInfoArray>,
+			Box<world::layer::BlockLightArray>,
+		)>,
+	> {
 		let chunk = world::chunk::Chunk::new(&data, &self.block_types)?;
 		world::layer::top_layer(&chunk)
+	}
+
+	fn chunk_lightmap(block_light: Box<BlockLightArray>) -> image::GrayAlphaImage {
+		const N: u32 = BLOCKS_PER_CHUNK as u32;
+
+		image::GrayAlphaImage::from_fn(N, N, |x, z| {
+			let v: f32 = block_light[LayerBlockCoords {
+				x: BlockX(x as u8),
+				z: BlockZ(z as u8),
+			}]
+			.into();
+			image::LumaA([0, (192.0 * (1.0 - v / 15.0)) as u8])
+		})
 	}
 
 	fn save_region(&self, coords: RegionCoords, processed_region: &ProcessedRegion) -> Result<()> {
@@ -122,26 +158,52 @@ impl<'a> RegionProcessor<'a> {
 		Ok(())
 	}
 
+	fn save_lightmap(&self, coords: RegionCoords, lightmap: &image::GrayAlphaImage) -> Result<()> {
+		let tmp_path = self.config.light_path(coords, true);
+		lightmap
+			.save_with_format(&tmp_path, image::ImageFormat::Png)
+			.context("Failed to save image")?;
+
+		let output_path = self.config.light_path(coords, false);
+		fs::rename(&tmp_path, &output_path).with_context(|| {
+			format!(
+				"Failed to rename {} to {}",
+				tmp_path.display(),
+				output_path.display(),
+			)
+		})?;
+
+		Ok(())
+	}
+
 	/// Processes a single region file
 	fn process_region(&self, path: &Path, coords: RegionCoords) -> Result<()> {
+		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
+
 		println!("Processing region r.{}.{}.mca", coords.0, coords.1);
 
 		let mut processed_region = ProcessedRegion::default();
+		let mut lightmap = image::GrayAlphaImage::new(N, N);
 
 		minedmap::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
-				let Some(processed_chunk) = self
+				let Some((processed_chunk, block_light)) = self
 					.process_chunk(data)
 					.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
 				else {
 					return Ok(());
 				};
 				processed_region[chunk_coords] = Some(processed_chunk);
+
+				let chunk_lightmap = Self::chunk_lightmap(block_light);
+				overlay_chunk(&mut lightmap, &chunk_lightmap, chunk_coords);
+
 				Ok(())
 			},
 		)?;
 
 		self.save_region(coords, &processed_region)?;
+		self.save_lightmap(coords, &lightmap)?;
 
 		Ok(())
 	}
@@ -161,6 +223,12 @@ impl<'a> RegionProcessor<'a> {
 			format!(
 				"Failed to create directory {}",
 				self.config.processed_dir.display(),
+			)
+		})?;
+		fs::create_dir_all(&self.config.light_dir).with_context(|| {
+			format!(
+				"Failed to create directory {}",
+				self.config.light_dir.display(),
 			)
 		})?;
 
