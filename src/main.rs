@@ -59,6 +59,19 @@ impl Config {
 	}
 }
 
+fn overlay_chunk<I, J>(image: &mut I, chunk: &J, coords: ChunkCoords)
+where
+	I: image::GenericImage,
+	J: image::GenericImageView<Pixel = I::Pixel>,
+{
+	image::imageops::overlay(
+		image,
+		chunk,
+		coords.x.0 as i64 * BLOCKS_PER_CHUNK as i64,
+		coords.z.0 as i64 * BLOCKS_PER_CHUNK as i64,
+	);
+}
+
 /// Type with methods for processing the regions of a Minecraft save directory
 struct RegionProcessor<'a> {
 	block_types: resource::BlockTypes,
@@ -209,12 +222,7 @@ impl<'a> TileRenderer<'a> {
 				},
 			)
 		});
-		image::imageops::overlay(
-			image,
-			&chunk_image,
-			coords.x.0 as i64 * BLOCKS_PER_CHUNK as i64,
-			coords.z.0 as i64 * BLOCKS_PER_CHUNK as i64,
-		);
+		overlay_chunk(image, &chunk_image, coords);
 	}
 
 	fn render_region(image: &mut image::RgbaImage, region: &ProcessedRegion) {
