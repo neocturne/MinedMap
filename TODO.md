@@ -3,5 +3,4 @@
 ## Optimizations
 
 - To check:
-  - fastnbt borrow
-  - fastnbt from_reader
+  - Bulk `block_at()`, possibly other `top_layer()` improvements
