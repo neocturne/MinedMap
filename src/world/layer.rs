@@ -100,6 +100,7 @@ pub fn top_layer(chunk: &Chunk) -> Result<Box<BlockInfoArray>> {
 	for SectionIterItem {
 		y: section_y,
 		section,
+		block_light: _,
 	} in chunk.sections().rev()
 	{
 		for y in BlockY::iter().rev() {

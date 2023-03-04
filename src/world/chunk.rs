@@ -203,6 +203,7 @@ impl<'a> Chunk<'a> {
 pub struct SectionIterItem<'a> {
 	pub y: SectionY,
 	pub section: &'a dyn Section,
+	pub block_light: BlockLight<'a>,
 }
 
 trait SectionIterTrait<'a>:
@@ -224,14 +225,30 @@ impl<'a> SectionIter<'a> {
 		F: FnOnce(&mut dyn SectionIterTrait<'a>) -> T,
 	{
 		match &mut self.inner {
-			SectionIterInner::V1_18 { iter } => {
-				f(&mut iter.map(|(&y, (section, _, _))| SectionIterItem { y, section }))
-			}
+			SectionIterInner::V1_18 { iter } => f(&mut iter.map(
+				|(&y, (section, _, block_light))| SectionIterItem {
+					y,
+					section,
+					block_light: *block_light,
+				},
+			)),
 			SectionIterInner::V1_13 { iter } => {
-				f(&mut iter.map(|(&y, (section, _))| SectionIterItem { y, section }))
+				f(
+					&mut iter.map(|(&y, (section, block_light))| SectionIterItem {
+						y,
+						section,
+						block_light: *block_light,
+					}),
+				)
 			}
 			SectionIterInner::V0 { iter } => {
-				f(&mut iter.map(|(&y, (section, _))| SectionIterItem { y, section }))
+				f(
+					&mut iter.map(|(&y, (section, block_light))| SectionIterItem {
+						y,
+						section,
+						block_light: *block_light,
+					}),
+				)
 			}
 			SectionIterInner::Empty => f(&mut iter::empty()),
 		}
