@@ -24,14 +24,14 @@ pub enum Chunk<'a> {
 	/// block IDs
 	V1_13 {
 		section_map: BTreeMap<SectionY, (SectionV1_13<'a>, BlockLight<'a>)>,
-		biomes: &'a de::BiomesV0,
+		biomes: BiomesV0<'a>,
 	},
 	/// Original pre-1.13 chunk
 	///
 	/// The original chunk format with fixed 8-bit numeric block IDs
 	V0 {
 		section_map: BTreeMap<SectionY, (SectionV0<'a>, BlockLight<'a>)>,
-		biomes: &'a de::BiomesV0,
+		biomes: BiomesV0<'a>,
 	},
 	/// Unpopulated chunk without any block data
 	Empty,
@@ -158,8 +158,7 @@ impl<'a> Chunk<'a> {
 			}
 		}
 
-		// TODO Check biomes length
-		let biomes = level.biomes.as_ref().context("Invalid biome data");
+		let biomes = BiomesV0::new(level.biomes.as_ref());
 
 		Ok(
 			match (section_map_v1_13.is_empty(), section_map_v0.is_empty()) {

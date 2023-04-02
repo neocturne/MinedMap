@@ -202,6 +202,36 @@ impl<'a> BiomesV18<'a> {
 	}
 }
 
+/// Pre-v1.18 section biome data
+///
+/// There are a 3 formats for biome data that were used in
+/// different pre-v1.18 Minecraft versions
+#[derive(Debug)]
+pub enum BiomesV0<'a> {
+	IntArrayV15(&'a fastnbt::IntArray),
+	IntArrayV0(&'a fastnbt::IntArray),
+	ByteArray(&'a fastnbt::ByteArray),
+}
+
+impl<'a> BiomesV0<'a> {
+	/// Constructs a new [BiomesV0] from deserialized data structures
+	pub fn new(biomes: Option<&'a de::BiomesV0>) -> Result<Self> {
+		const N: usize = BLOCKS_PER_CHUNK;
+		const MAXY: usize = 256;
+		const BN: usize = N >> 2;
+		const BMAXY: usize = MAXY >> 2;
+
+		Ok(match biomes {
+			Some(de::BiomesV0::IntArray(data)) if data.len() == BN * BN * BMAXY => {
+				BiomesV0::IntArrayV15(data)
+			}
+			Some(de::BiomesV0::IntArray(data)) if data.len() == N * N => BiomesV0::IntArrayV0(data),
+			Some(de::BiomesV0::ByteArray(data)) if data.len() == N * N => BiomesV0::ByteArray(data),
+			_ => bail!("Invalid biome data"),
+		})
+	}
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct BlockLight<'a>(Option<&'a [i8]>);
 
