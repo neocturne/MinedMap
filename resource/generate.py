@@ -36,7 +36,7 @@ with open(sys.argv[2], 'w') as f:
 			flags.append('Water')
 		flags = 'make_bitflags!(BlockFlag::{' + '|'.join(flags) + '})'
 
-		print('\t("%s", BlockType { flags: %s, color: BlockColor([%u, %u, %u]) }),' % (
+		print('\t("%s", BlockType { flags: %s, color: Color([%u, %u, %u]) }),' % (
 			name,
 			flags,
 			info['color']['r'],

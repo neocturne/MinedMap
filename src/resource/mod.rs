@@ -34,7 +34,7 @@ where
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct BlockColor(pub [u8; 3]);
+pub struct Color(pub [u8; 3]);
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct BlockType {
@@ -43,7 +43,7 @@ pub struct BlockType {
 		deserialize_with = "deserialize_block_flags"
 	)]
 	pub flags: BitFlags<BlockFlag>,
-	pub color: BlockColor,
+	pub color: Color,
 }
 
 impl BlockType {
