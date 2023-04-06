@@ -1,3 +1,4 @@
+mod biomes;
 mod block_types;
 mod legacy_block_types;
 
@@ -85,5 +86,57 @@ impl BlockTypes {
 	#[inline]
 	pub fn get_legacy(&self, id: u8, data: u8) -> Option<BlockType> {
 		Some(self.legacy_block_types[id as usize][data as usize])
+	}
+}
+
+pub use biomes::Biome;
+
+#[derive(Debug)]
+pub struct BiomeTypes {
+	biome_map: HashMap<String, &'static Biome>,
+	legacy_biomes: Box<[&'static Biome; 256]>,
+}
+
+impl Default for BiomeTypes {
+	fn default() -> Self {
+		let mut biome_map: HashMap<_, _> = biomes::BIOMES
+			.iter()
+			.map(|(k, v)| (String::from(*k), v))
+			.collect();
+
+		for &(old, new) in biomes::BIOME_ALIASES.iter().rev() {
+			let biome = biome_map
+				.get(new)
+				.copied()
+				.expect("Biome alias for unknown biome");
+			assert!(biome_map.insert(String::from(old), biome).is_none());
+		}
+
+		let legacy_biomes = (0..=255)
+			.map(|index| {
+				let id = biomes::legacy_biome(index);
+				*biome_map.get(id).expect("Unknown legacy biome")
+			})
+			.collect::<Box<[_]>>()
+			.try_into()
+			.unwrap();
+
+		Self {
+			biome_map,
+			legacy_biomes,
+		}
+	}
+}
+
+impl BiomeTypes {
+	#[inline]
+	pub fn get(&self, id: &str) -> Option<&Biome> {
+		let suffix = id.strip_prefix("minecraft:")?;
+		self.biome_map.get(suffix).copied()
+	}
+
+	#[inline]
+	pub fn get_legacy(&self, id: u8) -> Option<&Biome> {
+		Some(self.legacy_biomes[id as usize])
 	}
 }
