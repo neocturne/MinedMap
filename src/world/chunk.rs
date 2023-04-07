@@ -6,7 +6,10 @@ use std::{
 use anyhow::{bail, Context, Result};
 
 use super::{de, section::*};
-use crate::{resource::BlockTypes, types::*};
+use crate::{
+	resource::{BiomeTypes, BlockTypes},
+	types::*,
+};
 
 /// Chunk data structure wrapping a [de::Chunk] for convenient access to
 /// block and biome data
@@ -64,14 +67,20 @@ pub struct SectionIter<'a> {
 
 impl<'a> Chunk<'a> {
 	/// Creates a new [Chunk] from a deserialized [de::Chunk]
-	pub fn new(data: &'a de::Chunk, block_types: &'a BlockTypes) -> Result<Self> {
+	pub fn new(
+		data: &'a de::Chunk,
+		block_types: &'a BlockTypes,
+		biome_types: &'a BiomeTypes,
+	) -> Result<Self> {
 		let data_version = data.data_version.unwrap_or_default();
 
 		match &data.chunk {
 			de::ChunkVariants::V1_18 { sections } => {
-				Self::new_v1_18(data_version, sections, block_types)
+				Self::new_v1_18(data_version, sections, block_types, biome_types)
 			}
-			de::ChunkVariants::V0 { level } => Self::new_v0(data_version, level, block_types),
+			de::ChunkVariants::V0 { level } => {
+				Self::new_v0(data_version, level, block_types, biome_types)
+			}
 		}
 	}
 
@@ -80,6 +89,7 @@ impl<'a> Chunk<'a> {
 		data_version: u32,
 		sections: &'a Vec<de::SectionV1_18>,
 		block_types: &'a BlockTypes,
+		biome_types: &'a BiomeTypes,
 	) -> Result<Self> {
 		let mut section_map = BTreeMap::new();
 
@@ -94,10 +104,12 @@ impl<'a> Chunk<'a> {
 						block_types,
 					)
 					.with_context(|| format!("Failed to load section at Y={}", section.y))?,
-					BiomesV18::new(section.biomes.data.as_deref(), &section.biomes.palette)
-						.with_context(|| {
-							format!("Failed to load section biomes at Y={}", section.y)
-						})?,
+					BiomesV18::new(
+						section.biomes.data.as_deref(),
+						&section.biomes.palette,
+						biome_types,
+					)
+					.with_context(|| format!("Failed to load section biomes at Y={}", section.y))?,
 					BlockLight::new(section.block_light.as_deref()).with_context(|| {
 						format!("Failed to load section block light at Y={}", section.y)
 					})?,
@@ -113,6 +125,7 @@ impl<'a> Chunk<'a> {
 		data_version: u32,
 		level: &'a de::LevelV0,
 		block_types: &'a BlockTypes,
+		biome_types: &'a BiomeTypes,
 	) -> Result<Self> {
 		let mut section_map_v1_13 = BTreeMap::new();
 		let mut section_map_v0 = BTreeMap::new();
@@ -158,7 +171,7 @@ impl<'a> Chunk<'a> {
 			}
 		}
 
-		let biomes = BiomesV0::new(level.biomes.as_ref());
+		let biomes = BiomesV0::new(level.biomes.as_ref(), biome_types);
 
 		Ok(
 			match (section_map_v1_13.is_empty(), section_map_v0.is_empty()) {

@@ -5,7 +5,7 @@ use num_integer::div_rem;
 
 use super::de;
 use crate::{
-	resource::{BlockType, BlockTypes},
+	resource::{BiomeTypes, BlockType, BlockTypes},
 	types::*,
 };
 
@@ -183,7 +183,11 @@ pub struct BiomesV18<'a> {
 
 impl<'a> BiomesV18<'a> {
 	/// Constructs a new [BiomesV18] from deserialized data structures
-	pub fn new(biomes: Option<&'a [i64]>, palette: &'a [String]) -> Result<Self> {
+	pub fn new(
+		biomes: Option<&'a [i64]>,
+		palette: &'a [String],
+		_biome_types: &'a BiomeTypes,
+	) -> Result<Self> {
 		let bits = palette_bits(palette.len(), 1, 6).context("Unsupported block palette size")?;
 
 		if let Some(biomes) = biomes {
@@ -208,14 +212,23 @@ impl<'a> BiomesV18<'a> {
 /// different pre-v1.18 Minecraft versions
 #[derive(Debug)]
 pub enum BiomesV0<'a> {
-	IntArrayV15(&'a fastnbt::IntArray),
-	IntArrayV0(&'a fastnbt::IntArray),
-	ByteArray(&'a fastnbt::ByteArray),
+	IntArrayV15 {
+		data: &'a fastnbt::IntArray,
+		biome_types: &'a BiomeTypes,
+	},
+	IntArrayV0 {
+		data: &'a fastnbt::IntArray,
+		biome_types: &'a BiomeTypes,
+	},
+	ByteArray {
+		data: &'a fastnbt::ByteArray,
+		biome_types: &'a BiomeTypes,
+	},
 }
 
 impl<'a> BiomesV0<'a> {
 	/// Constructs a new [BiomesV0] from deserialized data structures
-	pub fn new(biomes: Option<&'a de::BiomesV0>) -> Result<Self> {
+	pub fn new(biomes: Option<&'a de::BiomesV0>, biome_types: &'a BiomeTypes) -> Result<Self> {
 		const N: usize = BLOCKS_PER_CHUNK;
 		const MAXY: usize = 256;
 		const BN: usize = N >> 2;
@@ -223,10 +236,14 @@ impl<'a> BiomesV0<'a> {
 
 		Ok(match biomes {
 			Some(de::BiomesV0::IntArray(data)) if data.len() == BN * BN * BMAXY => {
-				BiomesV0::IntArrayV15(data)
+				BiomesV0::IntArrayV15 { data, biome_types }
 			}
-			Some(de::BiomesV0::IntArray(data)) if data.len() == N * N => BiomesV0::IntArrayV0(data),
-			Some(de::BiomesV0::ByteArray(data)) if data.len() == N * N => BiomesV0::ByteArray(data),
+			Some(de::BiomesV0::IntArray(data)) if data.len() == N * N => {
+				BiomesV0::IntArrayV0 { data, biome_types }
+			}
+			Some(de::BiomesV0::ByteArray(data)) if data.len() == N * N => {
+				BiomesV0::ByteArray { data, biome_types }
+			}
 			_ => bail!("Invalid biome data"),
 		})
 	}

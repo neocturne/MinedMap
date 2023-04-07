@@ -96,6 +96,7 @@ where
 /// Type with methods for processing the regions of a Minecraft save directory
 struct RegionProcessor<'a> {
 	block_types: resource::BlockTypes,
+	biome_types: resource::BiomeTypes,
 	config: &'a Config,
 }
 
@@ -103,6 +104,7 @@ impl<'a> RegionProcessor<'a> {
 	fn new(config: &'a Config) -> Self {
 		RegionProcessor {
 			block_types: resource::BlockTypes::default(),
+			biome_types: resource::BiomeTypes::default(),
 			config,
 		}
 	}
@@ -128,7 +130,7 @@ impl<'a> RegionProcessor<'a> {
 			Box<world::layer::BlockLightArray>,
 		)>,
 	> {
-		let chunk = world::chunk::Chunk::new(&data, &self.block_types)?;
+		let chunk = world::chunk::Chunk::new(&data, &self.block_types, &self.biome_types)?;
 		world::layer::top_layer(&chunk)
 	}
 
