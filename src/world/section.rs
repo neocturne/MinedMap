@@ -175,13 +175,13 @@ impl<'a> Section for SectionV0<'a> {
 /// the biomes laid out as an array of indices into a palette, similar to the
 /// v1.13+ block data.
 #[derive(Debug)]
-pub struct BiomesV18<'a> {
+pub struct BiomesV1_18<'a> {
 	_biomes: Option<&'a [i64]>,
 	_palette: &'a [String],
 	_bits: u8,
 }
 
-impl<'a> BiomesV18<'a> {
+impl<'a> BiomesV1_18<'a> {
 	/// Constructs a new [BiomesV18] from deserialized data structures
 	pub fn new(
 		biomes: Option<&'a [i64]>,
@@ -198,7 +198,7 @@ impl<'a> BiomesV18<'a> {
 			}
 		}
 
-		Ok(BiomesV18 {
+		Ok(BiomesV1_18 {
 			_biomes: biomes,
 			_palette: palette,
 			_bits: bits,

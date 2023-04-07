@@ -17,7 +17,7 @@ use crate::{
 pub enum Chunk<'a> {
 	/// Minecraft v1.18+ chunk with biome data moved into sections
 	V1_18 {
-		section_map: BTreeMap<SectionY, (SectionV1_13<'a>, BiomesV18<'a>, BlockLight<'a>)>,
+		section_map: BTreeMap<SectionY, (SectionV1_13<'a>, BiomesV1_18<'a>, BlockLight<'a>)>,
 	},
 	/// Minecraft v1.13+ chunk
 	///
@@ -45,7 +45,7 @@ pub enum Chunk<'a> {
 enum SectionIterInner<'a> {
 	/// Iterator over sections of [Chunk::V1_18]
 	V1_18 {
-		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BiomesV18<'a>, BlockLight<'a>)>,
+		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BiomesV1_18<'a>, BlockLight<'a>)>,
 	},
 	/// Iterator over sections of [Chunk::V1_13]
 	V1_13 {
@@ -104,7 +104,7 @@ impl<'a> Chunk<'a> {
 						block_types,
 					)
 					.with_context(|| format!("Failed to load section at Y={}", section.y))?,
-					BiomesV18::new(
+					BiomesV1_18::new(
 						section.biomes.data.as_deref(),
 						&section.biomes.palette,
 						biome_types,
