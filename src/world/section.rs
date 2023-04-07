@@ -5,7 +5,7 @@ use num_integer::div_rem;
 
 use super::de;
 use crate::{
-	resource::{BiomeTypes, BlockType, BlockTypes},
+	resource::{Biome, BiomeTypes, BlockType, BlockTypes},
 	types::*,
 };
 
@@ -177,7 +177,7 @@ impl<'a> Section for SectionV0<'a> {
 #[derive(Debug)]
 pub struct BiomesV1_18<'a> {
 	_biomes: Option<&'a [i64]>,
-	_palette: &'a [String],
+	_palette: Vec<Option<&'a Biome>>,
 	_bits: u8,
 }
 
@@ -186,7 +186,7 @@ impl<'a> BiomesV1_18<'a> {
 	pub fn new(
 		biomes: Option<&'a [i64]>,
 		palette: &'a [String],
-		_biome_types: &'a BiomeTypes,
+		biome_types: &'a BiomeTypes,
 	) -> Result<Self> {
 		let bits = palette_bits(palette.len(), 1, 6).context("Unsupported block palette size")?;
 
@@ -198,9 +198,20 @@ impl<'a> BiomesV1_18<'a> {
 			}
 		}
 
+		let palette_types = palette
+			.iter()
+			.map(|entry| {
+				let biome_type = biome_types.get(entry);
+				if biome_type.is_none() {
+					eprintln!("Unknown biome type: {}", entry);
+				}
+				biome_type
+			})
+			.collect();
+
 		Ok(BiomesV1_18 {
 			_biomes: biomes,
-			_palette: palette,
+			_palette: palette_types,
 			_bits: bits,
 		})
 	}
