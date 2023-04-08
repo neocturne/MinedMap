@@ -50,10 +50,12 @@ enum SectionIterInner<'a> {
 	/// Iterator over sections of [Chunk::V1_13]
 	V1_13 {
 		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BlockLight<'a>)>,
+		biomes: &'a BiomesV0<'a>,
 	},
 	/// Iterator over sections of [Chunk::V0]
 	V0 {
 		iter: btree_map::Iter<'a, SectionY, (SectionV0<'a>, BlockLight<'a>)>,
+		biomes: &'a BiomesV0<'a>,
 	},
 	/// Empty iterator over an unpopulated chunk ([Chunk::Empty])
 	Empty,
@@ -208,11 +210,19 @@ impl<'a> Chunk<'a> {
 				Chunk::V1_18 { section_map } => V1_18 {
 					iter: section_map.iter(),
 				},
-				Chunk::V1_13 { section_map, .. } => V1_13 {
+				Chunk::V1_13 {
+					section_map,
+					biomes,
+				} => V1_13 {
 					iter: section_map.iter(),
+					biomes,
 				},
-				Chunk::V0 { section_map, .. } => V0 {
+				Chunk::V0 {
+					section_map,
+					biomes,
+				} => V0 {
 					iter: section_map.iter(),
+					biomes,
 				},
 				Chunk::Empty => Empty,
 			},
@@ -224,6 +234,7 @@ impl<'a> Chunk<'a> {
 pub struct SectionIterItem<'a> {
 	pub y: SectionY,
 	pub section: &'a dyn Section,
+	pub biomes: &'a dyn Biomes,
 	pub block_light: BlockLight<'a>,
 }
 
@@ -247,30 +258,29 @@ impl<'a> SectionIter<'a> {
 	{
 		match &mut self.inner {
 			SectionIterInner::V1_18 { iter } => f(&mut iter.map(
-				|(&y, (section, _, block_light))| SectionIterItem {
+				|(&y, (section, biomes, block_light))| SectionIterItem {
 					y,
 					section,
+					biomes,
 					block_light: *block_light,
 				},
 			)),
-			SectionIterInner::V1_13 { iter } => {
-				f(
-					&mut iter.map(|(&y, (section, block_light))| SectionIterItem {
-						y,
-						section,
-						block_light: *block_light,
-					}),
-				)
-			}
-			SectionIterInner::V0 { iter } => {
-				f(
-					&mut iter.map(|(&y, (section, block_light))| SectionIterItem {
-						y,
-						section,
-						block_light: *block_light,
-					}),
-				)
-			}
+			SectionIterInner::V1_13 { iter, biomes } => f(&mut iter.map(
+				|(&y, (section, block_light))| SectionIterItem {
+					y,
+					section,
+					biomes: *biomes,
+					block_light: *block_light,
+				},
+			)),
+			SectionIterInner::V0 { iter, biomes } => f(&mut iter.map(
+				|(&y, (section, block_light))| SectionIterItem {
+					y,
+					section,
+					biomes: *biomes,
+					block_light: *block_light,
+				},
+			)),
 			SectionIterInner::Empty => f(&mut iter::empty()),
 		}
 	}
@@ -286,8 +296,8 @@ impl<'a> Iterator for SectionIter<'a> {
 	fn size_hint(&self) -> (usize, Option<usize>) {
 		match &self.inner {
 			SectionIterInner::V1_18 { iter } => iter.size_hint(),
-			SectionIterInner::V1_13 { iter } => iter.size_hint(),
-			SectionIterInner::V0 { iter } => iter.size_hint(),
+			SectionIterInner::V1_13 { iter, .. } => iter.size_hint(),
+			SectionIterInner::V0 { iter, .. } => iter.size_hint(),
 			SectionIterInner::Empty => (0, Some(0)),
 		}
 	}
@@ -307,8 +317,8 @@ impl<'a> ExactSizeIterator for SectionIter<'a> {
 	fn len(&self) -> usize {
 		match &self.inner {
 			SectionIterInner::V1_18 { iter } => iter.len(),
-			SectionIterInner::V1_13 { iter } => iter.len(),
-			SectionIterInner::V0 { iter } => iter.len(),
+			SectionIterInner::V1_13 { iter, .. } => iter.len(),
+			SectionIterInner::V0 { iter, .. } => iter.len(),
 			SectionIterInner::Empty => 0,
 		}
 	}

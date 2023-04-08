@@ -106,6 +106,7 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<(Box<BlockInfoArray>, Box<Block
 	for SectionIterItem {
 		y: section_y,
 		section,
+		biomes: _,
 		block_light,
 	} in chunk.sections().rev()
 	{
