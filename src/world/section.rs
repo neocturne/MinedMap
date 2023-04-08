@@ -169,6 +169,11 @@ impl<'a> Section for SectionV0<'a> {
 	}
 }
 
+/// Trait for common functions of [BiomesV1_18] and [BiomesV0]
+pub trait Biomes: Debug {
+	fn biome_at(&self, section: SectionY, coords: SectionBlockCoords) -> Result<Option<&Biome>>;
+}
+
 /// Minecraft v1.18+ section biome data
 ///
 /// The biome data is part of the section structure in Minecraft v1.18+, with
@@ -176,9 +181,9 @@ impl<'a> Section for SectionV0<'a> {
 /// v1.13+ block data.
 #[derive(Debug)]
 pub struct BiomesV1_18<'a> {
-	_biomes: Option<&'a [i64]>,
-	_palette: Vec<Option<&'a Biome>>,
-	_bits: u8,
+	biomes: Option<&'a [i64]>,
+	palette: Vec<Option<&'a Biome>>,
+	bits: u8,
 }
 
 impl<'a> BiomesV1_18<'a> {
@@ -210,10 +215,44 @@ impl<'a> BiomesV1_18<'a> {
 			.collect();
 
 		Ok(BiomesV1_18 {
-			_biomes: biomes,
-			_palette: palette_types,
-			_bits: bits,
+			biomes,
+			palette: palette_types,
+			bits,
 		})
+	}
+
+	/// Looks up the block type palette index at the given coordinates
+	fn palette_index_at(&self, coords: SectionBlockCoords) -> usize {
+		const N: usize = BLOCKS_PER_CHUNK;
+		const BN: usize = N >> 2;
+
+		let Some(biomes) = self.biomes else {
+			return 0;
+		};
+
+		let bits = self.bits as usize;
+		let mask = (1 << bits) - 1;
+
+		let x = (coords.xz.x.0 >> 2) as usize;
+		let y = (coords.y.0 >> 2) as usize;
+		let z = (coords.xz.z.0 >> 2) as usize;
+		let offset = BN * BN * y + BN * z + x;
+
+		let blocks_per_word = 64 / bits;
+		let (word, shift) = div_rem(offset, blocks_per_word);
+		let shifted = biomes[word] as u64 >> (shift * bits);
+
+		(shifted & mask) as usize
+	}
+}
+
+impl<'a> Biomes for BiomesV1_18<'a> {
+	fn biome_at(&self, _section: SectionY, coords: SectionBlockCoords) -> Result<Option<&Biome>> {
+		let index = self.palette_index_at(coords);
+		Ok(*self
+			.palette
+			.get(index)
+			.context("Palette index out of bounds")?)
 	}
 }
 
@@ -256,6 +295,35 @@ impl<'a> BiomesV0<'a> {
 			_ => bail!("Invalid biome data"),
 		};
 		Ok(BiomesV0 { data, biome_types })
+	}
+}
+
+impl<'a> Biomes for BiomesV0<'a> {
+	fn biome_at(&self, section: SectionY, coords: SectionBlockCoords) -> Result<Option<&Biome>> {
+		let id = match self.data {
+			BiomesV0Data::IntArrayV15(data) => {
+				const N: usize = BLOCKS_PER_CHUNK;
+				const MAXY: usize = 256;
+				const BN: usize = N >> 2;
+
+				let LayerBlockCoords { x, z } = coords.xz;
+				let y = section
+					.0
+					.checked_mul(BLOCKS_PER_CHUNK as i32)
+					.and_then(|y| y.checked_add_unsigned(coords.y.0.into()))
+					.filter(|&height| height >= 0 && (height as usize) < MAXY)
+					.context("Y coordinate out of range")? as usize;
+				let offset = (y >> 2) * BN * BN + (z.0 >> 2) as usize * BN + (x.0 >> 2) as usize;
+				let id = data[offset] as u32;
+				id.try_into().context("Biome index out of range")?
+			}
+			BiomesV0Data::IntArrayV0(data) => {
+				let id = data[coords.xz.offset()] as u32;
+				id.try_into().context("Biome index out of range")?
+			}
+			BiomesV0Data::ByteArray(data) => data[coords.xz.offset()] as u8,
+		};
+		Ok(self.biome_types.get_legacy(id))
 	}
 }
 
