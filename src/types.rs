@@ -53,6 +53,20 @@ impl Debug for LayerBlockCoords {
 	}
 }
 
+impl LayerBlockCoords {
+	/// Computes a block's offset in various data structures
+	///
+	/// Many chunk data structures store block and biome data in the same
+	/// order. This method computes the offset at which the data for the
+	/// block at a given coordinate is stored.
+	pub fn offset(&self) -> usize {
+		use BLOCKS_PER_CHUNK as N;
+		let x = self.x.0 as usize;
+		let z = self.z.0 as usize;
+		N * z + x
+	}
+}
+
 /// Generic array for data stored per block of a chunk layer
 ///
 /// Includes various convenient iteration functions.
@@ -102,10 +116,8 @@ impl SectionBlockCoords {
 	/// block at a given coordinate is stored.
 	pub fn offset(&self) -> usize {
 		use BLOCKS_PER_CHUNK as N;
-		let x = self.xz.x.0 as usize;
 		let y = self.y.0 as usize;
-		let z = self.xz.z.0 as usize;
-		((y * N) + z) * N + x
+		N * N * y + self.xz.offset()
 	}
 }
 
