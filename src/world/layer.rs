@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::chunk::{Chunk, SectionIterItem};
 use crate::{
-	resource::{BlockFlag, BlockType},
+	resource::{Biome, BlockFlag, BlockType},
 	types::*,
 };
 
@@ -83,6 +83,7 @@ impl OptionBlockInfoExt for Option<BlockInfo> {
 }
 
 pub type BlockInfoArray = LayerBlockArray<Option<BlockInfo>>;
+pub type BiomeArray = LayerBlockArray<Option<Biome>>;
 pub type BlockLightArray = LayerBlockArray<u8>;
 
 /// Fills in a [BlockInfoArray] with the information of the chunk's top
@@ -92,7 +93,9 @@ pub type BlockLightArray = LayerBlockArray<u8>;
 /// determined as the block that should be visible on the rendered
 /// map. For water blocks, the height of the first non-water block
 /// is additionally filled in as the water depth.
-pub fn top_layer(chunk: &Chunk) -> Result<Option<(Box<BlockInfoArray>, Box<BlockLightArray>)>> {
+pub fn top_layer(
+	chunk: &Chunk,
+) -> Result<Option<((Box<BlockInfoArray>, Box<BiomeArray>), Box<BlockLightArray>)>> {
 	use BLOCKS_PER_CHUNK as N;
 
 	if chunk.is_empty() {
@@ -101,12 +104,13 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<(Box<BlockInfoArray>, Box<Block
 
 	let mut done = 0;
 	let mut blocks = Box::<BlockInfoArray>::default();
+	let mut block_biomes = Box::<BiomeArray>::default();
 	let mut light = Box::<BlockLightArray>::default();
 
 	for SectionIterItem {
 		y: section_y,
 		section,
-		biomes: _,
+		biomes,
 		block_light,
 	} in chunk.sections().rev()
 	{
@@ -133,6 +137,11 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<(Box<BlockInfoArray>, Box<Block
 					done += 1;
 				};
 
+				let biome_entry = &mut block_biomes[xz];
+				if !entry.is_none() && biome_entry.is_none() {
+					*biome_entry = biomes.biome_at(section_y, coords)?.copied();
+				}
+
 				if entry.is_none() {
 					light[xz] = block_light.block_light_at(coords);
 				}
@@ -144,5 +153,5 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<(Box<BlockInfoArray>, Box<Block
 		}
 	}
 
-	Ok(Some((blocks, light)))
+	Ok(Some(((blocks, block_biomes), light)))
 }

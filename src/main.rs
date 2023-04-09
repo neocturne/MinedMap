@@ -126,7 +126,10 @@ impl<'a> RegionProcessor<'a> {
 		data: world::de::Chunk,
 	) -> Result<
 		Option<(
-			Box<world::layer::BlockInfoArray>,
+			(
+				Box<world::layer::BlockInfoArray>,
+				Box<world::layer::BiomeArray>,
+			),
 			Box<world::layer::BlockLightArray>,
 		)>,
 	> {
@@ -192,7 +195,7 @@ impl<'a> RegionProcessor<'a> {
 
 		minedmap::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
-				let Some((processed_chunk, block_light)) = self
+				let Some(((processed_chunk, _), block_light)) = self
 					.process_chunk(data)
 					.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
 				else {
