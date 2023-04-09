@@ -1,12 +1,14 @@
+use serde::{Deserialize, Serialize};
+
 use super::Color;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum BiomeGrassColorModifier {
 	DarkForest,
 	Swamp,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Biome {
 	pub temp: i8,
 	pub downfall: i8,

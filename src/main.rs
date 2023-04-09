@@ -25,7 +25,12 @@ struct Args {
 }
 
 type RegionCoords = (i32, i32);
-type ProcessedRegion = ChunkArray<Option<Box<world::layer::BlockInfoArray>>>;
+type ProcessedRegion = ChunkArray<
+	Option<(
+		Box<world::layer::BlockInfoArray>,
+		Box<world::layer::BiomeArray>,
+	)>,
+>;
 
 struct Config {
 	region_dir: PathBuf,
@@ -195,7 +200,7 @@ impl<'a> RegionProcessor<'a> {
 
 		minedmap::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
-				let Some(((processed_chunk, _), block_light)) = self
+				let Some((processed_chunk, block_light)) = self
 					.process_chunk(data)
 					.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
 				else {
@@ -299,13 +304,14 @@ impl<'a> TileRenderer<'a> {
 	fn render_chunk(
 		image: &mut image::RgbaImage,
 		coords: ChunkCoords,
-		chunk: &world::layer::BlockInfoArray,
+		blocks: &world::layer::BlockInfoArray,
+		_biomes: &world::layer::BiomeArray,
 	) {
 		const N: u32 = BLOCKS_PER_CHUNK as u32;
 
 		let chunk_image = image::RgbaImage::from_fn(N, N, |x, z| {
 			image::Rgba(
-				match &chunk[LayerBlockCoords {
+				match &blocks[LayerBlockCoords {
 					x: BlockX(x as u8),
 					z: BlockZ(z as u8),
 				}] {
@@ -319,11 +325,11 @@ impl<'a> TileRenderer<'a> {
 
 	fn render_region(image: &mut image::RgbaImage, region: &ProcessedRegion) {
 		for (coords, chunk) in region.iter() {
-			let Some(chunk) = chunk else {
+			let Some((blocks, biomes)) = chunk else {
 				continue;
 			};
 
-			Self::render_chunk(image, coords, chunk);
+			Self::render_chunk(image, coords, blocks, biomes);
 		}
 	}
 
