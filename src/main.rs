@@ -8,7 +8,7 @@ use clap::Parser;
 
 use minedmap::{
 	io::storage,
-	resource,
+	resource::{self, Biome},
 	types::*,
 	world::{
 		self,
@@ -288,7 +288,7 @@ impl<'a> TileRenderer<'a> {
 		storage::read(&processed_path).context("Failed to load processed region data")
 	}
 
-	fn block_color(block: &BlockInfo) -> [u8; 4] {
+	fn block_color(block: &BlockInfo, _biome: &Biome) -> [u8; 4] {
 		let h = block
 			.depth
 			.map(|depth| 0.5 + 0.005 * depth.0 as f32)
@@ -305,20 +305,19 @@ impl<'a> TileRenderer<'a> {
 		image: &mut image::RgbaImage,
 		coords: ChunkCoords,
 		blocks: &world::layer::BlockInfoArray,
-		_biomes: &world::layer::BiomeArray,
+		biomes: &world::layer::BiomeArray,
 	) {
 		const N: u32 = BLOCKS_PER_CHUNK as u32;
 
 		let chunk_image = image::RgbaImage::from_fn(N, N, |x, z| {
-			image::Rgba(
-				match &blocks[LayerBlockCoords {
-					x: BlockX(x as u8),
-					z: BlockZ(z as u8),
-				}] {
-					Some(block) => Self::block_color(block),
-					None => [0, 0, 0, 0],
-				},
-			)
+			let coords = LayerBlockCoords {
+				x: BlockX(x as u8),
+				z: BlockZ(z as u8),
+			};
+			image::Rgba(match (&blocks[coords], &biomes[coords]) {
+				(Some(block), Some(biome)) => Self::block_color(block, biome),
+				_ => [0, 0, 0, 0],
+			})
 		});
 		overlay_chunk(image, &chunk_image, coords);
 	}
