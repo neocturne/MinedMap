@@ -6,6 +6,17 @@ use minedmap::{io::storage, resource, types::*, world};
 
 use super::common::*;
 
+/// Parses a filename in the format r.X.Z.mca into the contained X and Z values
+fn parse_region_filename(path: &Path) -> Option<RegionCoords> {
+	let file_name = path.file_name()?.to_str()?;
+	let parts: Vec<_> = file_name.split('.').collect();
+	let &["r", x, z, "mca"] = parts.as_slice() else {
+			return None;
+		};
+
+	Some((x.parse().ok()?, z.parse().ok()?))
+}
+
 /// Type with methods for processing the regions of a Minecraft save directory
 pub struct RegionProcessor<'a> {
 	block_types: resource::BlockTypes,
@@ -20,17 +31,6 @@ impl<'a> RegionProcessor<'a> {
 			biome_types: resource::BiomeTypes::default(),
 			config,
 		}
-	}
-
-	/// Parses a filename in the format r.X.Z.mca into the contained X and Z values
-	fn parse_region_filename(path: &Path) -> Option<RegionCoords> {
-		let file_name = path.file_name()?.to_str()?;
-		let parts: Vec<_> = file_name.split('.').collect();
-		let &["r", x, z, "mca"] = parts.as_slice() else {
-			return None;
-		};
-
-		Some((x.parse().ok()?, z.parse().ok()?))
 	}
 
 	/// Processes a single chunk
@@ -50,7 +50,9 @@ impl<'a> RegionProcessor<'a> {
 		world::layer::top_layer(&chunk)
 	}
 
-	fn chunk_lightmap(block_light: Box<world::layer::BlockLightArray>) -> image::GrayAlphaImage {
+	fn render_chunk_lightmap(
+		block_light: Box<world::layer::BlockLightArray>,
+	) -> image::GrayAlphaImage {
 		const N: u32 = BLOCKS_PER_CHUNK as u32;
 
 		image::GrayAlphaImage::from_fn(N, N, |x, z| {
@@ -116,7 +118,7 @@ impl<'a> RegionProcessor<'a> {
 				};
 				processed_region[chunk_coords] = Some(processed_chunk);
 
-				let chunk_lightmap = Self::chunk_lightmap(block_light);
+				let chunk_lightmap = Self::render_chunk_lightmap(block_light);
 				overlay_chunk(&mut lightmap, &chunk_lightmap, chunk_coords);
 
 				Ok(())
@@ -163,7 +165,7 @@ impl<'a> RegionProcessor<'a> {
 				.unwrap_or_default()
 		}) {
 			let path = entry.path();
-			let Some(coords) = Self::parse_region_filename(&path) else {
+			let Some(coords) = parse_region_filename(&path) else {
 				continue;
 			};
 
