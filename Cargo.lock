@@ -269,6 +269,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "glam"
+version = "0.24.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ad83ab008a4fa3b31dfa713dd41b5a9bdea1e94e4cf1e2fc274ffbd49b0271d3"
+
+[[package]]
 name = "heck"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -368,6 +374,7 @@ dependencies = [
  "enumflags2",
  "fastnbt",
  "flate2",
+ "glam",
  "image",
  "itertools",
  "num-integer",

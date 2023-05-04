@@ -90,7 +90,7 @@ impl BlockTypes {
 	}
 }
 
-pub use biomes::Biome;
+pub use biomes::{Biome, BiomeGrassColorModifier};
 pub use block_color::block_color;
 
 #[derive(Debug)]

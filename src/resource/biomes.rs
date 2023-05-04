@@ -60,6 +60,18 @@ impl Biome {
 			..self
 		}
 	}
+
+	fn decode(val: i8) -> f32 {
+		f32::from(val) / 20.0
+	}
+
+	pub fn temp(&self) -> f32 {
+		Self::decode(self.temp)
+	}
+
+	pub fn downfall(&self) -> f32 {
+		Self::decode(self.downfall)
+	}
 }
 
 // Data extracted from Minecraft code decompiled using https://github.com/Hexeption/MCP-Reborn
