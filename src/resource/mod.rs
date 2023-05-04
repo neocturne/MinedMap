@@ -1,4 +1,5 @@
 mod biomes;
+mod block_color;
 mod block_types;
 mod legacy_block_types;
 
@@ -90,6 +91,7 @@ impl BlockTypes {
 }
 
 pub use biomes::Biome;
+pub use block_color::block_color;
 
 #[derive(Debug)]
 pub struct BiomeTypes {

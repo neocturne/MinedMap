@@ -2,22 +2,9 @@ use std::fs;
 
 use anyhow::{Context, Result};
 
-use minedmap::{io::storage, resource::Biome, types::*, world};
+use minedmap::{io::storage, resource::block_color, types::*, world};
 
 use super::common::*;
-
-fn block_color(block: &world::layer::BlockInfo, _biome: &Biome) -> [u8; 4] {
-	let h = block
-		.depth
-		.map(|depth| 0.5 + 0.005 * depth.0 as f32)
-		.unwrap_or_default();
-	let c = block
-		.block_type
-		.color
-		.0
-		.map(|v| (f32::from(v) * h).clamp(0.0, 255.0) as u8);
-	[c[0], c[1], c[2], 255]
-}
 
 pub struct TileRenderer<'a> {
 	config: &'a Config,
@@ -47,7 +34,14 @@ impl<'a> TileRenderer<'a> {
 				z: BlockZ(z as u8),
 			};
 			image::Rgba(match (&blocks[coords], &biomes[coords]) {
-				(Some(block), Some(biome)) => block_color(block, biome),
+				(
+					Some(world::layer::BlockInfo {
+						block_type,
+						depth: Some(depth),
+						..
+					}),
+					Some(biome),
+				) => block_color(*block_type, biome, depth.0 as f32),
 				_ => [0, 0, 0, 0],
 			})
 		});
