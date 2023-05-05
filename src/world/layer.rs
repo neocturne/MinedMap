@@ -28,7 +28,6 @@ impl BlockHeight {
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct BlockInfo {
 	pub block_type: BlockType,
-	pub y: BlockHeight,
 	pub depth: Option<BlockHeight>,
 }
 
@@ -66,7 +65,6 @@ impl OptionBlockInfoExt for Option<BlockInfo> {
 		if self.is_none() {
 			*self = Some(BlockInfo {
 				block_type,
-				y,
 				depth: None,
 			});
 		}
