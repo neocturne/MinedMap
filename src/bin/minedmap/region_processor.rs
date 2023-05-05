@@ -2,7 +2,12 @@ use std::{fs, path::Path};
 
 use anyhow::{Context, Result};
 
-use minedmap::{io::storage, resource, types::*, world};
+use minedmap::{
+	io::storage,
+	resource,
+	types::*,
+	world::{self, layer::LayerData},
+};
 
 use super::common::*;
 
@@ -34,18 +39,7 @@ impl<'a> RegionProcessor<'a> {
 	}
 
 	/// Processes a single chunk
-	fn process_chunk(
-		&self,
-		data: world::de::Chunk,
-	) -> Result<
-		Option<(
-			(
-				Box<world::layer::BlockInfoArray>,
-				Box<world::layer::BiomeArray>,
-			),
-			Box<world::layer::BlockLightArray>,
-		)>,
-	> {
+	fn process_chunk(&self, data: world::de::Chunk) -> Result<Option<LayerData>> {
 		let chunk = world::chunk::Chunk::new(&data, &self.block_types, &self.biome_types)?;
 		world::layer::top_layer(&chunk)
 	}
@@ -110,15 +104,15 @@ impl<'a> RegionProcessor<'a> {
 
 		minedmap::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
-				let Some((processed_chunk, block_light)) = self
+				let Some(layer_data) = self
 					.process_chunk(data)
 					.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
 				else {
 					return Ok(());
 				};
-				processed_region[chunk_coords] = Some(processed_chunk);
+				processed_region[chunk_coords] = Some((layer_data.blocks, layer_data.biomes));
 
-				let chunk_lightmap = Self::render_chunk_lightmap(block_light);
+				let chunk_lightmap = Self::render_chunk_lightmap(layer_data.block_light);
 				overlay_chunk(&mut lightmap, &chunk_lightmap, chunk_coords);
 
 				Ok(())

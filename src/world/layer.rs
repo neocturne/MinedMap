@@ -86,6 +86,13 @@ pub type BlockInfoArray = LayerBlockArray<Option<BlockInfo>>;
 pub type BiomeArray = LayerBlockArray<Option<Biome>>;
 pub type BlockLightArray = LayerBlockArray<u8>;
 
+#[derive(Debug, Default)]
+pub struct LayerData {
+	pub blocks: Box<BlockInfoArray>,
+	pub biomes: Box<BiomeArray>,
+	pub block_light: Box<BlockLightArray>,
+}
+
 /// Fills in a [BlockInfoArray] with the information of the chunk's top
 /// block layer
 ///
@@ -93,9 +100,7 @@ pub type BlockLightArray = LayerBlockArray<u8>;
 /// determined as the block that should be visible on the rendered
 /// map. For water blocks, the height of the first non-water block
 /// is additionally filled in as the water depth.
-pub fn top_layer(
-	chunk: &Chunk,
-) -> Result<Option<((Box<BlockInfoArray>, Box<BiomeArray>), Box<BlockLightArray>)>> {
+pub fn top_layer(chunk: &Chunk) -> Result<Option<LayerData>> {
 	use BLOCKS_PER_CHUNK as N;
 
 	if chunk.is_empty() {
@@ -103,9 +108,7 @@ pub fn top_layer(
 	}
 
 	let mut done = 0;
-	let mut blocks = Box::<BlockInfoArray>::default();
-	let mut block_biomes = Box::<BiomeArray>::default();
-	let mut light = Box::<BlockLightArray>::default();
+	let mut ret = LayerData::default();
 
 	for SectionIterItem {
 		y: section_y,
@@ -116,7 +119,7 @@ pub fn top_layer(
 	{
 		for y in BlockY::iter().rev() {
 			for xz in BlockInfoArray::keys() {
-				let entry = &mut blocks[xz];
+				let entry = &mut ret.blocks[xz];
 				if entry.done() {
 					continue;
 				}
@@ -137,13 +140,13 @@ pub fn top_layer(
 					done += 1;
 				};
 
-				let biome_entry = &mut block_biomes[xz];
+				let biome_entry = &mut ret.biomes[xz];
 				if !entry.is_none() && biome_entry.is_none() {
 					*biome_entry = biomes.biome_at(section_y, coords)?.copied();
 				}
 
 				if entry.is_none() {
-					light[xz] = block_light.block_light_at(coords);
+					ret.block_light[xz] = block_light.block_light_at(coords);
 				}
 
 				if done == N * N {
@@ -153,5 +156,5 @@ pub fn top_layer(
 		}
 	}
 
-	Ok(Some(((blocks, block_biomes), light)))
+	Ok(Some(ret))
 }
