@@ -25,36 +25,23 @@ impl BlockHeight {
 	}
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct BlockInfo {
-	pub block_type: BlockType,
+	pub block_type: Option<BlockType>,
 	pub depth: Option<BlockHeight>,
 }
 
-/// Helper methods for [BlockInfo]
-trait OptionBlockInfoExt {
-	/// Checks if a [BlockInfo] has been filled in completely
-	///
-	/// Helper used by [top_layer]
-	fn done(&self) -> bool;
+pub type BlockInfoArray = LayerBlockArray<BlockInfo>;
+pub type BiomeArray = LayerBlockArray<Option<Biome>>;
+pub type BlockLightArray = LayerBlockArray<u8>;
 
-	/// Fills in a [BlockInfo] based on a [BlockType]
-	///
-	/// Only fills in data if the block is part of the visible top layer
-	/// of the rendered map.
-	///
-	/// Must be called on an incomplete [BlockInfo] entry. Returns `true`
-	/// if the entry has been filled in completely.
-	fn fill(&mut self, y: BlockHeight, block_type: BlockType) -> bool;
-}
+impl BlockInfo {
+	fn is_empty(&self) -> bool {
+		self.block_type.is_none()
+	}
 
-impl OptionBlockInfoExt for Option<BlockInfo> {
 	fn done(&self) -> bool {
-		let Some(info) = self else {
-			return false;
-		};
-
-		info.depth.is_some()
+		self.depth.is_some()
 	}
 
 	fn fill(&mut self, y: BlockHeight, block_type: BlockType) -> bool {
@@ -62,27 +49,19 @@ impl OptionBlockInfoExt for Option<BlockInfo> {
 			return false;
 		}
 
-		if self.is_none() {
-			*self = Some(BlockInfo {
-				block_type,
-				depth: None,
-			});
+		if self.block_type.is_none() {
+			self.block_type = Some(block_type);
 		}
 
 		if block_type.is(BlockFlag::Water) {
 			return false;
 		}
 
-		let info = self.as_mut().unwrap();
-		info.depth = Some(y);
+		self.depth = Some(y);
 
 		true
 	}
 }
-
-pub type BlockInfoArray = LayerBlockArray<Option<BlockInfo>>;
-pub type BiomeArray = LayerBlockArray<Option<Biome>>;
-pub type BlockLightArray = LayerBlockArray<u8>;
 
 #[derive(Debug, Default)]
 pub struct LayerData {
@@ -139,11 +118,11 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<LayerData>> {
 				};
 
 				let biome_entry = &mut ret.biomes[xz];
-				if !entry.is_none() && biome_entry.is_none() {
+				if !entry.is_empty() && biome_entry.is_none() {
 					*biome_entry = biomes.biome_at(section_y, coords)?.copied();
 				}
 
-				if entry.is_none() {
+				if entry.is_empty() {
 					ret.block_light[xz] = block_light.block_light_at(coords);
 				}
 

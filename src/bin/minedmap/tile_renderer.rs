@@ -35,11 +35,11 @@ impl<'a> TileRenderer<'a> {
 			};
 			image::Rgba(match (&blocks[coords], &biomes[coords]) {
 				(
-					Some(world::layer::BlockInfo {
-						block_type,
+					world::layer::BlockInfo {
+						block_type: Some(block_type),
 						depth: Some(depth),
 						..
-					}),
+					},
 					Some(biome),
 				) => block_color(*block_type, biome, depth.0 as f32),
 				_ => [0, 0, 0, 0],
