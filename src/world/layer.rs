@@ -35,9 +35,16 @@ pub type BlockInfoArray = LayerBlockArray<BlockInfo>;
 pub type BiomeArray = LayerBlockArray<Option<Biome>>;
 pub type BlockLightArray = LayerBlockArray<u8>;
 
-impl BlockInfo {
+struct LayerEntry<'a> {
+	block: &'a mut Option<BlockType>,
+	biome: &'a mut Option<Biome>,
+	block_light: &'a mut u8,
+	depth: &'a mut Option<BlockHeight>,
+}
+
+impl<'a> LayerEntry<'a> {
 	fn is_empty(&self) -> bool {
-		self.block_type.is_none()
+		self.block.is_none()
 	}
 
 	fn done(&self) -> bool {
@@ -49,15 +56,15 @@ impl BlockInfo {
 			return false;
 		}
 
-		if self.block_type.is_none() {
-			self.block_type = Some(block_type);
+		if self.block.is_none() {
+			*self.block = Some(block_type);
 		}
 
 		if block_type.is(BlockFlag::Water) {
 			return false;
 		}
 
-		self.depth = Some(y);
+		*self.depth = Some(y);
 
 		true
 	}
@@ -68,6 +75,18 @@ pub struct LayerData {
 	pub blocks: Box<BlockInfoArray>,
 	pub biomes: Box<BiomeArray>,
 	pub block_light: Box<BlockLightArray>,
+}
+
+impl LayerData {
+	fn entry(&mut self, coords: LayerBlockCoords) -> LayerEntry {
+		let block_info = &mut self.blocks[coords];
+		LayerEntry {
+			block: &mut block_info.block_type,
+			biome: &mut self.biomes[coords],
+			block_light: &mut self.block_light[coords],
+			depth: &mut block_info.depth,
+		}
+	}
 }
 
 /// Fills in a [BlockInfoArray] with the information of the chunk's top
@@ -96,7 +115,7 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<LayerData>> {
 	{
 		for y in BlockY::iter().rev() {
 			for xz in BlockInfoArray::keys() {
-				let entry = &mut ret.blocks[xz];
+				let mut entry = ret.entry(xz);
 				if entry.done() {
 					continue;
 				}
@@ -117,13 +136,12 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<LayerData>> {
 					done += 1;
 				};
 
-				let biome_entry = &mut ret.biomes[xz];
-				if !entry.is_empty() && biome_entry.is_none() {
-					*biome_entry = biomes.biome_at(section_y, coords)?.copied();
+				if !entry.is_empty() && entry.biome.is_none() {
+					*entry.biome = biomes.biome_at(section_y, coords)?.copied();
 				}
 
 				if entry.is_empty() {
-					ret.block_light[xz] = block_light.block_light_at(coords);
+					*entry.block_light = block_light.block_light_at(coords);
 				}
 
 				if done == N * N {
