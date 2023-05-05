@@ -6,7 +6,10 @@ use minedmap::{
 	io::storage,
 	resource,
 	types::*,
-	world::{self, layer::LayerData},
+	world::{
+		self,
+		layer::{self, LayerData},
+	},
 };
 
 use super::common::*;
@@ -104,15 +107,19 @@ impl<'a> RegionProcessor<'a> {
 
 		minedmap::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
-				let Some(layer_data) = self
+				let Some(layer::LayerData{ blocks, biomes, block_light, depths }) = self
 					.process_chunk(data)
 					.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
 				else {
 					return Ok(());
 				};
-				processed_region[chunk_coords] = Some((layer_data.blocks, layer_data.biomes));
+				processed_region[chunk_coords] = Some(ProcessedChunk {
+					blocks,
+					biomes,
+					depths,
+				});
 
-				let chunk_lightmap = Self::render_chunk_lightmap(layer_data.block_light);
+				let chunk_lightmap = Self::render_chunk_lightmap(block_light);
 				overlay_chunk(&mut lightmap, &chunk_lightmap, chunk_coords);
 
 				Ok(())

@@ -25,15 +25,10 @@ impl BlockHeight {
 	}
 }
 
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
-pub struct BlockInfo {
-	pub block_type: Option<BlockType>,
-	pub depth: Option<BlockHeight>,
-}
-
-pub type BlockInfoArray = LayerBlockArray<BlockInfo>;
+pub type BlockArray = LayerBlockArray<Option<BlockType>>;
 pub type BiomeArray = LayerBlockArray<Option<Biome>>;
 pub type BlockLightArray = LayerBlockArray<u8>;
+pub type DepthArray = LayerBlockArray<Option<BlockHeight>>;
 
 struct LayerEntry<'a> {
 	block: &'a mut Option<BlockType>,
@@ -80,19 +75,19 @@ impl<'a> LayerEntry<'a> {
 
 #[derive(Debug, Default)]
 pub struct LayerData {
-	pub blocks: Box<BlockInfoArray>,
+	pub blocks: Box<BlockArray>,
 	pub biomes: Box<BiomeArray>,
 	pub block_light: Box<BlockLightArray>,
+	pub depths: Box<DepthArray>,
 }
 
 impl LayerData {
 	fn entry(&mut self, coords: LayerBlockCoords) -> LayerEntry {
-		let block_info = &mut self.blocks[coords];
 		LayerEntry {
-			block: &mut block_info.block_type,
+			block: &mut self.blocks[coords],
 			biome: &mut self.biomes[coords],
 			block_light: &mut self.block_light[coords],
-			depth: &mut block_info.depth,
+			depth: &mut self.depths[coords],
 		}
 	}
 }
@@ -116,7 +111,7 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<LayerData>> {
 
 	for section in chunk.sections().rev() {
 		for y in BlockY::iter().rev() {
-			for xz in BlockInfoArray::keys() {
+			for xz in LayerBlockArray::<()>::keys() {
 				let mut entry = ret.entry(xz);
 				if entry.done() {
 					continue;

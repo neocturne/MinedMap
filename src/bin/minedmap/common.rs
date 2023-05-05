@@ -1,14 +1,18 @@
 use std::path::{Path, PathBuf};
 
-use minedmap::{types::*, world};
+use serde::{Deserialize, Serialize};
+
+use minedmap::{types::*, world::layer};
 
 pub type RegionCoords = (i32, i32);
-pub type ProcessedRegion = ChunkArray<
-	Option<(
-		Box<world::layer::BlockInfoArray>,
-		Box<world::layer::BiomeArray>,
-	)>,
->;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProcessedChunk {
+	pub blocks: Box<layer::BlockArray>,
+	pub biomes: Box<layer::BiomeArray>,
+	pub depths: Box<layer::DepthArray>,
+}
+pub type ProcessedRegion = ChunkArray<Option<ProcessedChunk>>;
 
 pub struct Config {
 	pub region_dir: PathBuf,

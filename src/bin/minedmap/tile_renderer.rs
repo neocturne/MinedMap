@@ -2,7 +2,7 @@ use std::fs;
 
 use anyhow::{Context, Result};
 
-use minedmap::{io::storage, resource::block_color, types::*, world};
+use minedmap::{io::storage, resource::block_color, types::*};
 
 use super::common::*;
 
@@ -20,12 +20,7 @@ impl<'a> TileRenderer<'a> {
 		storage::read(&processed_path).context("Failed to load processed region data")
 	}
 
-	fn render_chunk(
-		image: &mut image::RgbaImage,
-		coords: ChunkCoords,
-		blocks: &world::layer::BlockInfoArray,
-		biomes: &world::layer::BiomeArray,
-	) {
+	fn render_chunk(image: &mut image::RgbaImage, coords: ChunkCoords, chunk: &ProcessedChunk) {
 		const N: u32 = BLOCKS_PER_CHUNK as u32;
 
 		let chunk_image = image::RgbaImage::from_fn(N, N, |x, z| {
@@ -33,28 +28,29 @@ impl<'a> TileRenderer<'a> {
 				x: BlockX(x as u8),
 				z: BlockZ(z as u8),
 			};
-			image::Rgba(match (&blocks[coords], &biomes[coords]) {
-				(
-					world::layer::BlockInfo {
-						block_type: Some(block_type),
-						depth: Some(depth),
-						..
-					},
-					Some(biome),
-				) => block_color(*block_type, biome, depth.0 as f32),
-				_ => [0, 0, 0, 0],
-			})
+			image::Rgba(
+				match (
+					&chunk.blocks[coords],
+					&chunk.biomes[coords],
+					&chunk.depths[coords],
+				) {
+					(Some(block), Some(biome), Some(depth)) => {
+						block_color(*block, biome, depth.0 as f32)
+					}
+					_ => [0, 0, 0, 0],
+				},
+			)
 		});
 		overlay_chunk(image, &chunk_image, coords);
 	}
 
 	fn render_region(image: &mut image::RgbaImage, region: &ProcessedRegion) {
 		for (coords, chunk) in region.iter() {
-			let Some((blocks, biomes)) = chunk else {
+			let Some(chunk) = chunk else {
 				continue;
 			};
 
-			Self::render_chunk(image, coords, blocks, biomes);
+			Self::render_chunk(image, coords, chunk);
 		}
 	}
 
