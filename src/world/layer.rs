@@ -51,22 +51,30 @@ impl<'a> LayerEntry<'a> {
 		self.depth.is_some()
 	}
 
-	fn fill(&mut self, y: BlockHeight, block_type: BlockType) -> bool {
-		if !block_type.is(BlockFlag::Opaque) {
-			return false;
-		}
+	fn fill(&mut self, section: SectionIterItem, coords: SectionBlockCoords) -> Result<bool> {
+		let Some(block_type) = section.section.block_at(coords)?
+			.filter(|block_type| block_type.is(BlockFlag::Opaque))
+		else {
+			if self.is_empty() {
+				*self.block_light = section.block_light.block_light_at(coords);
+			}
 
-		if self.block.is_none() {
+			return Ok(false);
+		};
+
+		if self.is_empty() {
 			*self.block = Some(block_type);
+			*self.biome = section.biomes.biome_at(section.y, coords)?.copied();
 		}
 
 		if block_type.is(BlockFlag::Water) {
-			return false;
+			return Ok(false);
 		}
 
-		*self.depth = Some(y);
+		let height = BlockHeight::new(section.y, coords.y)?;
+		*self.depth = Some(height);
 
-		true
+		Ok(true)
 	}
 }
 
@@ -106,13 +114,7 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<LayerData>> {
 	let mut done = 0;
 	let mut ret = LayerData::default();
 
-	for SectionIterItem {
-		y: section_y,
-		section,
-		biomes,
-		block_light,
-	} in chunk.sections().rev()
-	{
+	for section in chunk.sections().rev() {
 		for y in BlockY::iter().rev() {
 			for xz in BlockInfoArray::keys() {
 				let mut entry = ret.entry(xz);
@@ -121,29 +123,12 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<LayerData>> {
 				}
 
 				let coords = SectionBlockCoords { xz, y };
-
-				'check_block: {
-					let Some(block_type) = section.block_at(coords)? else {
-						break 'check_block;
-					};
-
-					let height = BlockHeight::new(section_y, y)?;
-					if !entry.fill(height, block_type) {
-						break 'check_block;
-					}
-
-					assert!(entry.done());
-					done += 1;
-				};
-
-				if !entry.is_empty() && entry.biome.is_none() {
-					*entry.biome = biomes.biome_at(section_y, coords)?.copied();
+				if !entry.fill(section, coords)? {
+					continue;
 				}
 
-				if entry.is_empty() {
-					*entry.block_light = block_light.block_light_at(coords);
-				}
-
+				assert!(entry.done());
+				done += 1;
 				if done == N * N {
 					break;
 				}
