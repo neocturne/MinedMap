@@ -63,19 +63,8 @@ impl<'a> RegionProcessor<'a> {
 	}
 
 	fn save_region(&self, coords: RegionCoords, processed_region: &ProcessedRegion) -> Result<()> {
-		let tmp_path = self.config.processed_path(coords, true);
-		storage::write(&tmp_path, processed_region)?;
-
 		let output_path = self.config.processed_path(coords, false);
-		fs::rename(&tmp_path, &output_path).with_context(|| {
-			format!(
-				"Failed to rename {} to {}",
-				tmp_path.display(),
-				output_path.display(),
-			)
-		})?;
-
-		Ok(())
+		storage::write(&output_path, processed_region)
 	}
 
 	fn save_lightmap(&self, coords: RegionCoords, lightmap: &image::GrayAlphaImage) -> Result<()> {
