@@ -21,6 +21,10 @@ pub struct Config {
 	pub map_dir: PathBuf,
 }
 
+fn coord_filename(coords: RegionCoords, ext: &str) -> String {
+	format!("r.{}.{}.{}", coords.0, coords.1, ext)
+}
+
 impl Config {
 	pub fn new(args: super::Args) -> Self {
 		let region_dir = [&args.input_dir, Path::new("region")].iter().collect();
@@ -36,33 +40,18 @@ impl Config {
 		}
 	}
 
-	pub fn processed_path(&self, coords: RegionCoords, temp: bool) -> PathBuf {
-		let filename = format!(
-			"r.{}.{}.bin{}",
-			coords.0,
-			coords.1,
-			if temp { ".tmp" } else { "" },
-		);
+	pub fn processed_path(&self, coords: RegionCoords) -> PathBuf {
+		let filename = coord_filename(coords, "bin");
 		[&self.processed_dir, Path::new(&filename)].iter().collect()
 	}
 
-	pub fn light_path(&self, coords: RegionCoords, temp: bool) -> PathBuf {
-		let filename = format!(
-			"r.{}.{}.png{}",
-			coords.0,
-			coords.1,
-			if temp { ".tmp" } else { "" },
-		);
+	pub fn light_path(&self, coords: RegionCoords) -> PathBuf {
+		let filename = coord_filename(coords, "png");
 		[&self.light_dir, Path::new(&filename)].iter().collect()
 	}
 
-	pub fn map_path(&self, coords: RegionCoords, temp: bool) -> PathBuf {
-		let filename = format!(
-			"r.{}.{}.png{}",
-			coords.0,
-			coords.1,
-			if temp { ".tmp" } else { "" },
-		);
+	pub fn map_path(&self, coords: RegionCoords) -> PathBuf {
+		let filename = coord_filename(coords, "png");
 		[&self.map_dir, Path::new(&filename)].iter().collect()
 	}
 }

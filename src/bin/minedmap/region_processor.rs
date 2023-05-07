@@ -1,9 +1,9 @@
-use std::{fs, path::Path};
+use std::path::Path;
 
 use anyhow::{Context, Result};
 
 use minedmap::{
-	io::storage,
+	io::{fs, storage},
 	resource,
 	types::*,
 	world::{
@@ -63,26 +63,16 @@ impl<'a> RegionProcessor<'a> {
 	}
 
 	fn save_region(&self, coords: RegionCoords, processed_region: &ProcessedRegion) -> Result<()> {
-		let output_path = self.config.processed_path(coords, false);
+		let output_path = self.config.processed_path(coords);
 		storage::write(&output_path, processed_region)
 	}
 
 	fn save_lightmap(&self, coords: RegionCoords, lightmap: &image::GrayAlphaImage) -> Result<()> {
-		let tmp_path = self.config.light_path(coords, true);
-		lightmap
-			.save_with_format(&tmp_path, image::ImageFormat::Png)
-			.context("Failed to save image")?;
-
-		let output_path = self.config.light_path(coords, false);
-		fs::rename(&tmp_path, &output_path).with_context(|| {
-			format!(
-				"Failed to rename {} to {}",
-				tmp_path.display(),
-				output_path.display(),
-			)
-		})?;
-
-		Ok(())
+		fs::create_with_tmpfile(&self.config.light_path(coords), |file| {
+			lightmap
+				.write_to(file, image::ImageFormat::Png)
+				.context("Failed to save image")
+		})
 	}
 
 	/// Processes a single region file
@@ -132,18 +122,8 @@ impl<'a> RegionProcessor<'a> {
 			)
 		})?;
 
-		fs::create_dir_all(&self.config.processed_dir).with_context(|| {
-			format!(
-				"Failed to create directory {}",
-				self.config.processed_dir.display(),
-			)
-		})?;
-		fs::create_dir_all(&self.config.light_dir).with_context(|| {
-			format!(
-				"Failed to create directory {}",
-				self.config.light_dir.display(),
-			)
-		})?;
+		fs::create_dir_all(&self.config.processed_dir)?;
+		fs::create_dir_all(&self.config.light_dir)?;
 
 		let mut ret = Vec::new();
 
