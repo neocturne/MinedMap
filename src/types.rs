@@ -73,20 +73,6 @@ impl LayerBlockCoords {
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct LayerBlockArray<T>(pub [[T; BLOCKS_PER_CHUNK]; BLOCKS_PER_CHUNK]);
 
-impl<T> LayerBlockArray<T> {
-	pub fn keys() -> impl Iterator<Item = LayerBlockCoords> + Clone + Debug {
-		iproduct!(BlockZ::iter(), BlockX::iter()).map(|(z, x)| LayerBlockCoords { x, z })
-	}
-
-	pub fn values(&self) -> impl Iterator<Item = &T> + Clone + Debug {
-		Self::keys().map(|k| &self[k])
-	}
-
-	pub fn iter(&self) -> impl Iterator<Item = (LayerBlockCoords, &T)> + Clone + Debug {
-		Self::keys().map(|k| (k, &self[k]))
-	}
-}
-
 impl<T> Index<LayerBlockCoords> for LayerBlockArray<T> {
 	type Output = T;
 

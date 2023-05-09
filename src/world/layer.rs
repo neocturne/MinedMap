@@ -111,21 +111,25 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<LayerData>> {
 
 	for section in chunk.sections().rev() {
 		for y in BlockY::iter().rev() {
-			for xz in LayerBlockArray::<()>::keys() {
-				let mut entry = ret.entry(xz);
-				if entry.done() {
-					continue;
-				}
+			for z in BlockZ::iter() {
+				for x in BlockX::iter() {
+					let xz = LayerBlockCoords { x, z };
 
-				let coords = SectionBlockCoords { xz, y };
-				if !entry.fill(section, coords)? {
-					continue;
-				}
+					let mut entry = ret.entry(xz);
+					if entry.done() {
+						continue;
+					}
 
-				assert!(entry.done());
-				done += 1;
-				if done == N * N {
-					break;
+					let coords = SectionBlockCoords { xz, y };
+					if !entry.fill(section, coords)? {
+						continue;
+					}
+
+					assert!(entry.done());
+					done += 1;
+					if done == N * N {
+						break;
+					}
 				}
 			}
 		}
