@@ -17,7 +17,7 @@ fastnbt = "2.3.2"
 flate2 = "1.0.25"
 glam = "0.24.0"
 image = { version = "0.24.5", default-features = false, features = ["png"] }
-itertools = "0.10.5"
+itertools = "0.11.0"
 num-integer = "0.1.45"
 serde = "1.0.152"
 zstd = "0.12.3"
