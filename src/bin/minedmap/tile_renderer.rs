@@ -64,9 +64,9 @@ impl<'a> TileRenderer<'a> {
 		println!(
 			"Rendering tile {}",
 			output_path
-				.file_name()
-				.unwrap_or_default()
-				.to_string_lossy(),
+				.strip_prefix(&self.config.output_dir)
+				.expect("tile path must be in output directory")
+				.display(),
 		);
 
 		let region = self.load_region(coords)?;
@@ -85,7 +85,7 @@ impl<'a> TileRenderer<'a> {
 
 		for coords in regions {
 			if let Err(err) = self.render_tile(coords) {
-				eprintln!("Failed to render tile {:?}: {:?}", coords, err,);
+				eprintln!("Failed to render tile {:?}: {:?}", coords, err);
 			}
 		}
 
