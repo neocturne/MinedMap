@@ -15,7 +15,7 @@ use minedmap::{
 use super::common::*;
 
 /// Parses a filename in the format r.X.Z.mca into the contained X and Z values
-fn parse_region_filename(path: &Path) -> Option<RegionCoords> {
+fn parse_region_filename(path: &Path) -> Option<TileCoords> {
 	let file_name = path.file_name()?.to_str()?;
 	let parts: Vec<_> = file_name.split('.').collect();
 	let &["r", x, z, "mca"] = parts.as_slice() else {
@@ -62,12 +62,12 @@ impl<'a> RegionProcessor<'a> {
 		})
 	}
 
-	fn save_region(&self, coords: RegionCoords, processed_region: &ProcessedRegion) -> Result<()> {
+	fn save_region(&self, coords: TileCoords, processed_region: &ProcessedRegion) -> Result<()> {
 		let output_path = self.config.processed_path(coords);
 		storage::write(&output_path, processed_region)
 	}
 
-	fn save_lightmap(&self, coords: RegionCoords, lightmap: &image::GrayAlphaImage) -> Result<()> {
+	fn save_lightmap(&self, coords: TileCoords, lightmap: &image::GrayAlphaImage) -> Result<()> {
 		fs::create_with_tmpfile(&self.config.light_path(coords), |file| {
 			lightmap
 				.write_to(file, image::ImageFormat::Png)
@@ -76,7 +76,7 @@ impl<'a> RegionProcessor<'a> {
 	}
 
 	/// Processes a single region file
-	fn process_region(&self, path: &Path, coords: RegionCoords) -> Result<()> {
+	fn process_region(&self, path: &Path, coords: TileCoords) -> Result<()> {
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
 		println!("Processing region r.{}.{}.mca", coords.0, coords.1);
@@ -114,7 +114,7 @@ impl<'a> RegionProcessor<'a> {
 	/// Iterates over all region files of a Minecraft save directory
 	///
 	/// Returns a list of the coordinates of all processed regions
-	pub fn run(self) -> Result<Vec<RegionCoords>> {
+	pub fn run(self) -> Result<Vec<TileCoords>> {
 		let read_dir = self.config.region_dir.read_dir().with_context(|| {
 			format!(
 				"Failed to read directory {}",

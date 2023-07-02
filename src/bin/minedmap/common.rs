@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use minedmap::{types::*, world::layer};
 
-pub type RegionCoords = (i32, i32);
+pub type TileCoords = (i32, i32);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProcessedChunk {
@@ -21,7 +21,7 @@ pub struct Config {
 	pub map_dir: PathBuf,
 }
 
-fn coord_filename(coords: RegionCoords, ext: &str) -> String {
+fn coord_filename(coords: TileCoords, ext: &str) -> String {
 	format!("r.{}.{}.{}", coords.0, coords.1, ext)
 }
 
@@ -40,17 +40,17 @@ impl Config {
 		}
 	}
 
-	pub fn processed_path(&self, coords: RegionCoords) -> PathBuf {
+	pub fn processed_path(&self, coords: TileCoords) -> PathBuf {
 		let filename = coord_filename(coords, "bin");
 		[&self.processed_dir, Path::new(&filename)].iter().collect()
 	}
 
-	pub fn light_path(&self, coords: RegionCoords) -> PathBuf {
+	pub fn light_path(&self, coords: TileCoords) -> PathBuf {
 		let filename = coord_filename(coords, "png");
 		[&self.light_dir, Path::new(&filename)].iter().collect()
 	}
 
-	pub fn map_path(&self, coords: RegionCoords) -> PathBuf {
+	pub fn map_path(&self, coords: TileCoords) -> PathBuf {
 		let filename = coord_filename(coords, "png");
 		[&self.map_dir, Path::new(&filename)].iter().collect()
 	}

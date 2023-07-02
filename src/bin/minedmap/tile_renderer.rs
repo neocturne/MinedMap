@@ -17,7 +17,7 @@ impl<'a> TileRenderer<'a> {
 		TileRenderer { config }
 	}
 
-	fn load_region(&self, coords: RegionCoords) -> Result<ProcessedRegion> {
+	fn load_region(&self, coords: TileCoords) -> Result<ProcessedRegion> {
 		let processed_path = self.config.processed_path(coords);
 		storage::read(&processed_path).context("Failed to load processed region data")
 	}
@@ -56,7 +56,7 @@ impl<'a> TileRenderer<'a> {
 		}
 	}
 
-	fn render_tile(&self, coords: RegionCoords) -> Result<()> {
+	fn render_tile(&self, coords: TileCoords) -> Result<()> {
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
 		let output_path = self.config.map_path(coords);
@@ -80,7 +80,7 @@ impl<'a> TileRenderer<'a> {
 		})
 	}
 
-	pub fn run(self, regions: &[RegionCoords]) -> Result<()> {
+	pub fn run(self, regions: &[TileCoords]) -> Result<()> {
 		fs::create_dir_all(&self.config.map_dir)?;
 
 		for &coords in regions {
