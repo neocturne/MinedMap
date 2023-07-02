@@ -1,10 +1,23 @@
-use std::path::{Path, PathBuf};
+use std::{
+	fmt::Debug,
+	path::{Path, PathBuf},
+};
 
 use serde::{Deserialize, Serialize};
 
 use minedmap::{types::*, world::layer};
 
-pub type TileCoords = (i32, i32);
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct TileCoords {
+	pub x: i32,
+	pub z: i32,
+}
+
+impl Debug for TileCoords {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "({}, {})", self.x, self.z)
+	}
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProcessedChunk {
@@ -22,7 +35,7 @@ pub struct Config {
 }
 
 fn coord_filename(coords: TileCoords, ext: &str) -> String {
-	format!("r.{}.{}.{}", coords.0, coords.1, ext)
+	format!("r.{}.{}.{}", coords.x, coords.z, ext)
 }
 
 impl Config {

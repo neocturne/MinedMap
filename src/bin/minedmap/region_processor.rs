@@ -22,7 +22,10 @@ fn parse_region_filename(path: &Path) -> Option<TileCoords> {
 			return None;
 		};
 
-	Some((x.parse().ok()?, z.parse().ok()?))
+	Some(TileCoords {
+		x: x.parse().ok()?,
+		z: z.parse().ok()?,
+	})
 }
 
 /// Type with methods for processing the regions of a Minecraft save directory
@@ -79,7 +82,7 @@ impl<'a> RegionProcessor<'a> {
 	fn process_region(&self, path: &Path, coords: TileCoords) -> Result<()> {
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
-		println!("Processing region r.{}.{}.mca", coords.0, coords.1);
+		println!("Processing region r.{}.{}.mca", coords.x, coords.z);
 
 		let mut processed_region = ProcessedRegion::default();
 		let mut lightmap = image::GrayAlphaImage::new(N, N);
