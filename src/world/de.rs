@@ -99,3 +99,18 @@ pub struct Chunk {
 	#[serde(flatten)]
 	pub chunk: ChunkVariants,
 }
+
+/// "Data" compound element of level.dat
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct LevelDatData {
+	pub spawn_x: i32,
+	pub spawn_z: i32,
+}
+
+/// Toplevel compound element of level.dat
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct LevelDat {
+	pub data: LevelDatData,
+}
