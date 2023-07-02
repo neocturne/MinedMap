@@ -24,7 +24,7 @@ fn main() -> Result<()> {
 	let config = Config::new(args);
 
 	let regions = RegionProcessor::new(&config).run()?;
-	TileRenderer::new(&config).run(&regions)?;
+	TileRenderer::new(&config).run(regions.iter().copied())?;
 
 	Ok(())
 }
