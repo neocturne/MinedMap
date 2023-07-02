@@ -59,7 +59,7 @@ impl<'a> TileRenderer<'a> {
 	fn render_tile(&self, coords: TileCoords) -> Result<()> {
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
-		let output_path = self.config.map_path(coords);
+		let output_path = self.config.tile_path(TileKind::Map, 0, coords);
 
 		println!(
 			"Rendering tile {}",
@@ -81,7 +81,7 @@ impl<'a> TileRenderer<'a> {
 	}
 
 	pub fn run(self, regions: impl IntoIterator<Item = TileCoords>) -> Result<()> {
-		fs::create_dir_all(&self.config.map_dir)?;
+		fs::create_dir_all(&self.config.tile_dir(TileKind::Map, 0))?;
 
 		for coords in regions {
 			if let Err(err) = self.render_tile(coords) {

@@ -71,11 +71,14 @@ impl<'a> RegionProcessor<'a> {
 	}
 
 	fn save_lightmap(&self, coords: TileCoords, lightmap: &image::GrayAlphaImage) -> Result<()> {
-		fs::create_with_tmpfile(&self.config.light_path(coords), |file| {
-			lightmap
-				.write_to(file, image::ImageFormat::Png)
-				.context("Failed to save image")
-		})
+		fs::create_with_tmpfile(
+			&self.config.tile_path(TileKind::Lightmap, 0, coords),
+			|file| {
+				lightmap
+					.write_to(file, image::ImageFormat::Png)
+					.context("Failed to save image")
+			},
+		)
 	}
 
 	/// Processes a single region file
@@ -126,7 +129,7 @@ impl<'a> RegionProcessor<'a> {
 		})?;
 
 		fs::create_dir_all(&self.config.processed_dir)?;
-		fs::create_dir_all(&self.config.light_dir)?;
+		fs::create_dir_all(&self.config.tile_dir(TileKind::Lightmap, 0))?;
 
 		let mut ret = BTreeSet::new();
 
