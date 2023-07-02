@@ -1,4 +1,4 @@
-use std::{collections::BTreeSet, path::Path};
+use std::path::Path;
 
 use anyhow::{Context, Result};
 
@@ -120,7 +120,7 @@ impl<'a> RegionProcessor<'a> {
 	/// Iterates over all region files of a Minecraft save directory
 	///
 	/// Returns a list of the coordinates of all processed regions
-	pub fn run(self) -> Result<BTreeSet<TileCoords>> {
+	pub fn run(self) -> Result<Vec<TileCoords>> {
 		let read_dir = self.config.region_dir.read_dir().with_context(|| {
 			format!(
 				"Failed to read directory {}",
@@ -131,7 +131,7 @@ impl<'a> RegionProcessor<'a> {
 		fs::create_dir_all(&self.config.processed_dir)?;
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Lightmap, 0))?;
 
-		let mut ret = BTreeSet::new();
+		let mut ret = Vec::new();
 
 		for entry in read_dir.filter_map(|entry| entry.ok()).filter(|entry| {
 			// We are only interested in regular files
@@ -153,7 +153,7 @@ impl<'a> RegionProcessor<'a> {
 				);
 			}
 
-			ret.insert(coords);
+			ret.push(coords);
 		}
 
 		Ok(ret)

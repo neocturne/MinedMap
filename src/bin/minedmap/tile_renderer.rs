@@ -80,10 +80,10 @@ impl<'a> TileRenderer<'a> {
 		})
 	}
 
-	pub fn run(self, regions: impl IntoIterator<Item = TileCoords>) -> Result<()> {
+	pub fn run(self, regions: &[TileCoords]) -> Result<()> {
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Map, 0))?;
 
-		for coords in regions {
+		for &coords in regions {
 			if let Err(err) = self.render_tile(coords) {
 				eprintln!("Failed to render tile {:?}: {:?}", coords, err);
 			}

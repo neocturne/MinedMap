@@ -1,5 +1,3 @@
-use std::collections::BTreeSet;
-
 use anyhow::{Context, Result};
 
 use minedmap::{io::fs, types::*};
@@ -100,11 +98,11 @@ impl<'a> TileMipmapper<'a> {
 		})
 	}
 
-	pub fn run(self, tiles: BTreeSet<TileCoords>) -> Result<Vec<TileCoordMap>> {
+	pub fn run(self, tiles: &[TileCoords]) -> Result<Vec<TileCoordMap>> {
 		let mut tile_stack = {
 			let mut tile_map = TileCoordMap::default();
 
-			for TileCoords { x, z } in tiles {
+			for &TileCoords { x, z } in tiles {
 				tile_map.0.entry(z).or_default().insert(x);
 			}
 
