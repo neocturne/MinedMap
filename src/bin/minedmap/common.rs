@@ -1,4 +1,5 @@
 use std::{
+	collections::{BTreeMap, BTreeSet},
 	fmt::Debug,
 	path::{Path, PathBuf},
 };
@@ -16,6 +17,19 @@ pub struct TileCoords {
 impl Debug for TileCoords {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		write!(f, "({}, {})", self.x, self.z)
+	}
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct TileCoordMap(pub BTreeMap<i32, BTreeSet<i32>>);
+
+impl TileCoordMap {
+	pub fn contains(&self, coords: TileCoords) -> bool {
+		let Some(xs) = self.0.get(&coords.z) else {
+			return false;
+		};
+
+		xs.contains(&coords.x)
 	}
 }
 

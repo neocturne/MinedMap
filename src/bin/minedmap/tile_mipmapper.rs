@@ -15,20 +15,23 @@ impl<'a> TileMipmapper<'a> {
 		TileMipmapper { config }
 	}
 
-	fn done(tiles: &BTreeSet<TileCoords>) -> bool {
+	fn done(tiles: &TileCoordMap) -> bool {
 		tiles
-			.into_iter()
-			.all(|TileCoords { x, z }| (-1..=0).contains(x) && (-1..=0).contains(z))
+			.0
+			.iter()
+			.all(|(z, xs)| (-1..=0).contains(z) && xs.iter().all(|x| (-1..=0).contains(x)))
 	}
 
-	fn map_coords(tiles: &BTreeSet<TileCoords>) -> BTreeSet<TileCoords> {
-		let mut ret = BTreeSet::new();
+	fn map_coords(tiles: &TileCoordMap) -> TileCoordMap {
+		let mut ret = TileCoordMap::default();
 
-		for coords in tiles {
-			ret.insert(TileCoords {
-				x: coords.x >> 1,
-				z: coords.z >> 1,
-			});
+		for (&z, xs) in &tiles.0 {
+			for &x in xs {
+				let xt = x >> 1;
+				let zt = z >> 1;
+
+				ret.0.entry(zt).or_default().insert(xt);
+			}
 		}
 
 		ret
@@ -39,7 +42,7 @@ impl<'a> TileMipmapper<'a> {
 		kind: TileKind,
 		level: usize,
 		coords: TileCoords,
-		prev: &BTreeSet<TileCoords>,
+		prev: &TileCoordMap,
 	) -> Result<()>
 	where
 		[P::Subpixel]: image::EncodableLayout,
@@ -65,7 +68,7 @@ impl<'a> TileMipmapper<'a> {
 				x: 2 * coords.x + dx,
 				z: 2 * coords.z + dz,
 			};
-			if !prev.contains(&source_coords) {
+			if !prev.contains(source_coords) {
 				continue;
 			}
 
@@ -97,8 +100,16 @@ impl<'a> TileMipmapper<'a> {
 		})
 	}
 
-	pub fn run(self, tiles: BTreeSet<TileCoords>) -> Result<Vec<BTreeSet<TileCoords>>> {
-		let mut tile_stack = vec![tiles];
+	pub fn run(self, tiles: BTreeSet<TileCoords>) -> Result<Vec<TileCoordMap>> {
+		let mut tile_stack = {
+			let mut tile_map = TileCoordMap::default();
+
+			for TileCoords { x, z } in tiles {
+				tile_map.0.entry(z).or_default().insert(x);
+			}
+
+			vec![tile_map]
+		};
 
 		loop {
 			let level = tile_stack.len();
@@ -112,9 +123,17 @@ impl<'a> TileMipmapper<'a> {
 
 			let next = Self::map_coords(prev);
 
-			for &coords in &next {
-				self.render_mipmap::<image::Rgba<u8>>(TileKind::Map, level, coords, prev)?;
-				self.render_mipmap::<image::LumaA<u8>>(TileKind::Lightmap, level, coords, prev)?;
+			for (&z, xs) in &next.0 {
+				for &x in xs {
+					let coords = TileCoords { x, z };
+					self.render_mipmap::<image::Rgba<u8>>(TileKind::Map, level, coords, prev)?;
+					self.render_mipmap::<image::LumaA<u8>>(
+						TileKind::Lightmap,
+						level,
+						coords,
+						prev,
+					)?;
+				}
 			}
 
 			tile_stack.push(next);
