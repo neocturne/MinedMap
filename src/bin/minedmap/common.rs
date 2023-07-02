@@ -20,7 +20,8 @@ impl Debug for TileCoords {
 	}
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(transparent)]
 pub struct TileCoordMap(pub BTreeMap<i32, BTreeSet<i32>>);
 
 impl TileCoordMap {
@@ -45,6 +46,8 @@ pub struct Config {
 	pub region_dir: PathBuf,
 	pub processed_dir: PathBuf,
 	pub output_dir: PathBuf,
+	pub level_dat_path: PathBuf,
+	pub metadata_path: PathBuf,
 }
 
 fn coord_filename(coords: TileCoords, ext: &str) -> String {
@@ -61,11 +64,15 @@ impl Config {
 	pub fn new(args: super::Args) -> Self {
 		let region_dir = [&args.input_dir, Path::new("region")].iter().collect();
 		let processed_dir = [&args.output_dir, Path::new("processed")].iter().collect();
+		let level_dat_path = [&args.input_dir, Path::new("level.dat")].iter().collect();
+		let metadata_path = [&args.output_dir, Path::new("info.json")].iter().collect();
 
 		Config {
 			region_dir,
 			processed_dir,
 			output_dir: args.output_dir,
+			level_dat_path,
+			metadata_path,
 		}
 	}
 
