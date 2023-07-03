@@ -25,39 +25,39 @@ trait BiomeExt {
 
 impl BiomeExt for Biome {
 	fn grass_color(&self, depth: f32) -> Vec3 {
+		use super::BiomeGrassColorModifier::*;
+
 		const GRASS_COLORS: [Vec3; 3] = [
 			Vec3::new(0.502, 0.706, 0.592),   // lower right
 			Vec3::new(0.247, 0.012, -0.259),  // lower left - lower right
 			Vec3::new(-0.471, 0.086, -0.133), // upper left - lower left
 		];
+		const DARK_FOREST_GRASS_COLOR: Vec3 = Vec3::new(0.157, 0.204, 0.039); // == color_vec(Color([40, 52, 10]))
+		const SWAMP_GRASS_COLOR: Vec3 = Vec3::new(0.416, 0.439, 0.224); // == color_vec(Color([106, 112, 57]))
 
-		self.grass_color
-			.map(color_vec)
-			.unwrap_or_else(|| color_from_params(&GRASS_COLORS, self, depth))
+		let regular_color = || {
+			self.grass_color
+				.map(color_vec)
+				.unwrap_or_else(|| color_from_params(&GRASS_COLORS, self, depth))
+		};
+
+		match self.grass_color_modifier {
+			Some(DarkForest) => 0.5 * (regular_color() + DARK_FOREST_GRASS_COLOR),
+			Some(Swamp) => SWAMP_GRASS_COLOR,
+			None => regular_color(),
+		}
 	}
 
 	fn foliage_color(&self, depth: f32) -> Vec3 {
-		use super::BiomeGrassColorModifier::*;
-
 		const FOLIAGE_COLORS: [Vec3; 3] = [
 			Vec3::new(0.376, 0.631, 0.482),   // lower right
 			Vec3::new(0.306, 0.012, -0.317),  // lower left - lower right
 			Vec3::new(-0.580, 0.106, -0.165), // upper left - lower left
 		];
-		const DARK_FOREST_COLOR: Vec3 = Vec3::new(0.157, 0.204, 0.039); // == color_vec(Color([40, 52, 10]))
-		const SWAMP_FOLIAGE_COLOR: Vec3 = Vec3::new(0.416, 0.439, 0.224); // == color_vec(Color([106, 112, 57]))
 
-		let regular_color = || {
-			self.foliage_color
-				.map(color_vec)
-				.unwrap_or_else(|| color_from_params(&FOLIAGE_COLORS, self, depth))
-		};
-
-		match self.grass_color_modifier {
-			Some(DarkForest) => 0.5 * (regular_color() + DARK_FOREST_COLOR),
-			Some(Swamp) => SWAMP_FOLIAGE_COLOR,
-			None => regular_color(),
-		}
+		self.foliage_color
+			.map(color_vec)
+			.unwrap_or_else(|| color_from_params(&FOLIAGE_COLORS, self, depth))
 	}
 
 	fn water_color(&self) -> Vec3 {
