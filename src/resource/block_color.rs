@@ -40,9 +40,9 @@ impl BiomeExt for Biome {
 		use super::BiomeGrassColorModifier::*;
 
 		const FOLIAGE_COLORS: [Vec3; 3] = [
-			Vec3::new(0.502, 0.706, 0.592),   // lower right
-			Vec3::new(0.247, 0.012, -0.259),  // lower left - lower right
-			Vec3::new(-0.471, 0.086, -0.133), // upper left - lower left
+			Vec3::new(0.376, 0.631, 0.482),   // lower right
+			Vec3::new(0.306, 0.012, -0.317),  // lower left - lower right
+			Vec3::new(-0.580, 0.106, -0.165), // upper left - lower left
 		];
 		const DARK_FOREST_COLOR: Vec3 = Vec3::new(0.157, 0.204, 0.039); // == color_vec(Color([40, 52, 10]))
 		const SWAMP_FOLIAGE_COLOR: Vec3 = Vec3::new(0.416, 0.439, 0.224); // == color_vec(Color([106, 112, 57]))
