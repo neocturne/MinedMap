@@ -2,8 +2,12 @@ use super::{Biome, BlockType, Color};
 
 use glam::Vec3;
 
-fn color_vec(color: Color) -> Vec3 {
+fn color_vec_unscaled(color: Color) -> Vec3 {
 	Vec3::from_array(color.0.map(f32::from))
+}
+
+fn color_vec(color: Color) -> Vec3 {
+	color_vec_unscaled(color) / 255.0
 }
 
 fn color_from_params(colors: &[Vec3; 3], biome: &Biome, depth: f32) -> Vec3 {
@@ -71,7 +75,7 @@ const EVERGREEN_COLOR: Vec3 = Vec3::new(0.380, 0.600, 0.380); // == color_vec(Co
 pub fn block_color(block: BlockType, biome: &Biome, depth: f32) -> [u8; 4] {
 	use super::BlockFlag::*;
 
-	let mut color = color_vec(block.color);
+	let mut color = color_vec_unscaled(block.color);
 
 	if block.is(Grass) {
 		color *= biome.grass_color(depth);
