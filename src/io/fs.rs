@@ -6,12 +6,12 @@ use std::{
 };
 
 use anyhow::{Context, Ok, Result};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Serialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub struct FileMetaVersion(pub u32);
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct FileMeta {
 	version: FileMetaVersion,
 	timestamp: SystemTime,
@@ -113,6 +113,18 @@ pub fn modified_timestamp(path: &Path) -> Result<SystemTime> {
 				path.display()
 			)
 		})
+}
+
+pub fn read_timestamp(path: &Path, version: FileMetaVersion) -> Option<SystemTime> {
+	let meta_path = metafile_name(path);
+	let mut file = BufReader::new(fs::File::open(meta_path).ok()?);
+
+	let meta: FileMeta = serde_json::from_reader(&mut file).ok()?;
+	if meta.version != version {
+		return None;
+	}
+
+	Some(meta.timestamp)
 }
 
 pub fn create_with_timestamp<T, F>(

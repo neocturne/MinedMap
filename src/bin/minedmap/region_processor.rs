@@ -66,43 +66,46 @@ impl<'a> RegionProcessor<'a> {
 	}
 
 	fn save_region(
-		&self,
-		coords: TileCoords,
+		path: &Path,
 		processed_region: &ProcessedRegion,
 		timestamp: SystemTime,
 	) -> Result<()> {
-		let output_path = self.config.processed_path(coords);
-		storage::write(&output_path, processed_region, FILE_META_VERSION, timestamp)
+		storage::write(path, processed_region, FILE_META_VERSION, timestamp)
 	}
 
 	fn save_lightmap(
-		&self,
-		coords: TileCoords,
+		path: &Path,
 		lightmap: &image::GrayAlphaImage,
 		timestamp: SystemTime,
 	) -> Result<()> {
-		fs::create_with_timestamp(
-			&self.config.tile_path(TileKind::Lightmap, 0, coords),
-			FILE_META_VERSION,
-			timestamp,
-			|file| {
-				lightmap
-					.write_to(file, image::ImageFormat::Png)
-					.context("Failed to save image")
-			},
-		)
+		fs::create_with_timestamp(path, FILE_META_VERSION, timestamp, |file| {
+			lightmap
+				.write_to(file, image::ImageFormat::Png)
+				.context("Failed to save image")
+		})
 	}
 
 	/// Processes a single region file
 	fn process_region(&self, path: &Path, coords: TileCoords) -> Result<()> {
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
-		println!("Processing region r.{}.{}.mca", coords.x, coords.z);
-
 		let mut processed_region = ProcessedRegion::default();
 		let mut lightmap = image::GrayAlphaImage::new(N, N);
 
-		let timestamp = fs::modified_timestamp(path)?;
+		let input_timestamp = fs::modified_timestamp(path)?;
+
+		let output_path = self.config.processed_path(coords);
+		let output_timestamp = fs::read_timestamp(&output_path, FILE_META_VERSION);
+		let lightmap_path = self.config.tile_path(TileKind::Lightmap, 0, coords);
+		let lightmap_timestamp = fs::read_timestamp(&lightmap_path, FILE_META_VERSION);
+
+		if Some(input_timestamp) <= output_timestamp && Some(input_timestamp) <= lightmap_timestamp
+		{
+			println!("Skipping unchanged region r.{}.{}.mca", coords.x, coords.z);
+			return Ok(());
+		}
+
+		println!("Processing region r.{}.{}.mca", coords.x, coords.z);
 
 		minedmap::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
@@ -125,8 +128,12 @@ impl<'a> RegionProcessor<'a> {
 			},
 		)?;
 
-		self.save_region(coords, &processed_region, timestamp)?;
-		self.save_lightmap(coords, &lightmap, timestamp)?;
+		if Some(input_timestamp) > output_timestamp {
+			Self::save_region(&output_path, &processed_region, input_timestamp)?;
+		}
+		if Some(input_timestamp) > lightmap_timestamp {
+			Self::save_lightmap(&lightmap_path, &lightmap, input_timestamp)?;
+		}
 
 		Ok(())
 	}

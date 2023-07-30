@@ -49,17 +49,7 @@ impl<'a> TileMipmapper<'a> {
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
 		let output_path = self.config.tile_path(kind, level, coords);
-
-		println!(
-			"Rendering mipmap tile {}",
-			output_path
-				.strip_prefix(&self.config.output_dir)
-				.expect("tile path must be in output directory")
-				.display(),
-		);
-
-		let mut image: image::DynamicImage =
-			image::ImageBuffer::<P, Vec<P::Subpixel>>::new(N, N).into();
+		let output_timestamp = fs::read_timestamp(&output_path, FILE_META_VERSION);
 
 		let sources: Vec<_> = [(0, 0), (0, 1), (1, 0), (1, 1)]
 			.into_iter()
@@ -84,9 +74,31 @@ impl<'a> TileMipmapper<'a> {
 			})
 			.collect();
 
-		let Some(timestamp) = sources.iter().map(|(_, _, ts)| *ts).max() else {
+		let Some(input_timestamp) = sources.iter().map(|(_, _, ts)| *ts).max() else {
 			return Ok(());
 		};
+
+		if Some(input_timestamp) <= output_timestamp {
+			println!(
+				"Skipping unchanged mipmap tile {}",
+				output_path
+					.strip_prefix(&self.config.output_dir)
+					.expect("tile path must be in output directory")
+					.display(),
+			);
+			return Ok(());
+		}
+
+		println!(
+			"Rendering mipmap tile {}",
+			output_path
+				.strip_prefix(&self.config.output_dir)
+				.expect("tile path must be in output directory")
+				.display(),
+		);
+
+		let mut image: image::DynamicImage =
+			image::ImageBuffer::<P, Vec<P::Subpixel>>::new(N, N).into();
 
 		for ((dx, dz), source_path, _) in sources {
 			let source = match image::open(&source_path) {
@@ -109,7 +121,7 @@ impl<'a> TileMipmapper<'a> {
 			);
 		}
 
-		fs::create_with_timestamp(&output_path, FILE_META_VERSION, timestamp, |file| {
+		fs::create_with_timestamp(&output_path, FILE_META_VERSION, input_timestamp, |file| {
 			image
 				.write_to(file, image::ImageFormat::Png)
 				.context("Failed to save image")

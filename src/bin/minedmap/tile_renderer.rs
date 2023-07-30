@@ -1,4 +1,4 @@
-use std::time::SystemTime;
+use std::path::Path;
 
 use anyhow::{Context, Result};
 
@@ -19,12 +19,8 @@ impl<'a> TileRenderer<'a> {
 		TileRenderer { config }
 	}
 
-	fn load_region(&self, coords: TileCoords) -> Result<(ProcessedRegion, SystemTime)> {
-		let processed_path = self.config.processed_path(coords);
-		let timestamp = fs::modified_timestamp(&processed_path)?;
-		let region =
-			storage::read(&processed_path).context("Failed to load processed region data")?;
-		Ok((region, timestamp))
+	fn load_region(processed_path: &Path) -> Result<ProcessedRegion> {
+		storage::read(processed_path).context("Failed to load processed region data")
 	}
 
 	fn render_chunk(image: &mut image::RgbaImage, coords: ChunkCoords, chunk: &ProcessedChunk) {
@@ -64,7 +60,22 @@ impl<'a> TileRenderer<'a> {
 	fn render_tile(&self, coords: TileCoords) -> Result<()> {
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
+		let processed_path = self.config.processed_path(coords);
+		let processed_timestamp = fs::modified_timestamp(&processed_path)?;
+
 		let output_path = self.config.tile_path(TileKind::Map, 0, coords);
+		let output_timestamp = fs::read_timestamp(&output_path, FILE_META_VERSION);
+
+		if Some(processed_timestamp) <= output_timestamp {
+			println!(
+				"Skipping unchanged tile {}",
+				output_path
+					.strip_prefix(&self.config.output_dir)
+					.expect("tile path must be in output directory")
+					.display(),
+			);
+			return Ok(());
+		}
 
 		println!(
 			"Rendering tile {}",
@@ -74,15 +85,20 @@ impl<'a> TileRenderer<'a> {
 				.display(),
 		);
 
-		let (region, timestamp) = self.load_region(coords)?;
+		let region = Self::load_region(&processed_path)?;
 		let mut image = image::RgbaImage::new(N, N);
 		Self::render_region(&mut image, &region);
 
-		fs::create_with_timestamp(&output_path, FILE_META_VERSION, timestamp, |file| {
-			image
-				.write_to(file, image::ImageFormat::Png)
-				.context("Failed to save image")
-		})
+		fs::create_with_timestamp(
+			&output_path,
+			FILE_META_VERSION,
+			processed_timestamp,
+			|file| {
+				image
+					.write_to(file, image::ImageFormat::Png)
+					.context("Failed to save image")
+			},
+		)
 	}
 
 	pub fn run(self, regions: &[TileCoords]) -> Result<()> {
