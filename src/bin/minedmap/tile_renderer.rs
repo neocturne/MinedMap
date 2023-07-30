@@ -78,7 +78,7 @@ impl<'a> TileRenderer<'a> {
 		let mut image = image::RgbaImage::new(N, N);
 		Self::render_region(&mut image, &region);
 
-		fs::create_with_timestamp(&output_path, timestamp, |file| {
+		fs::create_with_timestamp(&output_path, FILE_META_VERSION, timestamp, |file| {
 			image
 				.write_to(file, image::ImageFormat::Png)
 				.context("Failed to save image")

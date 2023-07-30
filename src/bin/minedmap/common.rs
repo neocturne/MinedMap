@@ -6,7 +6,10 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-use minedmap::{types::*, world::layer};
+use minedmap::{io::fs::FileMetaVersion, types::*, world::layer};
+
+// Increase to force regeneration of all output files
+pub const FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TileCoords {

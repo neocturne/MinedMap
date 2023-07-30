@@ -72,7 +72,7 @@ impl<'a> RegionProcessor<'a> {
 		timestamp: SystemTime,
 	) -> Result<()> {
 		let output_path = self.config.processed_path(coords);
-		storage::write(&output_path, processed_region, timestamp)
+		storage::write(&output_path, processed_region, FILE_META_VERSION, timestamp)
 	}
 
 	fn save_lightmap(
@@ -83,6 +83,7 @@ impl<'a> RegionProcessor<'a> {
 	) -> Result<()> {
 		fs::create_with_timestamp(
 			&self.config.tile_path(TileKind::Lightmap, 0, coords),
+			FILE_META_VERSION,
 			timestamp,
 			|file| {
 				lightmap

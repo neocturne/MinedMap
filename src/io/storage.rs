@@ -10,8 +10,13 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::fs;
 
-pub fn write<T: Serialize>(path: &Path, value: &T, timestamp: SystemTime) -> Result<()> {
-	fs::create_with_timestamp(path, timestamp, |file| {
+pub fn write<T: Serialize>(
+	path: &Path,
+	value: &T,
+	version: fs::FileMetaVersion,
+	timestamp: SystemTime,
+) -> Result<()> {
+	fs::create_with_timestamp(path, version, timestamp, |file| {
 		let data = bincode::serialize(value)?;
 		let len = u32::try_from(data.len())?;
 		let compressed = zstd::bulk::compress(&data, 1)?;

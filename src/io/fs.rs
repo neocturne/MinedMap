@@ -8,8 +8,12 @@ use std::{
 use anyhow::{Context, Ok, Result};
 use serde::Serialize;
 
+#[derive(Debug, Clone, Copy, Serialize)]
+pub struct FileMetaVersion(pub u32);
+
 #[derive(Debug, Serialize)]
 struct FileMeta {
+	version: FileMetaVersion,
 	timestamp: SystemTime,
 }
 
@@ -111,7 +115,12 @@ pub fn modified_timestamp(path: &Path) -> Result<SystemTime> {
 		})
 }
 
-pub fn create_with_timestamp<T, F>(path: &Path, timestamp: SystemTime, f: F) -> Result<T>
+pub fn create_with_timestamp<T, F>(
+	path: &Path,
+	version: FileMetaVersion,
+	timestamp: SystemTime,
+	f: F,
+) -> Result<T>
 where
 	F: FnOnce(&mut BufWriter<File>) -> Result<T>,
 {
@@ -119,7 +128,7 @@ where
 
 	let meta_path = metafile_name(path);
 	create(&meta_path, |file| {
-		serde_json::to_writer(file, &FileMeta { timestamp })?;
+		serde_json::to_writer(file, &FileMeta { version, timestamp })?;
 		Ok(())
 	})?;
 
