@@ -1,3 +1,5 @@
+use std::time::SystemTime;
+
 use anyhow::{Context, Result};
 
 use minedmap::{
@@ -17,9 +19,12 @@ impl<'a> TileRenderer<'a> {
 		TileRenderer { config }
 	}
 
-	fn load_region(&self, coords: TileCoords) -> Result<ProcessedRegion> {
+	fn load_region(&self, coords: TileCoords) -> Result<(ProcessedRegion, SystemTime)> {
 		let processed_path = self.config.processed_path(coords);
-		storage::read(&processed_path).context("Failed to load processed region data")
+		let timestamp = fs::modified_timestamp(&processed_path)?;
+		let region =
+			storage::read(&processed_path).context("Failed to load processed region data")?;
+		Ok((region, timestamp))
 	}
 
 	fn render_chunk(image: &mut image::RgbaImage, coords: ChunkCoords, chunk: &ProcessedChunk) {
@@ -69,11 +74,11 @@ impl<'a> TileRenderer<'a> {
 				.display(),
 		);
 
-		let region = self.load_region(coords)?;
+		let (region, timestamp) = self.load_region(coords)?;
 		let mut image = image::RgbaImage::new(N, N);
 		Self::render_region(&mut image, &region);
 
-		fs::create_with_tmpfile(&output_path, |file| {
+		fs::create_with_timestamp(&output_path, timestamp, |file| {
 			image
 				.write_to(file, image::ImageFormat::Png)
 				.context("Failed to save image")

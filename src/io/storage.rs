@@ -2,6 +2,7 @@ use std::{
 	fs::File,
 	io::{Read, Write},
 	path::Path,
+	time::SystemTime,
 };
 
 use anyhow::{Context, Result};
@@ -9,8 +10,8 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::fs;
 
-pub fn write<T: Serialize>(path: &Path, value: &T) -> Result<()> {
-	fs::create_with_tmpfile(path, |file| {
+pub fn write<T: Serialize>(path: &Path, value: &T, timestamp: SystemTime) -> Result<()> {
+	fs::create_with_timestamp(path, timestamp, |file| {
 		let data = bincode::serialize(value)?;
 		let len = u32::try_from(data.len())?;
 		let compressed = zstd::bulk::compress(&data, 1)?;

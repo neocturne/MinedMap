@@ -2,17 +2,32 @@ use std::{
 	fs::{self, File},
 	io::{BufReader, BufWriter, Read, Write},
 	path::{Path, PathBuf},
+	time::SystemTime,
 };
 
 use anyhow::{Context, Ok, Result};
+use serde::Serialize;
 
-fn tmpfile_name(path: &Path) -> PathBuf {
+#[derive(Debug, Serialize)]
+struct FileMeta {
+	timestamp: SystemTime,
+}
+
+fn suffix_name(path: &Path, suffix: &str) -> PathBuf {
 	let mut file_name = path.file_name().unwrap_or_default().to_os_string();
-	file_name.push(".tmp");
+	file_name.push(suffix);
 
 	let mut ret = path.to_path_buf();
 	ret.set_file_name(file_name);
 	ret
+}
+
+fn tmpfile_name(path: &Path) -> PathBuf {
+	suffix_name(path, ".tmp")
+}
+
+fn metafile_name(path: &Path) -> PathBuf {
+	suffix_name(path, ".meta")
 }
 
 pub fn create_dir_all(path: &Path) -> Result<()> {
@@ -83,4 +98,30 @@ where
 	}
 
 	ret
+}
+
+pub fn modified_timestamp(path: &Path) -> Result<SystemTime> {
+	fs::metadata(path)
+		.and_then(|meta| meta.modified())
+		.with_context(|| {
+			format!(
+				"Failed to get modified timestamp of file {}",
+				path.display()
+			)
+		})
+}
+
+pub fn create_with_timestamp<T, F>(path: &Path, timestamp: SystemTime, f: F) -> Result<T>
+where
+	F: FnOnce(&mut BufWriter<File>) -> Result<T>,
+{
+	let ret = create_with_tmpfile(path, f)?;
+
+	let meta_path = metafile_name(path);
+	create(&meta_path, |file| {
+		serde_json::to_writer(file, &FileMeta { timestamp })?;
+		Ok(())
+	})?;
+
+	Ok(ret)
 }

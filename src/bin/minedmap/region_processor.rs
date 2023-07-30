@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{path::Path, time::SystemTime};
 
 use anyhow::{Context, Result};
 
@@ -65,14 +65,25 @@ impl<'a> RegionProcessor<'a> {
 		})
 	}
 
-	fn save_region(&self, coords: TileCoords, processed_region: &ProcessedRegion) -> Result<()> {
+	fn save_region(
+		&self,
+		coords: TileCoords,
+		processed_region: &ProcessedRegion,
+		timestamp: SystemTime,
+	) -> Result<()> {
 		let output_path = self.config.processed_path(coords);
-		storage::write(&output_path, processed_region)
+		storage::write(&output_path, processed_region, timestamp)
 	}
 
-	fn save_lightmap(&self, coords: TileCoords, lightmap: &image::GrayAlphaImage) -> Result<()> {
-		fs::create_with_tmpfile(
+	fn save_lightmap(
+		&self,
+		coords: TileCoords,
+		lightmap: &image::GrayAlphaImage,
+		timestamp: SystemTime,
+	) -> Result<()> {
+		fs::create_with_timestamp(
 			&self.config.tile_path(TileKind::Lightmap, 0, coords),
+			timestamp,
 			|file| {
 				lightmap
 					.write_to(file, image::ImageFormat::Png)
@@ -89,6 +100,8 @@ impl<'a> RegionProcessor<'a> {
 
 		let mut processed_region = ProcessedRegion::default();
 		let mut lightmap = image::GrayAlphaImage::new(N, N);
+
+		let timestamp = fs::modified_timestamp(path)?;
 
 		minedmap::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
@@ -111,8 +124,8 @@ impl<'a> RegionProcessor<'a> {
 			},
 		)?;
 
-		self.save_region(coords, &processed_region)?;
-		self.save_lightmap(coords, &lightmap)?;
+		self.save_region(coords, &processed_region, timestamp)?;
+		self.save_lightmap(coords, &lightmap, timestamp)?;
 
 		Ok(())
 	}
