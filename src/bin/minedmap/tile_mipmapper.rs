@@ -61,16 +61,34 @@ impl<'a> TileMipmapper<'a> {
 		let mut image: image::DynamicImage =
 			image::ImageBuffer::<P, Vec<P::Subpixel>>::new(N, N).into();
 
-		for (dx, dz) in [(0, 0), (0, 1), (1, 0), (1, 1)] {
-			let source_coords = TileCoords {
-				x: 2 * coords.x + dx,
-				z: 2 * coords.z + dz,
-			};
-			if !prev.contains(source_coords) {
-				continue;
-			}
+		let sources: Vec<_> = [(0, 0), (0, 1), (1, 0), (1, 1)]
+			.into_iter()
+			.filter_map(|(dx, dz)| {
+				let source_coords = TileCoords {
+					x: 2 * coords.x + dx,
+					z: 2 * coords.z + dz,
+				};
+				if !prev.contains(source_coords) {
+					return None;
+				}
 
-			let source_path = self.config.tile_path(kind, level - 1, source_coords);
+				let source_path = self.config.tile_path(kind, level - 1, source_coords);
+				let timestamp = match fs::modified_timestamp(&source_path) {
+					Ok(timestamp) => timestamp,
+					Err(err) => {
+						eprintln!("{}", err);
+						return None;
+					}
+				};
+				Some(((dx, dz), source_path, timestamp))
+			})
+			.collect();
+
+		let Some(timestamp) = sources.iter().map(|(_, _, ts)| *ts).max() else {
+			return Ok(());
+		};
+
+		for ((dx, dz), source_path, _) in sources {
 			let source = match image::open(&source_path) {
 				Ok(source) => source,
 				Err(err) => {
@@ -91,7 +109,7 @@ impl<'a> TileMipmapper<'a> {
 			);
 		}
 
-		fs::create_with_tmpfile(&output_path, |file| {
+		fs::create_with_timestamp(&output_path, timestamp, |file| {
 			image
 				.write_to(file, image::ImageFormat::Png)
 				.context("Failed to save image")
