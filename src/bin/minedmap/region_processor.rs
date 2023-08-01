@@ -57,8 +57,8 @@ impl<'a> RegionProcessor<'a> {
 
 		image::GrayAlphaImage::from_fn(N, N, |x, z| {
 			let v: f32 = block_light[LayerBlockCoords {
-				x: BlockX(x as u8),
-				z: BlockZ(z as u8),
+				x: BlockX::new(x),
+				z: BlockZ::new(z),
 			}]
 			.into();
 			image::LumaA([0, (192.0 * (1.0 - v / 15.0)) as u8])

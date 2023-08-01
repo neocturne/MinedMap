@@ -28,8 +28,8 @@ impl<'a> TileRenderer<'a> {
 
 		let chunk_image = image::RgbaImage::from_fn(N, N, |x, z| {
 			let coords = LayerBlockCoords {
-				x: BlockX(x as u8),
-				z: BlockZ(z as u8),
+				x: BlockX::new(x),
+				z: BlockZ::new(z),
 			};
 			image::Rgba(
 				match (

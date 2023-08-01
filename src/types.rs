@@ -7,38 +7,57 @@ use std::{
 use itertools::iproduct;
 use serde::{Deserialize, Serialize};
 
-macro_rules! coord_impl {
+pub mod axis {
+	pub const X: u8 = 0;
+	pub const Y: u8 = 1;
+	pub const Z: u8 = 2;
+}
+
+macro_rules! coord_type {
 	($t:ident, $max:expr) => {
-		impl $t {
+		#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+		pub struct $t<const AXIS: u8>(pub u8);
+
+		impl<const AXIS: u8> $t<AXIS> {
+			const MAX: usize = $max;
+
+			/// Constructs a new value
+			///
+			/// Will panic if the value is not in the valid range
+			pub fn new<T: TryInto<u8>>(value: T) -> Self {
+				Self(
+					value
+						.try_into()
+						.ok()
+						.filter(|&v| (v as usize) < Self::MAX)
+						.expect("coordinate should be in the valid range"),
+				)
+			}
+
 			/// Returns an iterator over all possible values of the type
-			pub fn iter() -> impl Iterator<Item = $t>
+			pub fn iter() -> impl Iterator<Item = $t<AXIS>>
 			       + DoubleEndedIterator
 			       + ExactSizeIterator
 			       + FusedIterator
 			       + Clone
 			       + Debug {
-				(0..$max as u8).map($t)
+				(0..Self::MAX as u8).map($t)
 			}
 		}
 	};
 }
 
 pub const BLOCKS_PER_CHUNK: usize = 16;
+coord_type!(BlockCoord, BLOCKS_PER_CHUNK);
 
 /// A block X coordinate relative to a chunk
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct BlockX(pub u8);
-coord_impl!(BlockX, BLOCKS_PER_CHUNK);
+pub type BlockX = BlockCoord<{ axis::X }>;
 
 /// A block Y coordinate relative to a chunk section
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct BlockY(pub u8);
-coord_impl!(BlockY, BLOCKS_PER_CHUNK);
+pub type BlockY = BlockCoord<{ axis::Y }>;
 
 /// A block Z coordinate relative to a chunk
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct BlockZ(pub u8);
-coord_impl!(BlockZ, BLOCKS_PER_CHUNK);
+pub type BlockZ = BlockCoord<{ axis::Z }>;
 
 /// X and Z coordinates of a block in a chunk
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -118,16 +137,13 @@ impl Debug for SectionBlockCoords {
 pub struct SectionY(pub i32);
 
 pub const CHUNKS_PER_REGION: usize = 32;
+coord_type!(ChunkCoord, CHUNKS_PER_REGION);
 
 /// A chunk X coordinate relative to a region
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ChunkX(pub u8);
-coord_impl!(ChunkX, CHUNKS_PER_REGION);
+pub type ChunkX = ChunkCoord<{ axis::X }>;
 
 /// A chunk Z coordinate relative to a region
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ChunkZ(pub u8);
-coord_impl!(ChunkZ, CHUNKS_PER_REGION);
+pub type ChunkZ = ChunkCoord<{ axis::Z }>;
 
 /// A pair of chunk coordinates relative to a region
 #[derive(Clone, Copy, PartialEq, Eq)]
