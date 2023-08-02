@@ -1,4 +1,7 @@
-use std::path::Path;
+use std::{
+	path::{Path, PathBuf},
+	time::SystemTime,
+};
 
 use anyhow::{Context, Result};
 
@@ -8,7 +11,7 @@ use minedmap::{
 	types::*,
 };
 
-use super::common::*;
+use super::{common::*, region_group::RegionGroup};
 
 pub struct TileRenderer<'a> {
 	config: &'a Config,
@@ -57,11 +60,35 @@ impl<'a> TileRenderer<'a> {
 		}
 	}
 
+	fn processed_source(&self, coords: TileCoords) -> Result<(PathBuf, SystemTime)> {
+		let path = self.config.processed_path(coords);
+		let timestamp = fs::modified_timestamp(&path)?;
+		Ok((path, timestamp))
+	}
+
+	fn processed_sources(&self, coords: TileCoords) -> Result<(RegionGroup<PathBuf>, SystemTime)> {
+		let sources = RegionGroup::new(|x, z| {
+			self.processed_source(TileCoords {
+				x: coords.x + (x as i32),
+				z: coords.z + (z as i32),
+			})
+		})
+		.with_context(|| format!("Region {:?} from previous step must exist", coords))?;
+
+		let max_timestamp = *sources
+			.iter()
+			.map(|(_, timestamp)| timestamp)
+			.max()
+			.expect("at least one timestamp must exist");
+
+		let paths = sources.map(|(path, _)| path);
+		Ok((paths, max_timestamp))
+	}
+
 	fn render_tile(&self, coords: TileCoords) -> Result<()> {
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
-		let processed_path = self.config.processed_path(coords);
-		let processed_timestamp = fs::modified_timestamp(&processed_path)?;
+		let (processed_paths, processed_timestamp) = self.processed_sources(coords)?;
 
 		let output_path = self.config.tile_path(TileKind::Map, 0, coords);
 		let output_timestamp = fs::read_timestamp(&output_path, FILE_META_VERSION);
@@ -85,7 +112,7 @@ impl<'a> TileRenderer<'a> {
 				.display(),
 		);
 
-		let region = Self::load_region(&processed_path)?;
+		let region = Self::load_region(processed_paths.center())?;
 		let mut image = image::RgbaImage::new(N, N);
 		Self::render_region(&mut image, &region);
 
