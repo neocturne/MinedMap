@@ -1,5 +1,6 @@
 mod common;
 mod metadata_writer;
+mod region_group;
 mod region_processor;
 mod tile_mipmapper;
 mod tile_renderer;
