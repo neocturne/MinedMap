@@ -79,11 +79,15 @@ impl<'a> TileRenderer<'a> {
 	}
 
 	fn block_color_at(
-		_region_group: &RegionGroup<ProcessedRegion>,
+		region_group: &RegionGroup<ProcessedRegion>,
 		chunk: &ProcessedChunk,
-		_chunk_coords: ChunkCoords,
+		chunk_coords: ChunkCoords,
 		block_coords: LayerBlockCoords,
 	) -> Option<Vec3> {
+		const SMOOTH: [[f32; 3]; 3] = [[41.0, 26.0, 7.0], [26.0, 16.0, 4.0], [7.0, 4.0, 1.0]];
+		const X: isize = SMOOTH[0].len() as isize - 1;
+		const Z: isize = SMOOTH.len() as isize - 1;
+
 		let block = chunk.blocks[block_coords]?;
 		let depth = chunk.depths[block_coords]?;
 
@@ -91,9 +95,29 @@ impl<'a> TileRenderer<'a> {
 			return Some(block_color(block, None, depth.0 as f32));
 		}
 
-		let biome = chunk.biomes[block_coords].as_ref()?;
+		let mut total = 0.0;
+		let mut color = Vec3::ZERO;
+		for dz in -Z..=Z {
+			for dx in -X..=X {
+				let w = SMOOTH[dz.unsigned_abs()][dx.unsigned_abs()];
+				if w == 0.0 {
+					continue;
+				}
 
-		Some(block_color(block, Some(biome), depth.0 as f32))
+				let Some(biome) = biome_at(region_group, chunk_coords, block_coords, dx as i32, dz as i32) else {
+					continue;
+				};
+
+				total += w;
+				color += w * block_color(block, Some(biome), depth.0 as f32);
+			}
+		}
+
+		if total == 0.0 {
+			return None;
+		}
+
+		Some(color / total)
 	}
 
 	fn render_chunk(
