@@ -8,7 +8,7 @@ use num_integer::div_mod_floor;
 
 use minedmap::{
 	io::{fs, storage},
-	resource::block_color,
+	resource::{block_color, Biome},
 	types::*,
 };
 
@@ -35,6 +35,27 @@ fn coord_offset<const AXIS: u8>(
 		ChunkCoord::new(chunk),
 		BlockCoord::new(block),
 	)
+}
+
+fn biome_at(
+	region_group: &RegionGroup<ProcessedRegion>,
+	chunk: ChunkCoords,
+	block: LayerBlockCoords,
+	dx: i32,
+	dz: i32,
+) -> Option<&Biome> {
+	let (region_x, chunk_x, block_x) = coord_offset(chunk.x, block.x, dx);
+	let (region_z, chunk_z, block_z) = coord_offset(chunk.z, block.z, dz);
+	let chunk = ChunkCoords {
+		x: chunk_x,
+		z: chunk_z,
+	};
+	let block = LayerBlockCoords {
+		x: block_x,
+		z: block_z,
+	};
+	let region = region_group.get(region_x, region_z)?;
+	region[chunk].as_ref()?.biomes[block].as_ref()
 }
 
 pub struct TileRenderer<'a> {
