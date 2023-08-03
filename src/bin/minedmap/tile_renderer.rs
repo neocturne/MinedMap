@@ -56,7 +56,8 @@ fn biome_at(
 		z: block_z,
 	};
 	let region = region_group.get(region_x, region_z)?;
-	region[chunk].as_ref()?.biomes[block].as_ref()
+	let index = region.chunks[chunk].as_ref()?.biomes[block]?.get() - 1;
+	region.biome_list.get_index(index.into())
 }
 
 pub struct TileRenderer<'a> {
@@ -144,7 +145,7 @@ impl<'a> TileRenderer<'a> {
 	}
 
 	fn render_region(image: &mut image::RgbaImage, region_group: &RegionGroup<ProcessedRegion>) {
-		for (coords, chunk) in region_group.center().iter() {
+		for (coords, chunk) in region_group.center().chunks.iter() {
 			let Some(chunk) = chunk else {
 				continue;
 			};

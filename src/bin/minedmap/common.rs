@@ -4,9 +4,10 @@ use std::{
 	path::{Path, PathBuf},
 };
 
+use indexmap::IndexSet;
 use serde::{Deserialize, Serialize};
 
-use minedmap::{io::fs::FileMetaVersion, types::*, world::layer};
+use minedmap::{io::fs::FileMetaVersion, resource::Biome, types::*, world::layer};
 
 // Increase to force regeneration of all output files
 pub const FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
@@ -43,7 +44,12 @@ pub struct ProcessedChunk {
 	pub biomes: Box<layer::BiomeArray>,
 	pub depths: Box<layer::DepthArray>,
 }
-pub type ProcessedRegion = ChunkArray<Option<ProcessedChunk>>;
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ProcessedRegion {
+	pub biome_list: IndexSet<Biome>,
+	pub chunks: ChunkArray<Option<ProcessedChunk>>,
+}
 
 pub struct Config {
 	pub region_dir: PathBuf,

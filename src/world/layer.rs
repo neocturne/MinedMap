@@ -1,4 +1,7 @@
+use std::num::NonZeroU16;
+
 use anyhow::{Context, Result};
+use indexmap::IndexSet;
 use serde::{Deserialize, Serialize};
 
 use super::chunk::{Chunk, SectionIterItem};
@@ -26,13 +29,13 @@ impl BlockHeight {
 }
 
 pub type BlockArray = LayerBlockArray<Option<BlockType>>;
-pub type BiomeArray = LayerBlockArray<Option<Biome>>;
+pub type BiomeArray = LayerBlockArray<Option<NonZeroU16>>;
 pub type BlockLightArray = LayerBlockArray<u8>;
 pub type DepthArray = LayerBlockArray<Option<BlockHeight>>;
 
 struct LayerEntry<'a> {
 	block: &'a mut Option<BlockType>,
-	biome: &'a mut Option<Biome>,
+	biome: &'a mut Option<NonZeroU16>,
 	block_light: &'a mut u8,
 	depth: &'a mut Option<BlockHeight>,
 }
@@ -46,7 +49,12 @@ impl<'a> LayerEntry<'a> {
 		self.depth.is_some()
 	}
 
-	fn fill(&mut self, section: SectionIterItem, coords: SectionBlockCoords) -> Result<bool> {
+	fn fill(
+		&mut self,
+		biome_list: &mut IndexSet<Biome>,
+		section: SectionIterItem,
+		coords: SectionBlockCoords,
+	) -> Result<bool> {
 		let Some(block_type) = section.section.block_at(coords)?
 			.filter(|block_type| block_type.is(BlockFlag::Opaque))
 		else {
@@ -59,7 +67,14 @@ impl<'a> LayerEntry<'a> {
 
 		if self.is_empty() {
 			*self.block = Some(block_type);
-			*self.biome = section.biomes.biome_at(section.y, coords)?.copied();
+			if let Some(biome) = section.biomes.biome_at(section.y, coords)? {
+				let (biome_index, _) = biome_list.insert_full(*biome);
+				*self.biome = NonZeroU16::new(
+					(biome_index + 1)
+						.try_into()
+						.expect("biome index not in range"),
+				);
+			}
 		}
 
 		if block_type.is(BlockFlag::Water) {
@@ -99,7 +114,7 @@ impl LayerData {
 /// determined as the block that should be visible on the rendered
 /// map. For water blocks, the height of the first non-water block
 /// is additionally filled in as the water depth.
-pub fn top_layer(chunk: &Chunk) -> Result<Option<LayerData>> {
+pub fn top_layer(biome_list: &mut IndexSet<Biome>, chunk: &Chunk) -> Result<Option<LayerData>> {
 	use BLOCKS_PER_CHUNK as N;
 
 	if chunk.is_empty() {
@@ -121,7 +136,7 @@ pub fn top_layer(chunk: &Chunk) -> Result<Option<LayerData>> {
 					}
 
 					let coords = SectionBlockCoords { xz, y };
-					if !entry.fill(section, coords)? {
+					if !entry.fill(biome_list, section, coords)? {
 						continue;
 					}
 

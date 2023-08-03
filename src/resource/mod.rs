@@ -35,7 +35,7 @@ where
 	BitFlags::<BlockFlag>::from_bits(bits).map_err(de::Error::custom)
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Color(pub [u8; 3]);
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
