@@ -26,6 +26,12 @@ impl<'a> TileRenderer<'a> {
 		storage::read(processed_path).context("Failed to load processed region data")
 	}
 
+	fn load_region_group(
+		processed_paths: RegionGroup<PathBuf>,
+	) -> Result<RegionGroup<ProcessedRegion>> {
+		processed_paths.try_map(|path| Self::load_region(&path))
+	}
+
 	fn render_chunk(image: &mut image::RgbaImage, coords: ChunkCoords, chunk: &ProcessedChunk) {
 		const N: u32 = BLOCKS_PER_CHUNK as u32;
 
@@ -50,8 +56,8 @@ impl<'a> TileRenderer<'a> {
 		overlay_chunk(image, &chunk_image, coords);
 	}
 
-	fn render_region(image: &mut image::RgbaImage, region: &ProcessedRegion) {
-		for (coords, chunk) in region.iter() {
+	fn render_region(image: &mut image::RgbaImage, region_group: &RegionGroup<ProcessedRegion>) {
+		for (coords, chunk) in region_group.center().iter() {
 			let Some(chunk) = chunk else {
 				continue;
 			};
@@ -112,9 +118,10 @@ impl<'a> TileRenderer<'a> {
 				.display(),
 		);
 
-		let region = Self::load_region(processed_paths.center())?;
+		let region_group = Self::load_region_group(processed_paths)
+			.with_context(|| format!("Region {:?} from previous step must be loadable", coords))?;
 		let mut image = image::RgbaImage::new(N, N);
-		Self::render_region(&mut image, &region);
+		Self::render_region(&mut image, &region_group);
 
 		fs::create_with_timestamp(
 			&output_path,
