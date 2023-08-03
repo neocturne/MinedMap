@@ -4,6 +4,7 @@ use std::{
 };
 
 use anyhow::{Context, Result};
+use glam::Vec3;
 use num_integer::div_mod_floor;
 
 use minedmap::{
@@ -82,7 +83,7 @@ impl<'a> TileRenderer<'a> {
 		chunk: &ProcessedChunk,
 		_chunk_coords: ChunkCoords,
 		block_coords: LayerBlockCoords,
-	) -> Option<[u8; 4]> {
+	) -> Option<Vec3> {
 		let block = chunk.blocks[block_coords]?;
 		let depth = chunk.depths[block_coords]?;
 
@@ -109,7 +110,11 @@ impl<'a> TileRenderer<'a> {
 				z: BlockZ::new(z),
 			};
 			let color = Self::block_color_at(region_group, chunk, chunk_coords, block_coords);
-			image::Rgba(color.unwrap_or_default())
+			image::Rgba(
+				color
+					.map(|c| [c[0] as u8, c[1] as u8, c[2] as u8, 255])
+					.unwrap_or_default(),
+			)
 		});
 		overlay_chunk(image, &chunk_image, chunk_coords);
 	}

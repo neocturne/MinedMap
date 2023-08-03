@@ -78,7 +78,7 @@ pub fn needs_biome(block: BlockType) -> bool {
 	block.is(Grass) || block.is(Foliage) || block.is(Water)
 }
 
-pub fn block_color(block: BlockType, biome: Option<&Biome>, depth: f32) -> [u8; 4] {
+pub fn block_color(block: BlockType, biome: Option<&Biome>, depth: f32) -> Vec3 {
 	use super::BlockFlag::*;
 
 	let get_biome = || biome.expect("needs biome to determine block color");
@@ -101,7 +101,5 @@ pub fn block_color(block: BlockType, biome: Option<&Biome>, depth: f32) -> [u8; 
 		color *= get_biome().water_color();
 	}
 
-	color *= 0.5 + 0.005 * depth;
-
-	[color[0] as u8, color[1] as u8, color[2] as u8, 255]
+	color * (0.5 + 0.005 * depth)
 }
