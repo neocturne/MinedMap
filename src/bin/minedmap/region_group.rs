@@ -60,7 +60,7 @@ impl<T> RegionGroup<T> {
 	{
 		RegionGroup {
 			center: f(self.center),
-			neighs: self.neighs.map(|entry| entry.map(|v| f(v))),
+			neighs: self.neighs.map(|entry| entry.map(&mut f)),
 		}
 	}
 
@@ -70,7 +70,7 @@ impl<T> RegionGroup<T> {
 	{
 		let RegionGroup { center, neighs } = self;
 		let center = f(center)?;
-		let neighs = neighs.map(|entry| entry.map(|value| f(value).ok()).flatten());
+		let neighs = neighs.map(|entry| entry.and_then(|value| f(value).ok()));
 		Ok(RegionGroup { center, neighs })
 	}
 
