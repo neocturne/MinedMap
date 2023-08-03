@@ -77,28 +77,35 @@ impl<'a> TileRenderer<'a> {
 		processed_paths.try_map(|path| Self::load_region(&path))
 	}
 
-	fn render_chunk(image: &mut image::RgbaImage, coords: ChunkCoords, chunk: &ProcessedChunk) {
+	fn block_color_at(
+		_region_group: &RegionGroup<ProcessedRegion>,
+		chunk: &ProcessedChunk,
+		_chunk_coords: ChunkCoords,
+		block_coords: LayerBlockCoords,
+	) -> Option<[u8; 4]> {
+		let block = chunk.blocks[block_coords]?;
+		let depth = chunk.depths[block_coords]?;
+		let biome = chunk.biomes[block_coords].as_ref()?;
+		Some(block_color(block, biome, depth.0 as f32))
+	}
+
+	fn render_chunk(
+		image: &mut image::RgbaImage,
+		region_group: &RegionGroup<ProcessedRegion>,
+		chunk: &ProcessedChunk,
+		chunk_coords: ChunkCoords,
+	) {
 		const N: u32 = BLOCKS_PER_CHUNK as u32;
 
 		let chunk_image = image::RgbaImage::from_fn(N, N, |x, z| {
-			let coords = LayerBlockCoords {
+			let block_coords = LayerBlockCoords {
 				x: BlockX::new(x),
 				z: BlockZ::new(z),
 			};
-			image::Rgba(
-				match (
-					&chunk.blocks[coords],
-					&chunk.biomes[coords],
-					&chunk.depths[coords],
-				) {
-					(Some(block), Some(biome), Some(depth)) => {
-						block_color(*block, biome, depth.0 as f32)
-					}
-					_ => [0, 0, 0, 0],
-				},
-			)
+			let color = Self::block_color_at(region_group, chunk, chunk_coords, block_coords);
+			image::Rgba(color.unwrap_or_default())
 		});
-		overlay_chunk(image, &chunk_image, coords);
+		overlay_chunk(image, &chunk_image, chunk_coords);
 	}
 
 	fn render_region(image: &mut image::RgbaImage, region_group: &RegionGroup<ProcessedRegion>) {
@@ -107,7 +114,7 @@ impl<'a> TileRenderer<'a> {
 				continue;
 			};
 
-			Self::render_chunk(image, coords, chunk);
+			Self::render_chunk(image, region_group, chunk, coords);
 		}
 	}
 
