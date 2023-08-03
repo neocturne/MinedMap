@@ -9,7 +9,7 @@ use num_integer::div_mod_floor;
 
 use minedmap::{
 	io::{fs, storage},
-	resource::{block_color, needs_biome, Biome},
+	resource::{block_color, needs_biome},
 	types::*,
 };
 
@@ -44,7 +44,7 @@ fn biome_at(
 	block: LayerBlockCoords,
 	dx: i32,
 	dz: i32,
-) -> Option<&Biome> {
+) -> Option<(i8, i8, u16)> {
 	let (region_x, chunk_x, block_x) = coord_offset(chunk.x, block.x, dx);
 	let (region_z, chunk_z, block_z) = coord_offset(chunk.z, block.z, dz);
 	let chunk = ChunkCoords {
@@ -56,8 +56,11 @@ fn biome_at(
 		z: block_z,
 	};
 	let region = region_group.get(region_x, region_z)?;
-	let index = region.chunks[chunk].as_ref()?.biomes[block]?.get() - 1;
-	region.biome_list.get_index(index.into())
+	Some((
+		region_x,
+		region_z,
+		region.chunks[chunk].as_ref()?.biomes[block]?.get() - 1,
+	))
 }
 
 pub struct TileRenderer<'a> {
@@ -96,8 +99,7 @@ impl<'a> TileRenderer<'a> {
 			return Some(block_color(block, None, depth.0 as f32));
 		}
 
-		let mut total = 0.0;
-		let mut color = Vec3::ZERO;
+		let mut weights = rustc_hash::FxHashMap::<(i8, i8, u16), f32>::default();
 		for dz in -Z..=Z {
 			for dx in -X..=X {
 				let w = SMOOTH[dz.unsigned_abs()][dx.unsigned_abs()];
@@ -109,13 +111,23 @@ impl<'a> TileRenderer<'a> {
 					continue;
 				};
 
-				total += w;
-				color += w * block_color(block, Some(biome), depth.0 as f32);
+				*weights.entry(biome).or_default() += w;
 			}
 		}
 
-		if total == 0.0 {
+		if weights.is_empty() {
 			return None;
+		}
+
+		let mut color = Vec3::ZERO;
+		let mut total = 0.0;
+
+		for ((region_x, region_z, index), w) in weights {
+			let region = region_group.get(region_x, region_z)?;
+			let biome = region.biome_list.get_index(index.into())?;
+
+			total += w;
+			color += w * block_color(block, Some(biome), depth.0 as f32);
 		}
 
 		Some(color / total)
