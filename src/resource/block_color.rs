@@ -72,16 +72,24 @@ impl BiomeExt for Biome {
 const BIRCH_COLOR: Vec3 = Vec3::new(0.502, 0.655, 0.333); // == color_vec(Color([128, 167, 85]))
 const EVERGREEN_COLOR: Vec3 = Vec3::new(0.380, 0.600, 0.380); // == color_vec(Color([97, 153, 97]))
 
-pub fn block_color(block: BlockType, biome: &Biome, depth: f32) -> [u8; 4] {
+pub fn needs_biome(block: BlockType) -> bool {
 	use super::BlockFlag::*;
+
+	block.is(Grass) || block.is(Foliage) || block.is(Water)
+}
+
+pub fn block_color(block: BlockType, biome: Option<&Biome>, depth: f32) -> [u8; 4] {
+	use super::BlockFlag::*;
+
+	let get_biome = || biome.expect("needs biome to determine block color");
 
 	let mut color = color_vec_unscaled(block.color);
 
 	if block.is(Grass) {
-		color *= biome.grass_color(depth);
+		color *= get_biome().grass_color(depth);
 	}
 	if block.is(Foliage) {
-		color *= biome.foliage_color(depth);
+		color *= get_biome().foliage_color(depth);
 	}
 	if block.is(Birch) {
 		color *= BIRCH_COLOR;
@@ -90,7 +98,7 @@ pub fn block_color(block: BlockType, biome: &Biome, depth: f32) -> [u8; 4] {
 		color *= EVERGREEN_COLOR;
 	}
 	if block.is(Water) {
-		color *= biome.water_color();
+		color *= get_biome().water_color();
 	}
 
 	color *= 0.5 + 0.005 * depth;

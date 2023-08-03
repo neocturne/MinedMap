@@ -8,7 +8,7 @@ use num_integer::div_mod_floor;
 
 use minedmap::{
 	io::{fs, storage},
-	resource::{block_color, Biome},
+	resource::{block_color, needs_biome, Biome},
 	types::*,
 };
 
@@ -85,8 +85,14 @@ impl<'a> TileRenderer<'a> {
 	) -> Option<[u8; 4]> {
 		let block = chunk.blocks[block_coords]?;
 		let depth = chunk.depths[block_coords]?;
+
+		if !needs_biome(block) {
+			return Some(block_color(block, None, depth.0 as f32));
+		}
+
 		let biome = chunk.biomes[block_coords].as_ref()?;
-		Some(block_color(block, biome, depth.0 as f32))
+
+		Some(block_color(block, Some(biome), depth.0 as f32))
 	}
 
 	fn render_chunk(

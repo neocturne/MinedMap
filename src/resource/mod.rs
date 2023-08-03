@@ -91,7 +91,7 @@ impl BlockTypes {
 }
 
 pub use biomes::{Biome, BiomeGrassColorModifier};
-pub use block_color::block_color;
+pub use block_color::{block_color, needs_biome};
 
 #[derive(Debug)]
 pub struct BiomeTypes {
