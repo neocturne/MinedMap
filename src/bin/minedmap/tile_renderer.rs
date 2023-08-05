@@ -103,6 +103,10 @@ impl<'a> TileRenderer<'a> {
 		chunk_coords: ChunkCoords,
 		block_coords: LayerBlockCoords,
 	) -> Option<Vec3> {
+		fn biome_key((dx, dz, index): (i8, i8, u16)) -> u32 {
+			(dx as u8 as u32) | (dz as u8 as u32) << 8 | (index as u32) << 16
+		}
+
 		const SMOOTH: [[f32; 3]; 3] = [[41.0, 26.0, 7.0], [26.0, 16.0, 4.0], [7.0, 4.0, 1.0]];
 		const X: isize = SMOOTH[0].len() as isize - 1;
 		const Z: isize = SMOOTH.len() as isize - 1;
@@ -114,7 +118,7 @@ impl<'a> TileRenderer<'a> {
 			return Some(block_color(block, None, depth.0 as f32));
 		}
 
-		let mut weights = rustc_hash::FxHashMap::<(i8, i8, u16), f32>::default();
+		let mut weights = rustc_hash::FxHashMap::<u32, ((i8, i8, u16), f32)>::default();
 		for dz in -Z..=Z {
 			for dx in -X..=X {
 				let w = SMOOTH[dz.unsigned_abs()][dx.unsigned_abs()];
@@ -132,7 +136,9 @@ impl<'a> TileRenderer<'a> {
 					continue;
 				};
 
-				*weights.entry(biome).or_default() += w;
+				let value = weights.entry(biome_key(biome)).or_default();
+				value.0 = biome;
+				value.1 += w;
 			}
 		}
 
@@ -143,7 +149,7 @@ impl<'a> TileRenderer<'a> {
 		let mut color = Vec3::ZERO;
 		let mut total = 0.0;
 
-		for ((region_x, region_z, index), w) in weights {
+		for ((region_x, region_z, index), w) in weights.into_values() {
 			let region = region_group.get(region_x, region_z)?;
 			let biome = region.biome_list.get_index(index.into())?;
 
