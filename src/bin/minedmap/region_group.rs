@@ -40,18 +40,23 @@ impl<T> RegionGroup<T> {
 	}
 
 	pub fn get(&self, x: i8, z: i8) -> Option<&T> {
-		match (x, z) {
-			(0, 0) => Some(&self.center),
-			(-1, -1) => self.neighs[0].as_ref(),
-			(-1, 0) => self.neighs[1].as_ref(),
-			(-1, 1) => self.neighs[2].as_ref(),
-			(0, -1) => self.neighs[3].as_ref(),
-			(0, 1) => self.neighs[4].as_ref(),
-			(1, -1) => self.neighs[5].as_ref(),
-			(1, 0) => self.neighs[6].as_ref(),
-			(1, 1) => self.neighs[7].as_ref(),
-			_ => panic!("index out of bounds"),
-		}
+		let index = match (x, z) {
+			(0, 0) => {
+				return Some(&self.center);
+			}
+			(-1, -1) => 0,
+			(-1, 0) => 1,
+			(-1, 1) => 2,
+			(0, -1) => 3,
+			(0, 1) => 4,
+			(1, -1) => 5,
+			(1, 0) => 6,
+			(1, 1) => 7,
+			_ => {
+				return None;
+			}
+		};
+		self.neighs[index].as_ref()
 	}
 
 	pub fn map<U, F>(self, mut f: F) -> RegionGroup<U>
