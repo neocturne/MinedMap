@@ -39,7 +39,7 @@ fn coord_offset<const AXIS: u8>(
 }
 
 fn biome_at(
-	region_group: &RegionGroup<ProcessedRegion>,
+	region_group: &RegionGroup<Box<ProcessedRegion>>,
 	chunk: ChunkCoords,
 	block: LayerBlockCoords,
 	dx: i32,
@@ -72,18 +72,18 @@ impl<'a> TileRenderer<'a> {
 		TileRenderer { config }
 	}
 
-	fn load_region(processed_path: &Path) -> Result<ProcessedRegion> {
+	fn load_region(processed_path: &Path) -> Result<Box<ProcessedRegion>> {
 		storage::read(processed_path).context("Failed to load processed region data")
 	}
 
 	fn load_region_group(
 		processed_paths: RegionGroup<PathBuf>,
-	) -> Result<RegionGroup<ProcessedRegion>> {
+	) -> Result<RegionGroup<Box<ProcessedRegion>>> {
 		processed_paths.try_map(|path| Self::load_region(&path))
 	}
 
 	fn block_color_at(
-		region_group: &RegionGroup<ProcessedRegion>,
+		region_group: &RegionGroup<Box<ProcessedRegion>>,
 		chunk: &ProcessedChunk,
 		chunk_coords: ChunkCoords,
 		block_coords: LayerBlockCoords,
@@ -141,7 +141,7 @@ impl<'a> TileRenderer<'a> {
 
 	fn render_chunk(
 		image: &mut image::RgbaImage,
-		region_group: &RegionGroup<ProcessedRegion>,
+		region_group: &RegionGroup<Box<ProcessedRegion>>,
 		chunk: &ProcessedChunk,
 		chunk_coords: ChunkCoords,
 	) {
@@ -162,7 +162,10 @@ impl<'a> TileRenderer<'a> {
 		overlay_chunk(image, &chunk_image, chunk_coords);
 	}
 
-	fn render_region(image: &mut image::RgbaImage, region_group: &RegionGroup<ProcessedRegion>) {
+	fn render_region(
+		image: &mut image::RgbaImage,
+		region_group: &RegionGroup<Box<ProcessedRegion>>,
+	) {
 		for (coords, chunk) in region_group.center().chunks.iter() {
 			let Some(chunk) = chunk else {
 				continue;

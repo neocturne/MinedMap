@@ -125,11 +125,11 @@ impl<'a> RegionProcessor<'a> {
 				else {
 					return Ok(());
 				};
-				processed_region.chunks[chunk_coords] = Some(ProcessedChunk {
+				processed_region.chunks[chunk_coords] = Some(Box::new(ProcessedChunk {
 					blocks,
 					biomes,
 					depths,
-				});
+				}));
 
 				let chunk_lightmap = Self::render_chunk_lightmap(block_light);
 				overlay_chunk(&mut lightmap, &chunk_lightmap, chunk_coords);

@@ -48,7 +48,7 @@ pub struct ProcessedChunk {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ProcessedRegion {
 	pub biome_list: IndexSet<Biome>,
-	pub chunks: ChunkArray<Option<ProcessedChunk>>,
+	pub chunks: ChunkArray<Option<Box<ProcessedChunk>>>,
 }
 
 pub struct Config {
