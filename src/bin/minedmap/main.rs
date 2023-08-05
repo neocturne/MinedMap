@@ -10,7 +10,7 @@ use std::path::PathBuf;
 use anyhow::Result;
 use clap::Parser;
 
-use common::Config;
+use common::{Config, TileCoords};
 use metadata_writer::MetadataWriter;
 use region_processor::RegionProcessor;
 use tile_mipmapper::TileMipmapper;
@@ -28,7 +28,11 @@ fn main() -> Result<()> {
 	let args = Args::parse();
 	let config = Config::new(args);
 
-	let regions = RegionProcessor::new(&config).run()?;
+	let mut regions = RegionProcessor::new(&config).run()?;
+
+	// Sort regions in a zig-zag pattern to optimize cache usage
+	regions.sort_unstable_by_key(|&TileCoords { x, z }| (x, if x % 2 == 0 { z } else { -z }));
+
 	TileRenderer::new(&config).run(&regions)?;
 	let tiles = TileMipmapper::new(&config).run(&regions)?;
 	MetadataWriter::new(&config).run(tiles)?;
