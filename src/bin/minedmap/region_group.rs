@@ -11,7 +11,7 @@ use anyhow::Result;
 #[derive(Debug, Clone, Copy)]
 pub struct RegionGroup<T> {
 	center: T,
-	neighs: [Option<T>; 8],
+	neighs: [Option<T>; 9],
 }
 
 impl<T> RegionGroup<T> {
@@ -26,6 +26,7 @@ impl<T> RegionGroup<T> {
 				Some((-1, 0)),
 				Some((-1, 1)),
 				Some((0, -1)),
+				None,
 				Some((0, 1)),
 				Some((1, -1)),
 				Some((1, 0)),
@@ -40,23 +41,13 @@ impl<T> RegionGroup<T> {
 	}
 
 	pub fn get(&self, x: i8, z: i8) -> Option<&T> {
-		let index = match (x, z) {
-			(0, 0) => {
-				return Some(&self.center);
-			}
-			(-1, -1) => 0,
-			(-1, 0) => 1,
-			(-1, 1) => 2,
-			(0, -1) => 3,
-			(0, 1) => 4,
-			(1, -1) => 5,
-			(1, 0) => 6,
-			(1, 1) => 7,
-			_ => {
-				return None;
-			}
-		};
-		self.neighs[index].as_ref()
+		if (x, z) == (0, 0) {
+			return Some(&self.center);
+		}
+		if !(-1..=1).contains(&x) || !(-1..=1).contains(&z) {
+			return None;
+		}
+		self.neighs.get((3 * x + z + 4) as usize)?.as_ref()
 	}
 
 	pub fn map<U, F>(self, mut f: F) -> RegionGroup<U>
