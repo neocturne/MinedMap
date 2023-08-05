@@ -55,7 +55,9 @@ impl<'a> LayerEntry<'a> {
 		section: SectionIterItem,
 		coords: SectionBlockCoords,
 	) -> Result<bool> {
-		let Some(block_type) = section.section.block_at(coords)?
+		let Some(block_type) = section
+			.section
+			.block_at(coords)?
 			.filter(|block_type| block_type.is(BlockFlag::Opaque))
 		else {
 			if self.is_empty() {

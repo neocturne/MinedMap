@@ -20,8 +20,8 @@ fn parse_region_filename(path: &Path) -> Option<TileCoords> {
 	let file_name = path.file_name()?.to_str()?;
 	let parts: Vec<_> = file_name.split('.').collect();
 	let &["r", x, z, "mca"] = parts.as_slice() else {
-			return None;
-		};
+		return None;
+	};
 
 	Some(TileCoords {
 		x: x.parse().ok()?,
@@ -114,7 +114,12 @@ impl<'a> RegionProcessor<'a> {
 
 		minedmap::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
-				let Some(layer::LayerData{ blocks, biomes, block_light, depths }) = self
+				let Some(layer::LayerData {
+					blocks,
+					biomes,
+					block_light,
+					depths,
+				}) = self
 					.process_chunk(&mut processed_region.biome_list, data)
 					.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
 				else {

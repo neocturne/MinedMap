@@ -107,7 +107,13 @@ impl<'a> TileRenderer<'a> {
 					continue;
 				}
 
-				let Some(biome) = biome_at(region_group, chunk_coords, block_coords, dx as i32, dz as i32) else {
+				let Some(biome) = biome_at(
+					region_group,
+					chunk_coords,
+					block_coords,
+					dx as i32,
+					dz as i32,
+				) else {
 					continue;
 				};
 
