@@ -40,13 +40,8 @@ pub fn coord_offset<const AXIS: u8>(
 	let coord = ((chunk.0 as i32) << BLOCK_BITS | block.0 as i32) + offset;
 	let (region_chunk, block) = coord.shift_mask(BLOCK_BITS);
 	let (region, chunk) = region_chunk.shift_mask(CHUNK_BITS);
-	(
-		region
-			.try_into()
-			.expect("the region coordinate should be in the valid range"),
-		ChunkCoord::new(chunk),
-		BlockCoord::new(block),
-	)
+	debug_assert!(i8::try_from(region).is_ok());
+	(region as i8, ChunkCoord::new(chunk), BlockCoord::new(block))
 }
 
 #[cfg(test)]
