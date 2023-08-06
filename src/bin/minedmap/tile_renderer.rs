@@ -8,38 +8,15 @@ use std::{
 use anyhow::{Context, Result};
 use glam::Vec3;
 use lru::LruCache;
-use num_integer::div_mod_floor;
 
 use minedmap::{
 	io::{fs, storage},
 	resource::{block_color, needs_biome},
 	types::*,
+	util::coord_offset,
 };
 
 use super::{common::*, region_group::RegionGroup};
-
-/// Offsets a chunk and block coordinate pair by a number of blocks
-///
-/// As the new coordinate may end up in a different region, a region offset
-/// is returned together with the new chunk and block coordinates.
-fn coord_offset<const AXIS: u8>(
-	chunk: ChunkCoord<AXIS>,
-	block: BlockCoord<AXIS>,
-	offset: i32,
-) -> (i8, ChunkCoord<AXIS>, BlockCoord<AXIS>) {
-	const CHUNKS: i32 = CHUNKS_PER_REGION as i32;
-	const BLOCKS: i32 = BLOCKS_PER_CHUNK as i32;
-	let coord = chunk.0 as i32 * BLOCKS + block.0 as i32 + offset;
-	let (region_chunk, block) = div_mod_floor(coord, BLOCKS);
-	let (region, chunk) = div_mod_floor(region_chunk, CHUNKS);
-	(
-		region
-			.try_into()
-			.expect("the region coordinate should be in the valid range"),
-		ChunkCoord::new(chunk),
-		BlockCoord::new(block),
-	)
-}
 
 fn biome_at(
 	region_group: &RegionGroup<Rc<ProcessedRegion>>,
@@ -281,39 +258,5 @@ impl<'a> TileRenderer<'a> {
 		}
 
 		Ok(())
-	}
-}
-
-#[cfg(test)]
-mod test {
-	use super::*;
-
-	#[test]
-	fn test_coord_offset() {
-		const CHUNKS: i32 = CHUNKS_PER_REGION as i32;
-		const BLOCKS: i32 = BLOCKS_PER_CHUNK as i32;
-
-		for chunk in ChunkX::iter() {
-			for block in BlockX::iter() {
-				assert_eq!(coord_offset(chunk, block, 0), (0, chunk, block));
-				assert_eq!(
-					coord_offset(chunk, block, -(CHUNKS * BLOCKS)),
-					(-1, chunk, block)
-				);
-				assert_eq!(
-					coord_offset(chunk, block, CHUNKS * BLOCKS),
-					(1, chunk, block)
-				);
-
-				for offset in -(CHUNKS * BLOCKS)..(CHUNKS * BLOCKS) {
-					let (region2, chunk2, block2) = coord_offset(chunk, block, offset);
-					assert!((-1..=1).contains(&region2));
-					let coord = chunk.0 as i32 * BLOCKS + block.0 as i32 + offset;
-					let coord2 =
-						((region2 as i32 * CHUNKS) + chunk2.0 as i32) * BLOCKS + block2.0 as i32;
-					assert_eq!(coord2, coord);
-				}
-			}
-		}
 	}
 }

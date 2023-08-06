@@ -47,7 +47,8 @@ macro_rules! coord_type {
 	};
 }
 
-pub const BLOCKS_PER_CHUNK: usize = 16;
+pub const BLOCK_BITS: u8 = 4;
+pub const BLOCKS_PER_CHUNK: usize = 1 << BLOCK_BITS;
 coord_type!(BlockCoord, BLOCKS_PER_CHUNK);
 
 /// A block X coordinate relative to a chunk
@@ -136,7 +137,8 @@ impl Debug for SectionBlockCoords {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SectionY(pub i32);
 
-pub const CHUNKS_PER_REGION: usize = 32;
+pub const CHUNK_BITS: u8 = 5;
+pub const CHUNKS_PER_REGION: usize = 1 << CHUNK_BITS;
 coord_type!(ChunkCoord, CHUNKS_PER_REGION);
 
 /// A chunk X coordinate relative to a region
