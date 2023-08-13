@@ -27,6 +27,23 @@ impl ShiftMask for i32 {
 	}
 }
 
+#[inline]
+pub fn to_flat_coord<const AXIS: u8>(
+	region: i8,
+	chunk: ChunkCoord<AXIS>,
+	block: BlockCoord<AXIS>,
+) -> i32 {
+	(region as i32) << (BLOCK_BITS + CHUNK_BITS) | ((chunk.0 as i32) << BLOCK_BITS | block.0 as i32)
+}
+
+#[inline]
+pub fn from_flat_coord<const AXIS: u8>(coord: i32) -> (i8, ChunkCoord<AXIS>, BlockCoord<AXIS>) {
+	let (region_chunk, block) = coord.shift_mask(BLOCK_BITS);
+	let (region, chunk) = region_chunk.shift_mask(CHUNK_BITS);
+	debug_assert!(i8::try_from(region).is_ok());
+	(region as i8, ChunkCoord::new(chunk), BlockCoord::new(block))
+}
+
 /// Offsets a chunk and block coordinate pair by a number of blocks
 ///
 /// As the new coordinate may end up in a different region, a region offset
@@ -37,11 +54,7 @@ pub fn coord_offset<const AXIS: u8>(
 	block: BlockCoord<AXIS>,
 	offset: i32,
 ) -> (i8, ChunkCoord<AXIS>, BlockCoord<AXIS>) {
-	let coord = ((chunk.0 as i32) << BLOCK_BITS | block.0 as i32) + offset;
-	let (region_chunk, block) = coord.shift_mask(BLOCK_BITS);
-	let (region, chunk) = region_chunk.shift_mask(CHUNK_BITS);
-	debug_assert!(i8::try_from(region).is_ok());
-	(region as i8, ChunkCoord::new(chunk), BlockCoord::new(block))
+	from_flat_coord(to_flat_coord(0, chunk, block) + offset)
 }
 
 #[cfg(test)]
