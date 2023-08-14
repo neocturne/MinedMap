@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use rayon::prelude::*;
 
 use minedmap::{io::fs, types::*};
 
@@ -151,8 +152,8 @@ impl<'a> TileMipmapper<'a> {
 
 			let next = Self::map_coords(prev);
 
-			for (&z, xs) in &next.0 {
-				for &x in xs {
+			next.0.par_iter().try_for_each(|(&z, xs)| {
+				xs.par_iter().try_for_each(|&x| {
 					let coords = TileCoords { x, z };
 					self.render_mipmap::<image::Rgba<u8>>(TileKind::Map, level, coords, prev)?;
 					self.render_mipmap::<image::LumaA<u8>>(
@@ -161,8 +162,9 @@ impl<'a> TileMipmapper<'a> {
 						coords,
 						prev,
 					)?;
-				}
-			}
+					anyhow::Ok(())
+				})
+			})?;
 
 			tile_stack.push(next);
 		}

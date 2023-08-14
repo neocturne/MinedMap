@@ -1,8 +1,9 @@
 use std::{ffi::OsStr, path::Path, time::SystemTime};
 
 use anyhow::{Context, Result};
-
 use indexmap::IndexSet;
+use rayon::prelude::*;
+
 use minedmap::{
 	io::{fs, storage},
 	resource::{self, Biome},
@@ -183,11 +184,11 @@ impl<'a> RegionProcessor<'a> {
 		fs::create_dir_all(&self.config.processed_dir)?;
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Lightmap, 0))?;
 
-		for &coords in &regions {
+		regions.par_iter().for_each(|&coords| {
 			if let Err(err) = self.process_region(coords) {
 				eprintln!("Failed to process region {:?}: {:?}", coords, err);
 			}
-		}
+		});
 
 		Ok(regions)
 	}

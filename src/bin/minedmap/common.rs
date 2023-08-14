@@ -52,6 +52,7 @@ pub struct ProcessedRegion {
 }
 
 pub struct Config {
+	pub num_threads: usize,
 	pub region_dir: PathBuf,
 	pub processed_dir: PathBuf,
 	pub output_dir: PathBuf,
@@ -70,16 +71,23 @@ pub enum TileKind {
 }
 
 impl Config {
-	pub fn new(args: super::Args) -> Self {
+	pub fn new(args: &super::Args) -> Self {
+		let num_threads = match args.jobs {
+			Some(0) => num_cpus::get(),
+			Some(threads) => threads,
+			None => 1,
+		};
+
 		let region_dir = [&args.input_dir, Path::new("region")].iter().collect();
 		let processed_dir = [&args.output_dir, Path::new("processed")].iter().collect();
 		let level_dat_path = [&args.input_dir, Path::new("level.dat")].iter().collect();
 		let metadata_path = [&args.output_dir, Path::new("info.json")].iter().collect();
 
 		Config {
+			num_threads,
 			region_dir,
 			processed_dir,
-			output_dir: args.output_dir,
+			output_dir: args.output_dir.clone(),
 			level_dat_path,
 			metadata_path,
 		}
