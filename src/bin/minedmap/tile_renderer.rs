@@ -8,6 +8,7 @@ use std::{
 use anyhow::{Context, Result};
 use glam::Vec3;
 use lru::LruCache;
+use rayon::prelude::*;
 use tokio::sync::OnceCell;
 
 use minedmap::{
@@ -54,7 +55,9 @@ pub struct TileRenderer<'a> {
 
 impl<'a> TileRenderer<'a> {
 	pub fn new(config: &'a Config, rt: &'a tokio::runtime::Runtime) -> Self {
-		let region_cache = Mutex::new(LruCache::new(NonZeroUsize::new(12).unwrap()));
+		let region_cache = Mutex::new(LruCache::new(
+			NonZeroUsize::new(6 + 6 * config.num_threads).unwrap(),
+		));
 		TileRenderer {
 			config,
 			rt,
@@ -261,11 +264,12 @@ impl<'a> TileRenderer<'a> {
 	pub fn run(self, regions: &[TileCoords]) -> Result<()> {
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Map, 0))?;
 
-		for &coords in regions {
+		// Use par_bridge to process items in order (for better use of region cache)
+		regions.iter().par_bridge().for_each(|&coords| {
 			if let Err(err) = self.render_tile(coords) {
 				eprintln!("Failed to render tile {:?}: {:?}", coords, err);
 			}
-		}
+		});
 
 		Ok(())
 	}
