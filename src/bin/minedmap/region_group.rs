@@ -1,6 +1,7 @@
-use std::iter;
+use std::{future::Future, iter};
 
 use anyhow::Result;
+use futures_util::future::OptionFuture;
 
 /// A generic array of 3x3 elements
 ///
@@ -67,6 +68,46 @@ impl<T> RegionGroup<T> {
 		let RegionGroup { center, neighs } = self;
 		let center = f(center)?;
 		let neighs = neighs.map(|entry| entry.and_then(|value| f(value).ok()));
+		Ok(RegionGroup { center, neighs })
+	}
+
+	#[allow(dead_code)]
+	pub async fn async_map<U, F, Fut>(self, mut f: F) -> RegionGroup<U>
+	where
+		Fut: Future<Output = U>,
+		F: FnMut(T) -> Fut,
+	{
+		let center = f(self.center);
+		let neighs = futures_util::future::join_all(
+			self.neighs
+				.map(|entry| OptionFuture::from(entry.map(&mut f))),
+		);
+		let (center, neighs) = futures_util::join!(center, neighs);
+		RegionGroup {
+			center,
+			neighs: <[Option<_>; 9]>::try_from(neighs).ok().unwrap(),
+		}
+	}
+
+	pub async fn async_try_map<U, F, Fut>(self, mut f: F) -> Result<RegionGroup<U>>
+	where
+		Fut: Future<Output = Result<U>>,
+		F: FnMut(T) -> Fut,
+	{
+		let center = f(self.center);
+		let neighs = futures_util::future::join_all(
+			self.neighs
+				.map(|entry| OptionFuture::from(entry.map(&mut f))),
+		);
+		let (center, neighs) = futures_util::join!(center, neighs);
+		let center = center?;
+
+		let neighs: Vec<_> = neighs
+			.into_iter()
+			.map(|entry| entry.and_then(Result::ok))
+			.collect();
+		let neighs = <[Option<_>; 9]>::try_from(neighs).ok().unwrap();
+
 		Ok(RegionGroup { center, neighs })
 	}
 
