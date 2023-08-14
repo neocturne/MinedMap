@@ -43,8 +43,12 @@ fn main() -> Result<()> {
 
 	setup_threads(config.num_threads)?;
 
+	let rt = tokio::runtime::Builder::new_current_thread()
+		.build()
+		.unwrap();
+
 	let regions = RegionProcessor::new(&config).run()?;
-	TileRenderer::new(&config).run(&regions)?;
+	TileRenderer::new(&config, &rt).run(&regions)?;
 	let tiles = TileMipmapper::new(&config).run(&regions)?;
 	MetadataWriter::new(&config).run(tiles)?;
 

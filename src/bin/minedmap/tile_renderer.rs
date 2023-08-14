@@ -1,13 +1,14 @@
 use std::{
 	num::NonZeroUsize,
-	path::{Path, PathBuf},
-	rc::Rc,
+	path::PathBuf,
+	sync::{Arc, Mutex},
 	time::SystemTime,
 };
 
 use anyhow::{Context, Result};
 use glam::Vec3;
 use lru::LruCache;
+use tokio::sync::OnceCell;
 
 use minedmap::{
 	io::{fs, storage},
@@ -18,8 +19,10 @@ use minedmap::{
 
 use super::{common::*, region_group::RegionGroup};
 
+type RegionRef = Arc<ProcessedRegion>;
+
 fn biome_at(
-	region_group: &RegionGroup<Rc<ProcessedRegion>>,
+	region_group: &RegionGroup<RegionRef>,
 	chunk: ChunkCoords,
 	block: LayerBlockCoords,
 	dx: i32,
@@ -45,37 +48,51 @@ fn biome_at(
 
 pub struct TileRenderer<'a> {
 	config: &'a Config,
+	rt: &'a tokio::runtime::Runtime,
+	region_cache: Mutex<LruCache<PathBuf, Arc<OnceCell<RegionRef>>>>,
 }
 
 impl<'a> TileRenderer<'a> {
-	pub fn new(config: &'a Config) -> Self {
-		TileRenderer { config }
-	}
-
-	fn load_region(
-		region_cache: &mut LruCache<PathBuf, Rc<ProcessedRegion>>,
-		processed_path: &Path,
-	) -> Result<Rc<ProcessedRegion>> {
-		if let Some(region) = region_cache.get(processed_path) {
-			return Ok(region.clone());
+	pub fn new(config: &'a Config, rt: &'a tokio::runtime::Runtime) -> Self {
+		let region_cache = Mutex::new(LruCache::new(NonZeroUsize::new(12).unwrap()));
+		TileRenderer {
+			config,
+			rt,
+			region_cache,
 		}
-
-		let region: Rc<ProcessedRegion> =
-			storage::read(processed_path).context("Failed to load processed region data")?;
-		region_cache.put(processed_path.to_owned(), region.clone());
-
-		Ok(region)
 	}
 
-	fn load_region_group(
-		region_cache: &mut LruCache<PathBuf, Rc<ProcessedRegion>>,
+	async fn load_region(&self, processed_path: PathBuf) -> Result<RegionRef> {
+		let region_loader = {
+			let mut region_cache = self.region_cache.lock().unwrap();
+			if let Some(region_loader) = region_cache.get(&processed_path) {
+				Arc::clone(region_loader)
+			} else {
+				let region_loader = Default::default();
+				region_cache.put(processed_path.clone(), Arc::clone(&region_loader));
+				region_loader
+			}
+		};
+
+		region_loader
+			.get_or_try_init(|| async {
+				storage::read(&processed_path).context("Failed to load processed region data")
+			})
+			.await
+			.cloned()
+	}
+
+	async fn load_region_group(
+		&self,
 		processed_paths: RegionGroup<PathBuf>,
-	) -> Result<RegionGroup<Rc<ProcessedRegion>>> {
-		processed_paths.try_map(|path| Self::load_region(region_cache, &path))
+	) -> Result<RegionGroup<RegionRef>> {
+		processed_paths
+			.async_try_map(move |path| self.load_region(path))
+			.await
 	}
 
 	fn block_color_at(
-		region_group: &RegionGroup<Rc<ProcessedRegion>>,
+		region_group: &RegionGroup<RegionRef>,
 		chunk: &ProcessedChunk,
 		chunk_coords: ChunkCoords,
 		block_coords: LayerBlockCoords,
@@ -139,7 +156,7 @@ impl<'a> TileRenderer<'a> {
 
 	fn render_chunk(
 		image: &mut image::RgbaImage,
-		region_group: &RegionGroup<Rc<ProcessedRegion>>,
+		region_group: &RegionGroup<RegionRef>,
 		chunk: &ProcessedChunk,
 		chunk_coords: ChunkCoords,
 	) {
@@ -160,10 +177,7 @@ impl<'a> TileRenderer<'a> {
 		overlay_chunk(image, &chunk_image, chunk_coords);
 	}
 
-	fn render_region(
-		image: &mut image::RgbaImage,
-		region_group: &RegionGroup<Rc<ProcessedRegion>>,
-	) {
+	fn render_region(image: &mut image::RgbaImage, region_group: &RegionGroup<RegionRef>) {
 		for (coords, chunk) in region_group.center().chunks.iter() {
 			let Some(chunk) = chunk else {
 				continue;
@@ -198,11 +212,7 @@ impl<'a> TileRenderer<'a> {
 		Ok((paths, max_timestamp))
 	}
 
-	fn render_tile(
-		&self,
-		region_cache: &mut LruCache<PathBuf, Rc<ProcessedRegion>>,
-		coords: TileCoords,
-	) -> Result<()> {
+	fn render_tile(&self, coords: TileCoords) -> Result<()> {
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
 		let (processed_paths, processed_timestamp) = self.processed_sources(coords)?;
@@ -229,7 +239,9 @@ impl<'a> TileRenderer<'a> {
 				.display(),
 		);
 
-		let region_group = Self::load_region_group(region_cache, processed_paths)
+		let region_group = self
+			.rt
+			.block_on(self.load_region_group(processed_paths))
 			.with_context(|| format!("Region {:?} from previous step must be loadable", coords))?;
 		let mut image = image::RgbaImage::new(N, N);
 		Self::render_region(&mut image, &region_group);
@@ -249,10 +261,8 @@ impl<'a> TileRenderer<'a> {
 	pub fn run(self, regions: &[TileCoords]) -> Result<()> {
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Map, 0))?;
 
-		let mut region_cache = LruCache::new(NonZeroUsize::new(12).unwrap());
-
 		for &coords in regions {
-			if let Err(err) = self.render_tile(&mut region_cache, coords) {
+			if let Err(err) = self.render_tile(coords) {
 				eprintln!("Failed to render tile {:?}: {:?}", coords, err);
 			}
 		}
