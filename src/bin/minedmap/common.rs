@@ -85,6 +85,11 @@ impl Config {
 		}
 	}
 
+	pub fn region_path(&self, coords: TileCoords) -> PathBuf {
+		let filename = coord_filename(coords, "mca");
+		[&self.region_dir, Path::new(&filename)].iter().collect()
+	}
+
 	pub fn processed_path(&self, coords: TileCoords) -> PathBuf {
 		let filename = coord_filename(coords, "bin");
 		[&self.processed_dir, Path::new(&filename)].iter().collect()
