@@ -265,11 +265,10 @@ impl<'a> TileRenderer<'a> {
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Map, 0))?;
 
 		// Use par_bridge to process items in order (for better use of region cache)
-		regions.iter().par_bridge().for_each(|&coords| {
-			if let Err(err) = self.render_tile(coords) {
-				eprintln!("Failed to render tile {:?}: {:?}", coords, err);
-			}
-		});
+		regions.iter().par_bridge().try_for_each(|&coords| {
+			self.render_tile(coords)
+				.with_context(|| format!("Failed to render tile {:?}", coords))
+		})?;
 
 		Ok(())
 	}
