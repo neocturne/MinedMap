@@ -16,25 +16,24 @@ pub struct RegionGroup<T> {
 }
 
 impl<T> RegionGroup<T> {
-	pub fn new<F>(f: F) -> Result<Self>
+	pub fn new<F>(f: F) -> Self
 	where
-		F: Fn(i8, i8) -> Result<T>,
+		F: Fn(i8, i8) -> Option<T>,
 	{
 		RegionGroup {
-			center: (0, 0),
+			center: f(0, 0).expect("Center element of RegionGroup must not be None"),
 			neighs: [
-				Some((-1, -1)),
-				Some((-1, 0)),
-				Some((-1, 1)),
-				Some((0, -1)),
+				f(-1, -1),
+				f(-1, 0),
+				f(-1, 1),
+				f(0, -1),
 				None,
-				Some((0, 1)),
-				Some((1, -1)),
-				Some((1, 0)),
-				Some((1, 1)),
+				f(0, 1),
+				f(1, -1),
+				f(1, 0),
+				f(1, 1),
 			],
 		}
-		.try_map(|(x, z)| f(x, z))
 	}
 
 	pub fn center(&self) -> &T {

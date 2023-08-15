@@ -12,7 +12,7 @@ use minedmap::{io::fs::FileMetaVersion, resource::Biome, types::*, world::layer}
 // Increase to force regeneration of all output files
 pub const FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TileCoords {
 	pub x: i32,
 	pub z: i32,

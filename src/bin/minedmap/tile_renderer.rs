@@ -51,6 +51,7 @@ pub struct TileRenderer<'a> {
 	config: &'a Config,
 	rt: &'a tokio::runtime::Runtime,
 	regions: &'a [TileCoords],
+	region_set: rustc_hash::FxHashSet<TileCoords>,
 	region_cache: Mutex<LruCache<PathBuf, Arc<OnceCell<RegionRef>>>>,
 }
 
@@ -63,10 +64,12 @@ impl<'a> TileRenderer<'a> {
 		let region_cache = Mutex::new(LruCache::new(
 			NonZeroUsize::new(6 + 6 * config.num_threads).unwrap(),
 		));
+		let region_set = regions.iter().copied().collect();
 		TileRenderer {
 			config,
 			rt,
 			regions,
+			region_set,
 			region_cache,
 		}
 	}
@@ -204,11 +207,13 @@ impl<'a> TileRenderer<'a> {
 
 	fn processed_sources(&self, coords: TileCoords) -> Result<(RegionGroup<PathBuf>, SystemTime)> {
 		let sources = RegionGroup::new(|x, z| {
-			self.processed_source(TileCoords {
+			Some(TileCoords {
 				x: coords.x + (x as i32),
 				z: coords.z + (z as i32),
 			})
+			.filter(|entry| self.region_set.contains(entry))
 		})
+		.try_map(|entry| self.processed_source(entry))
 		.with_context(|| format!("Region {:?} from previous step must exist", coords))?;
 
 		let max_timestamp = *sources
