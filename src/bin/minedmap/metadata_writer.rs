@@ -4,10 +4,6 @@ use serde::Serialize;
 
 use super::common::*;
 
-pub struct MetadataWriter<'a> {
-	config: &'a Config,
-}
-
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Bounds {
@@ -35,9 +31,14 @@ struct Metadata<'t> {
 	spawn: Spawn,
 }
 
+pub struct MetadataWriter<'a> {
+	config: &'a Config,
+	tiles: &'a [TileCoordMap],
+}
+
 impl<'a> MetadataWriter<'a> {
-	pub fn new(config: &'a Config) -> Self {
-		MetadataWriter { config }
+	pub fn new(config: &'a Config, tiles: &'a [TileCoordMap]) -> Self {
+		MetadataWriter { config, tiles }
 	}
 
 	fn mipmap_entry(regions: &TileCoordMap) -> Mipmap {
@@ -87,7 +88,7 @@ impl<'a> MetadataWriter<'a> {
 		}
 	}
 
-	pub fn run(&self, tiles: Vec<TileCoordMap>) -> Result<()> {
+	pub fn run(self) -> Result<()> {
 		let level_dat = self.read_level_dat()?;
 
 		let mut metadata = Metadata {
@@ -95,7 +96,7 @@ impl<'a> MetadataWriter<'a> {
 			spawn: Self::spawn(&level_dat),
 		};
 
-		for tile_map in tiles.iter() {
+		for tile_map in self.tiles.iter() {
 			metadata.mipmaps.push(Self::mipmap_entry(tile_map));
 		}
 

@@ -50,17 +50,23 @@ fn biome_at(
 pub struct TileRenderer<'a> {
 	config: &'a Config,
 	rt: &'a tokio::runtime::Runtime,
+	regions: &'a [TileCoords],
 	region_cache: Mutex<LruCache<PathBuf, Arc<OnceCell<RegionRef>>>>,
 }
 
 impl<'a> TileRenderer<'a> {
-	pub fn new(config: &'a Config, rt: &'a tokio::runtime::Runtime) -> Self {
+	pub fn new(
+		config: &'a Config,
+		rt: &'a tokio::runtime::Runtime,
+		regions: &'a [TileCoords],
+	) -> Self {
 		let region_cache = Mutex::new(LruCache::new(
 			NonZeroUsize::new(6 + 6 * config.num_threads).unwrap(),
 		));
 		TileRenderer {
 			config,
 			rt,
+			regions,
 			region_cache,
 		}
 	}
@@ -261,11 +267,11 @@ impl<'a> TileRenderer<'a> {
 		)
 	}
 
-	pub fn run(self, regions: &[TileCoords]) -> Result<()> {
+	pub fn run(self) -> Result<()> {
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Map, 0))?;
 
 		// Use par_bridge to process items in order (for better use of region cache)
-		regions.iter().par_bridge().try_for_each(|&coords| {
+		self.regions.iter().par_bridge().try_for_each(|&coords| {
 			self.render_tile(coords)
 				.with_context(|| format!("Failed to render tile {:?}", coords))
 		})?;

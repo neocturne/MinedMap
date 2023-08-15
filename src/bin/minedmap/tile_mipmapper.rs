@@ -7,11 +7,12 @@ use super::common::*;
 
 pub struct TileMipmapper<'a> {
 	config: &'a Config,
+	regions: &'a [TileCoords],
 }
 
 impl<'a> TileMipmapper<'a> {
-	pub fn new(config: &'a Config) -> Self {
-		TileMipmapper { config }
+	pub fn new(config: &'a Config, regions: &'a [TileCoords]) -> Self {
+		TileMipmapper { config, regions }
 	}
 
 	fn done(tiles: &TileCoordMap) -> bool {
@@ -129,11 +130,11 @@ impl<'a> TileMipmapper<'a> {
 		})
 	}
 
-	pub fn run(self, tiles: &[TileCoords]) -> Result<Vec<TileCoordMap>> {
+	pub fn run(self) -> Result<Vec<TileCoordMap>> {
 		let mut tile_stack = {
 			let mut tile_map = TileCoordMap::default();
 
-			for &TileCoords { x, z } in tiles {
+			for &TileCoords { x, z } in self.regions {
 				tile_map.0.entry(z).or_default().insert(x);
 			}
 

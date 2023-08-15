@@ -48,9 +48,9 @@ fn main() -> Result<()> {
 		.unwrap();
 
 	let regions = RegionProcessor::new(&config).run()?;
-	TileRenderer::new(&config, &rt).run(&regions)?;
-	let tiles = TileMipmapper::new(&config).run(&regions)?;
-	MetadataWriter::new(&config).run(tiles)?;
+	TileRenderer::new(&config, &rt, &regions).run()?;
+	let tiles = TileMipmapper::new(&config, &regions).run()?;
+	MetadataWriter::new(&config, &tiles).run()?;
 
 	Ok(())
 }
