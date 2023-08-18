@@ -10,7 +10,7 @@ work.
   of two different versions
 - `extract.py`: Takes the block type information from `blocks.json` and texture data
   from an unpacked Minecraft JAR, storing the result in `colors.json`
-- `generate.py`: Generates `BlockType.inc.cpp` from `colors.json`
+- `generate.py`: Generates `block_types.rs` from `colors.json`
 
 In addition to these scripts, the JSON processor *jq* is a useful tool to work
 with MinedMap's resource metadata.
@@ -63,7 +63,8 @@ with MinedMap's resource metadata.
 7. Update the source code with the new block colors:
 
      ```sh
-     ./generate.py colors.json ../src/Resource/BlockType.inc.cpp
+     ./generate.py colors.json ../src/resource/block_types.rs
+     cargo fmt
      ```
 
 After the update, the new version should be tested with old savegames (both
