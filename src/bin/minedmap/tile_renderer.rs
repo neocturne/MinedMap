@@ -1,3 +1,5 @@
+//! The [TileRenderer] and related types and functions
+
 use std::{
 	num::NonZeroUsize,
 	path::PathBuf,
@@ -22,8 +24,16 @@ use super::{
 	region_group::RegionGroup,
 };
 
+/// Type for referencing loaded [ProcessedRegion] data
 type RegionRef = Arc<ProcessedRegion>;
 
+/// Returns the index of the biome at a block coordinate
+///
+/// The passed chunk and block coordinates relative to the center of the
+/// region group is offset by *dx* and *dz*.
+///
+/// The returned tuple contains the relative region coordinates the offset coordinate
+/// ends up in (in the range -1..1) and the index in that region's biome list.
 fn biome_at(
 	region_group: &RegionGroup<RegionRef>,
 	chunk: ChunkCoords,
@@ -49,15 +59,22 @@ fn biome_at(
 	))
 }
 
+/// The TileRenderer generates map tiles from processed region data
 pub struct TileRenderer<'a> {
+	/// Common MinedMap configuration from command line
 	config: &'a Config,
+	/// Runtime for asynchronous region loading
 	rt: &'a tokio::runtime::Runtime,
+	/// List of populated regions to render tiles for
 	regions: &'a [TileCoords],
+	/// Set of populated regions for fast existence checking
 	region_set: rustc_hash::FxHashSet<TileCoords>,
+	/// Cache of previously loaded regions
 	region_cache: Mutex<LruCache<PathBuf, Arc<OnceCell<RegionRef>>>>,
 }
 
 impl<'a> TileRenderer<'a> {
+	/// Constructs a new TileRenderer
 	pub fn new(
 		config: &'a Config,
 		rt: &'a tokio::runtime::Runtime,
@@ -76,6 +93,7 @@ impl<'a> TileRenderer<'a> {
 		}
 	}
 
+	/// Loads [ProcessedRegion] for a region or returns previously loaded data from the region cache
 	async fn load_region(&self, processed_path: PathBuf) -> Result<RegionRef> {
 		let region_loader = {
 			let mut region_cache = self.region_cache.lock().unwrap();
@@ -96,6 +114,7 @@ impl<'a> TileRenderer<'a> {
 			.cloned()
 	}
 
+	/// Loads a 3x3 neighborhood of processed region data
 	async fn load_region_group(
 		&self,
 		processed_paths: RegionGroup<PathBuf>,
@@ -105,18 +124,29 @@ impl<'a> TileRenderer<'a> {
 			.await
 	}
 
+	/// Computes the color of a tile pixel
 	fn block_color_at(
 		region_group: &RegionGroup<RegionRef>,
 		chunk: &ProcessedChunk,
 		chunk_coords: ChunkCoords,
 		block_coords: LayerBlockCoords,
 	) -> Option<Vec3> {
+		/// Helper for keys in the weight table
+		///
+		/// Hashing the value as a single u32 is more efficient than hashing
+		/// the tuple elements separately.
 		fn biome_key((dx, dz, index): (i8, i8, u16)) -> u32 {
 			(dx as u8 as u32) | (dz as u8 as u32) << 8 | (index as u32) << 16
 		}
 
+		/// One quadrant of the kernel used to smooth biome edges
+		///
+		/// The kernel is mirrored in X und Z direction to build the full 5x5
+		/// smoothing kernel.
 		const SMOOTH: [[f32; 3]; 3] = [[41.0, 26.0, 7.0], [26.0, 16.0, 4.0], [7.0, 4.0, 1.0]];
+		/// Maximum X coordinate offset to take into account for biome smoothing
 		const X: isize = SMOOTH[0].len() as isize - 1;
+		/// Maximum Z coordinate offset to take into account for biome smoothing
 		const Z: isize = SMOOTH.len() as isize - 1;
 
 		let block = chunk.blocks[block_coords]?;
@@ -168,12 +198,14 @@ impl<'a> TileRenderer<'a> {
 		Some(color / total)
 	}
 
+	/// Renders a chunk subtile into a region tile image
 	fn render_chunk(
 		image: &mut image::RgbaImage,
 		region_group: &RegionGroup<RegionRef>,
 		chunk: &ProcessedChunk,
 		chunk_coords: ChunkCoords,
 	) {
+		/// Width/height of a chunk subtile
 		const N: u32 = BLOCKS_PER_CHUNK as u32;
 
 		let chunk_image = image::RgbaImage::from_fn(N, N, |x, z| {
@@ -191,6 +223,7 @@ impl<'a> TileRenderer<'a> {
 		overlay_chunk(image, &chunk_image, chunk_coords);
 	}
 
+	/// Renders a region tile image
 	fn render_region(image: &mut image::RgbaImage, region_group: &RegionGroup<RegionRef>) {
 		for (coords, chunk) in region_group.center().chunks.iter() {
 			let Some(chunk) = chunk else {
@@ -201,12 +234,15 @@ impl<'a> TileRenderer<'a> {
 		}
 	}
 
+	/// Returns the filename of the processed data for a region and the time of its last modification
 	fn processed_source(&self, coords: TileCoords) -> Result<(PathBuf, SystemTime)> {
 		let path = self.config.processed_path(coords);
 		let timestamp = fs::modified_timestamp(&path)?;
 		Ok((path, timestamp))
 	}
 
+	/// Returns the filenames of the processed data for a 3x3 neighborhood of a region
+	/// and the time of last modification for any of them
 	fn processed_sources(&self, coords: TileCoords) -> Result<(RegionGroup<PathBuf>, SystemTime)> {
 		let sources = RegionGroup::new(|x, z| {
 			Some(TileCoords {
@@ -228,7 +264,9 @@ impl<'a> TileRenderer<'a> {
 		Ok((paths, max_timestamp))
 	}
 
+	/// Renders and saves a region tile image
 	fn render_tile(&self, coords: TileCoords) -> Result<()> {
+		/// Width/height of a tile image
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
 		let (processed_paths, processed_timestamp) = self.processed_sources(coords)?;
@@ -274,6 +312,7 @@ impl<'a> TileRenderer<'a> {
 		)
 	}
 
+	/// Runs the tile generation
 	pub fn run(self) -> Result<()> {
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Map, 0))?;
 

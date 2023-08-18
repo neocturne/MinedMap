@@ -1,3 +1,8 @@
+//! Higher-level interfaces to chunk data
+//!
+//! The data types in this module attempt to provide interfaces abstracting
+//! over different data versions as much as possible.
+
 use std::{
 	collections::{btree_map, BTreeMap},
 	iter::{self, FusedIterator},
@@ -17,6 +22,7 @@ use crate::{
 pub enum Chunk<'a> {
 	/// Minecraft v1.18+ chunk with biome data moved into sections
 	V1_18 {
+		/// Section data
 		section_map: BTreeMap<SectionY, (SectionV1_13<'a>, BiomesV1_18<'a>, BlockLight<'a>)>,
 	},
 	/// Minecraft v1.13+ chunk
@@ -26,14 +32,18 @@ pub enum Chunk<'a> {
 	/// section), and a palette mapping these indices to namespaced
 	/// block IDs
 	V1_13 {
+		/// Section data
 		section_map: BTreeMap<SectionY, (SectionV1_13<'a>, BlockLight<'a>)>,
+		/// Biome data
 		biomes: BiomesV0<'a>,
 	},
 	/// Original pre-1.13 chunk
 	///
 	/// The original chunk format with fixed 8-bit numeric block IDs
 	V0 {
+		/// Section data
 		section_map: BTreeMap<SectionY, (SectionV0<'a>, BlockLight<'a>)>,
+		/// Biome data
 		biomes: BiomesV0<'a>,
 	},
 	/// Unpopulated chunk without any block data
@@ -45,16 +55,21 @@ pub enum Chunk<'a> {
 enum SectionIterInner<'a> {
 	/// Iterator over sections of [Chunk::V1_18]
 	V1_18 {
+		/// Inner iterator into section map
 		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BiomesV1_18<'a>, BlockLight<'a>)>,
 	},
 	/// Iterator over sections of [Chunk::V1_13]
 	V1_13 {
+		/// Inner iterator into section map
 		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BlockLight<'a>)>,
+		/// Chunk biome data
 		biomes: &'a BiomesV0<'a>,
 	},
 	/// Iterator over sections of [Chunk::V0]
 	V0 {
+		/// Inner iterator into section map
 		iter: btree_map::Iter<'a, SectionY, (SectionV0<'a>, BlockLight<'a>)>,
+		/// Chunk biome data
 		biomes: &'a BiomesV0<'a>,
 	},
 	/// Empty iterator over an unpopulated chunk ([Chunk::Empty])
@@ -64,6 +79,7 @@ enum SectionIterInner<'a> {
 /// Iterator over the sections of a [Chunk]
 #[derive(Debug, Clone)]
 pub struct SectionIter<'a> {
+	/// Inner iterator enum
 	inner: SectionIterInner<'a>,
 }
 
@@ -193,6 +209,7 @@ impl<'a> Chunk<'a> {
 		)
 	}
 
+	/// Returns true if the chunk does not contain any sections
 	pub fn is_empty(&self) -> bool {
 		match self {
 			Chunk::V1_18 { section_map } => section_map.is_empty(),
@@ -230,14 +247,20 @@ impl<'a> Chunk<'a> {
 	}
 }
 
+/// Reference to block, biome and block light data of a section
 #[derive(Debug, Clone, Copy)]
 pub struct SectionIterItem<'a> {
+	/// The Y coordinate of the section
 	pub y: SectionY,
+	/// Section block data
 	pub section: &'a dyn Section,
+	/// Section biome data
 	pub biomes: &'a dyn Biomes,
+	/// Section block light data
 	pub block_light: BlockLight<'a>,
 }
 
+/// Helper trait to specify section iterator trait bounds
 trait SectionIterTrait<'a>:
 	Iterator<Item = SectionIterItem<'a>> + DoubleEndedIterator + ExactSizeIterator + FusedIterator
 {
@@ -252,6 +275,7 @@ impl<'a, T> SectionIterTrait<'a> for T where
 }
 
 impl<'a> SectionIter<'a> {
+	/// Helper to run a closure on the inner section iterator
 	fn with_iter<F, T>(&mut self, f: F) -> T
 	where
 		F: FnOnce(&mut dyn SectionIterTrait<'a>) -> T,

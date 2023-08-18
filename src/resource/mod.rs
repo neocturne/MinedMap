@@ -1,43 +1,62 @@
+//! Data describing Minecraft biomes and block types
+
 mod biomes;
 mod block_color;
-mod block_types;
 mod legacy_block_types;
+
+#[allow(clippy::missing_docs_in_private_items)] // Generated module
+mod block_types;
 
 use std::collections::HashMap;
 
 use enumflags2::{bitflags, BitFlags};
 use serde::{Deserialize, Serialize};
 
+/// Flags describing special properties of [BlockType]s
 #[bitflags]
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum BlockFlag {
+	/// The block type is opaque
 	Opaque,
+	/// The block type is colored using biome grass colors
 	Grass,
+	/// The block type is colored using biome foliage colors
 	Foliage,
+	/// The block type is birch foliage
 	Birch,
+	/// The block type is spurce foliage
 	Spruce,
+	/// The block type is colored using biome water colors
 	Water,
 }
 
+/// An RGB color
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Color(pub [u8; 3]);
 
+/// A block type specification
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct BlockType {
+	/// Bit set of [BlockFlag]s describing special properties of the block type
 	pub flags: BitFlags<BlockFlag>,
+	/// Base color of the block type
 	pub color: Color,
 }
 
 impl BlockType {
+	/// Checks whether a block type has a given [BlockFlag] set
 	pub fn is(&self, flag: BlockFlag) -> bool {
 		self.flags.contains(flag)
 	}
 }
 
+/// Used to look up standard Minecraft block types
 #[derive(Debug)]
 pub struct BlockTypes {
+	/// Map of string IDs to block types
 	block_type_map: HashMap<String, BlockType>,
+	/// Array used to look up old numeric block type and subtype values
 	legacy_block_types: Box<[[BlockType; 16]; 256]>,
 }
 
@@ -59,12 +78,14 @@ impl Default for BlockTypes {
 }
 
 impl BlockTypes {
+	/// Resolves a Minecraft 1.13+ string block type ID
 	#[inline]
 	pub fn get(&self, id: &str) -> Option<BlockType> {
 		let suffix = id.strip_prefix("minecraft:")?;
 		self.block_type_map.get(suffix).copied()
 	}
 
+	/// Resolves a Minecraft pre-1.13 numeric block type ID
 	#[inline]
 	pub fn get_legacy(&self, id: u8, data: u8) -> Option<BlockType> {
 		Some(self.legacy_block_types[id as usize][data as usize])
@@ -74,9 +95,12 @@ impl BlockTypes {
 pub use biomes::{Biome, BiomeGrassColorModifier};
 pub use block_color::{block_color, needs_biome};
 
+/// Used to look up standard Minecraft biome types
 #[derive(Debug)]
 pub struct BiomeTypes {
+	/// Map of string IDs to biome types
 	biome_map: HashMap<String, &'static Biome>,
+	/// Array used to look up old numeric biome IDs
 	legacy_biomes: Box<[&'static Biome; 256]>,
 }
 
@@ -112,12 +136,14 @@ impl Default for BiomeTypes {
 }
 
 impl BiomeTypes {
+	/// Resolves a Minecraft 1.18+ string biome type ID
 	#[inline]
 	pub fn get(&self, id: &str) -> Option<&Biome> {
 		let suffix = id.strip_prefix("minecraft:")?;
 		self.biome_map.get(suffix).copied()
 	}
 
+	/// Resolves a Minecraft pre-1.18 numeric biome type ID
 	#[inline]
 	pub fn get_legacy(&self, id: u8) -> Option<&Biome> {
 		Some(self.legacy_biomes[id as usize])

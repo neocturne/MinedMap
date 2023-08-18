@@ -1,3 +1,8 @@
+//! Higher-level interfaces to section data
+//!
+//! The data types in this module attempt to provide interfaces abstracting
+//! over different data versions as much as possible.
+
 use std::fmt::Debug;
 
 use anyhow::{bail, Context, Result};
@@ -8,6 +13,14 @@ use crate::{
 	resource::{Biome, BiomeTypes, BlockType, BlockTypes},
 	types::*,
 };
+
+use BLOCKS_PER_CHUNK as N;
+/// Maximum height of pre-1.18 levels
+const HEIGHT: usize = 256;
+/// Number of biome entries per chunk in each direction
+const BN: usize = N >> 2;
+/// Pre-1.18 height of level measured in 4-block spans (resolution of 1.15+ biome data)
+const BHEIGHT: usize = HEIGHT >> 2;
 
 /// Determine the number of bits required for indexing into a palette of a given length
 ///
@@ -29,20 +42,31 @@ fn palette_bits(len: usize, min: u8, max: u8) -> Option<u8> {
 
 /// Trait for common functions of [SectionV1_13] and [SectionV0]
 pub trait Section: Debug {
+	/// Returns the [BlockType] at a coordinate tuple inside the section
 	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<BlockType>>;
 }
 
 /// Minecraft v1.13+ section block data
 #[derive(Debug)]
 pub struct SectionV1_13<'a> {
+	/// Packed block type data
 	block_states: Option<&'a [i64]>,
+	/// List of block types indexed by entries encoded in *block_states*
 	palette: Vec<Option<BlockType>>,
+	/// Number of bits per block in *block_states*
 	bits: u8,
+	/// Set to true if packed block entries in *block_states* are aligned to i64
+	///
+	/// In older data formats, entries are unaligned and a single block can span
+	/// two i64 entries.
 	aligned_blocks: bool,
 }
 
 impl<'a> SectionV1_13<'a> {
 	/// Constructs a new [SectionV1_13] from deserialized data structures
+	///
+	/// The block IDs in the section's palette are resolved to their [BlockType]s
+	/// to allow for faster lookup later.
 	pub fn new(
 		data_version: u32,
 		block_states: Option<&'a [i64]>,
@@ -127,16 +151,21 @@ impl<'a> Section for SectionV1_13<'a> {
 /// Pre-1.13 section block data
 #[derive(Debug)]
 pub struct SectionV0<'a> {
+	/// Block type data
+	///
+	/// Each i8 entry corresponds to a block in the 16x16x16 section
 	blocks: &'a [i8],
+	/// Block damage/subtype data
+	///
+	/// Uses 4 bits for each block in the 16x16x16 section
 	data: &'a [i8],
+	/// Used to look up block type IDs
 	block_types: &'a BlockTypes,
 }
 
 impl<'a> SectionV0<'a> {
 	/// Constructs a new [SectionV0] from deserialized data structures
 	pub fn new(blocks: &'a [i8], data: &'a [i8], block_types: &'a BlockTypes) -> Result<Self> {
-		use BLOCKS_PER_CHUNK as N;
-
 		if blocks.len() != N * N * N {
 			bail!("Invalid section block data");
 		}
@@ -171,6 +200,7 @@ impl<'a> Section for SectionV0<'a> {
 
 /// Trait for common functions of [BiomesV1_18] and [BiomesV0]
 pub trait Biomes: Debug {
+	/// Returns the [Biome] at a coordinate tuple inside the chunk
 	fn biome_at(&self, section: SectionY, coords: SectionBlockCoords) -> Result<Option<&Biome>>;
 }
 
@@ -181,13 +211,21 @@ pub trait Biomes: Debug {
 /// v1.13+ block data.
 #[derive(Debug)]
 pub struct BiomesV1_18<'a> {
+	/// Packed biome data
+	///
+	/// Each entry specifies the biome of a 4x4x4 block area.
+	///
+	/// Unlike block type data in [SectionV1_13], biome data is always aligned
+	/// to whole i64 values.
 	biomes: Option<&'a [i64]>,
+	/// Biome palette indexed by entries encoded in *biomes*
 	palette: Vec<Option<&'a Biome>>,
+	/// Number of bits used for each entry in *biomes*
 	bits: u8,
 }
 
 impl<'a> BiomesV1_18<'a> {
-	/// Constructs a new [BiomesV18] from deserialized data structures
+	/// Constructs a new [BiomesV1_18] from deserialized data structures
 	pub fn new(
 		biomes: Option<&'a [i64]>,
 		palette: &'a [String],
@@ -223,9 +261,6 @@ impl<'a> BiomesV1_18<'a> {
 
 	/// Looks up the block type palette index at the given coordinates
 	fn palette_index_at(&self, coords: SectionBlockCoords) -> usize {
-		const N: usize = BLOCKS_PER_CHUNK;
-		const BN: usize = N >> 2;
-
 		let Some(biomes) = self.biomes else {
 			return 0;
 		};
@@ -262,28 +297,31 @@ impl<'a> Biomes for BiomesV1_18<'a> {
 /// different pre-v1.18 Minecraft versions
 #[derive(Debug)]
 enum BiomesV0Data<'a> {
+	/// Biome data stored as IntArray in 1.15+ format
+	///
+	/// Minecraft 1.15 switched to 3-dimensional biome information, but reduced
+	/// the resolution to only use one entry for every 4x4x4 block area.
 	IntArrayV15(&'a fastnbt::IntArray),
+	/// Biome data stored as IntArray in some pre-1.15 versions
 	IntArrayV0(&'a fastnbt::IntArray),
+	/// Biome data stored as ByteArray in some pre-1.15 versions
 	ByteArray(&'a fastnbt::ByteArray),
 }
 
 /// Pre-v1.18 section biome data
 #[derive(Debug)]
 pub struct BiomesV0<'a> {
+	/// Biome data from save data
 	data: BiomesV0Data<'a>,
+	/// Used to look up biome IDs
 	biome_types: &'a BiomeTypes,
 }
 
 impl<'a> BiomesV0<'a> {
 	/// Constructs a new [BiomesV0] from deserialized data structures
 	pub fn new(biomes: Option<&'a de::BiomesV0>, biome_types: &'a BiomeTypes) -> Result<Self> {
-		const N: usize = BLOCKS_PER_CHUNK;
-		const MAXY: usize = 256;
-		const BN: usize = N >> 2;
-		const BMAXY: usize = MAXY >> 2;
-
 		let data = match biomes {
-			Some(de::BiomesV0::IntArray(data)) if data.len() == BN * BN * BMAXY => {
+			Some(de::BiomesV0::IntArray(data)) if data.len() == BN * BN * BHEIGHT => {
 				BiomesV0Data::IntArrayV15(data)
 			}
 			Some(de::BiomesV0::IntArray(data)) if data.len() == N * N => {
@@ -302,16 +340,12 @@ impl<'a> Biomes for BiomesV0<'a> {
 	fn biome_at(&self, section: SectionY, coords: SectionBlockCoords) -> Result<Option<&Biome>> {
 		let id = match self.data {
 			BiomesV0Data::IntArrayV15(data) => {
-				const N: usize = BLOCKS_PER_CHUNK;
-				const MAXY: usize = 256;
-				const BN: usize = N >> 2;
-
 				let LayerBlockCoords { x, z } = coords.xz;
 				let y = section
 					.0
 					.checked_mul(BLOCKS_PER_CHUNK as i32)
 					.and_then(|y| y.checked_add_unsigned(coords.y.0.into()))
-					.filter(|&height| height >= 0 && (height as usize) < MAXY)
+					.filter(|&height| height >= 0 && (height as usize) < HEIGHT)
 					.context("Y coordinate out of range")? as usize;
 				let offset = (y >> 2) * BN * BN + (z.0 >> 2) as usize * BN + (x.0 >> 2) as usize;
 				let id = data[offset] as u32;
@@ -327,12 +361,13 @@ impl<'a> Biomes for BiomesV0<'a> {
 	}
 }
 
+/// Wrapper around chunk block light data array
 #[derive(Debug, Clone, Copy)]
 pub struct BlockLight<'a>(Option<&'a [i8]>);
 
 impl<'a> BlockLight<'a> {
+	/// Creates a new [BlockLight], checking validity
 	pub fn new(block_light: Option<&'a [i8]>) -> Result<Self> {
-		use BLOCKS_PER_CHUNK as N;
 		if let Some(block_light) = block_light {
 			if block_light.len() != N * N * N / 2 {
 				bail!("Invalid section block light data");
@@ -341,6 +376,7 @@ impl<'a> BlockLight<'a> {
 		Ok(BlockLight(block_light))
 	}
 
+	/// Returns the block light value at the given coordinates
 	pub fn block_light_at(&self, coords: SectionBlockCoords) -> u8 {
 		let Some(block_light) = self.0 else {
 			return 0;

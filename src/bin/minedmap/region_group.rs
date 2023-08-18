@@ -1,3 +1,5 @@
+//! The generic [RegionGroup] data structure
+
 use std::{future::Future, iter};
 
 use anyhow::Result;
@@ -5,17 +7,27 @@ use futures_util::future::OptionFuture;
 
 /// A generic array of 3x3 elements
 ///
-/// A RegionGroup is used to store information about a 3x3 neighbourhood of
+/// A RegionGroup is used to store information about a 3x3 neighborhood of
 /// regions.
 ///
 /// The center element is always populated, while the 8 adjacent elements may be None.
 #[derive(Debug, Clone, Copy)]
 pub struct RegionGroup<T> {
+	/// The element corresponding to the center of the 9x9 neighborhood
 	center: T,
+	/// The remaining elements, stored in row-first order
+	///
+	/// The center element is always None.
 	neighs: [Option<T>; 9],
 }
 
 impl<T> RegionGroup<T> {
+	/// Constructs a new RegionGroup from a closure called for each element
+	///
+	/// The X and Z coordinates relative to the center (in the range -1..1)
+	/// are passed to the closure.
+	///
+	/// Panics of the closure returns None for the center element.
 	pub fn new<F>(f: F) -> Self
 	where
 		F: Fn(i8, i8) -> Option<T>,
@@ -36,10 +48,14 @@ impl<T> RegionGroup<T> {
 		}
 	}
 
+	/// Returns a reference to the center element
 	pub fn center(&self) -> &T {
 		&self.center
 	}
 
+	/// Returns a reference to an element of the RegionGroup, if populated
+	///
+	/// Always returns None for X and Z coordinates outside of the -1..1 range.
 	pub fn get(&self, x: i8, z: i8) -> Option<&T> {
 		if (x, z) == (0, 0) {
 			return Some(&self.center);
@@ -50,6 +66,7 @@ impl<T> RegionGroup<T> {
 		self.neighs.get((3 * x + z + 4) as usize)?.as_ref()
 	}
 
+	/// Runs a closure on each element to construct a new RegionGroup
 	pub fn map<U, F>(self, mut f: F) -> RegionGroup<U>
 	where
 		F: FnMut(T) -> U,
@@ -60,6 +77,10 @@ impl<T> RegionGroup<T> {
 		}
 	}
 
+	/// Runs a fallible closure on each element to construct a new RegionGroup
+	///
+	/// [Err] return values for the center element are passed up. Outer elements
+	/// become unpopulated when the closure fails.
 	pub fn try_map<U, F>(self, mut f: F) -> Result<RegionGroup<U>>
 	where
 		F: FnMut(T) -> Result<U>,
@@ -70,6 +91,7 @@ impl<T> RegionGroup<T> {
 		Ok(RegionGroup { center, neighs })
 	}
 
+	/// Runs an asynchronous closure on each element to construct a new RegionGroup
 	#[allow(dead_code)]
 	pub async fn async_map<U, F, Fut>(self, mut f: F) -> RegionGroup<U>
 	where
@@ -88,6 +110,10 @@ impl<T> RegionGroup<T> {
 		}
 	}
 
+	/// Runs a fallible asynchronous closure on each element to construct a new RegionGroup
+	///
+	/// [Err] return values for the center element are passed up. Outer elements
+	/// become unpopulated when the closure fails.
 	pub async fn async_try_map<U, F, Fut>(self, mut f: F) -> Result<RegionGroup<U>>
 	where
 		Fut: Future<Output = Result<U>>,
@@ -110,6 +136,7 @@ impl<T> RegionGroup<T> {
 		Ok(RegionGroup { center, neighs })
 	}
 
+	/// Returns an [Iterator] over all populated elements
 	pub fn iter(&self) -> impl Iterator<Item = &T> {
 		iter::once(&self.center).chain(self.neighs.iter().filter_map(Option::as_ref))
 	}

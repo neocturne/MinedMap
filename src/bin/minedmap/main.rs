@@ -1,3 +1,8 @@
+//! The minedmap generator renders map tile images from Minecraft save data
+
+#![warn(missing_docs)]
+#![warn(clippy::missing_docs_in_private_items)]
+
 mod common;
 mod metadata_writer;
 mod region_group;
@@ -18,6 +23,7 @@ use region_processor::RegionProcessor;
 use tile_mipmapper::TileMipmapper;
 use tile_renderer::TileRenderer;
 
+/// Command line arguments for minedmap
 #[derive(Debug, Parser)]
 pub struct Args {
 	/// Number of parallel threads to use for processing
@@ -32,6 +38,7 @@ pub struct Args {
 	pub output_dir: PathBuf,
 }
 
+/// Configures the Rayon thread pool for parallel processing
 fn setup_threads(num_threads: usize) -> Result<()> {
 	rayon::ThreadPoolBuilder::new()
 		.num_threads(num_threads)

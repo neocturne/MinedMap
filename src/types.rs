@@ -1,3 +1,5 @@
+//! Common types used by MinedMap
+
 use std::{
 	fmt::Debug,
 	iter::FusedIterator,
@@ -7,14 +9,20 @@ use std::{
 use itertools::iproduct;
 use serde::{Deserialize, Serialize};
 
+/// Const generic AXIS arguments for coordinate types
 pub mod axis {
+	/// The X axis
 	pub const X: u8 = 0;
+	/// The Y axis (height)
 	pub const Y: u8 = 1;
+	/// The Z axis
 	pub const Z: u8 = 2;
 }
 
+/// Generates a generic coordinate type with a given range
 macro_rules! coord_type {
-	($t:ident, $max:expr) => {
+	($t:ident, $max:expr, $doc:expr $(,)?) => {
+		#[doc = $doc]
 		#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 		pub struct $t<const AXIS: u8>(pub u8);
 
@@ -47,9 +55,15 @@ macro_rules! coord_type {
 	};
 }
 
+/// Number of bits required to store a block coordinate
 pub const BLOCK_BITS: u8 = 4;
+/// Number of blocks per chunk in each dimension
 pub const BLOCKS_PER_CHUNK: usize = 1 << BLOCK_BITS;
-coord_type!(BlockCoord, BLOCKS_PER_CHUNK);
+coord_type!(
+	BlockCoord,
+	BLOCKS_PER_CHUNK,
+	"A block coordinate relative to a chunk",
+);
 
 /// A block X coordinate relative to a chunk
 pub type BlockX = BlockCoord<{ axis::X }>;
@@ -63,7 +77,9 @@ pub type BlockZ = BlockCoord<{ axis::Z }>;
 /// X and Z coordinates of a block in a chunk
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct LayerBlockCoords {
+	/// The X coordinate
 	pub x: BlockX,
+	/// The Z coordinate
 	pub z: BlockZ,
 }
 
@@ -110,7 +126,9 @@ impl<T> IndexMut<LayerBlockCoords> for LayerBlockArray<T> {
 /// X, Y and Z coordinates of a block in a chunk section
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct SectionBlockCoords {
+	/// The X and Z coordinates
 	pub xz: LayerBlockCoords,
+	/// The Y coordinate
 	pub y: BlockY,
 }
 
@@ -137,9 +155,15 @@ impl Debug for SectionBlockCoords {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SectionY(pub i32);
 
+/// Number of bits required to store a chunk coordinate
 pub const CHUNK_BITS: u8 = 5;
+/// Number of chunks per region in each dimension
 pub const CHUNKS_PER_REGION: usize = 1 << CHUNK_BITS;
-coord_type!(ChunkCoord, CHUNKS_PER_REGION);
+coord_type!(
+	ChunkCoord,
+	CHUNKS_PER_REGION,
+	"A chunk coordinate relative to a region",
+);
 
 /// A chunk X coordinate relative to a region
 pub type ChunkX = ChunkCoord<{ axis::X }>;
@@ -150,7 +174,9 @@ pub type ChunkZ = ChunkCoord<{ axis::Z }>;
 /// A pair of chunk coordinates relative to a region
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct ChunkCoords {
+	/// The X coordinate
 	pub x: ChunkX,
+	/// The Z coordinate
 	pub z: ChunkZ,
 }
 
@@ -167,14 +193,17 @@ impl Debug for ChunkCoords {
 pub struct ChunkArray<T>(pub [[T; CHUNKS_PER_REGION]; CHUNKS_PER_REGION]);
 
 impl<T> ChunkArray<T> {
+	/// Iterates over all possible chunk coordinate pairs used as [ChunkArray] keys
 	pub fn keys() -> impl Iterator<Item = ChunkCoords> + Clone + Debug {
 		iproduct!(ChunkZ::iter(), ChunkX::iter()).map(|(z, x)| ChunkCoords { x, z })
 	}
 
+	/// Iterates over all values stored in the [ChunkArray]
 	pub fn values(&self) -> impl Iterator<Item = &T> + Clone + Debug {
 		Self::keys().map(|k| &self[k])
 	}
 
+	/// Iterates over pairs of chunk coordinate pairs and corresponding stored values
 	pub fn iter(&self) -> impl Iterator<Item = (ChunkCoords, &T)> + Clone + Debug {
 		Self::keys().map(|k| (k, &self[k]))
 	}

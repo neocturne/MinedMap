@@ -1,3 +1,5 @@
+//! The [TileMipmapper]
+
 use anyhow::{Context, Result};
 use rayon::prelude::*;
 
@@ -6,16 +8,24 @@ use super::{
 	core::{io::fs, types::*},
 };
 
+/// Generates mipmap tiles from full-resolution tile images
 pub struct TileMipmapper<'a> {
+	/// Common MinedMap configuration from command line
 	config: &'a Config,
+	/// List of populated tiles for base mipmap level (level 0)
 	regions: &'a [TileCoords],
 }
 
 impl<'a> TileMipmapper<'a> {
+	/// Constructs a new TileMipmapper
 	pub fn new(config: &'a Config, regions: &'a [TileCoords]) -> Self {
 		TileMipmapper { config, regions }
 	}
 
+	/// Helper to determine if no further mipmap levels are needed
+	///
+	/// If all tile coordinates are -1 or 0, further mipmap levels will not
+	/// decrease the number of tiles and mipmap generated is considered finished.
 	fn done(tiles: &TileCoordMap) -> bool {
 		tiles
 			.0
@@ -23,6 +33,7 @@ impl<'a> TileMipmapper<'a> {
 			.all(|(z, xs)| (-1..=0).contains(z) && xs.iter().all(|x| (-1..=0).contains(x)))
 	}
 
+	/// Derives the map of populated tile coordinates for the next mipmap level
 	fn map_coords(tiles: &TileCoordMap) -> TileCoordMap {
 		let mut ret = TileCoordMap::default();
 
@@ -38,6 +49,10 @@ impl<'a> TileMipmapper<'a> {
 		ret
 	}
 
+	/// Renders and saves a single mipmap tile image
+	///
+	/// Each mipmap tile is rendered by taking 2x2 tiles from the
+	/// previous level and scaling them down by 50%.
 	fn render_mipmap<P: image::PixelWithColorType>(
 		&self,
 		kind: TileKind,
@@ -49,6 +64,7 @@ impl<'a> TileMipmapper<'a> {
 		[P::Subpixel]: image::EncodableLayout,
 		image::ImageBuffer<P, Vec<P::Subpixel>>: Into<image::DynamicImage>,
 	{
+		/// Tile width/height
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
 		let output_path = self.config.tile_path(kind, level, coords);
@@ -131,6 +147,7 @@ impl<'a> TileMipmapper<'a> {
 		})
 	}
 
+	/// Runs the mipmap generation
 	pub fn run(self) -> Result<Vec<TileCoordMap>> {
 		let mut tile_stack = {
 			let mut tile_map = TileCoordMap::default();

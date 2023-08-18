@@ -1,6 +1,10 @@
+//! Utility functions and extension traits
+
 use crate::types::*;
 
+/// Extension trait for combined bit shift and mask
 pub trait ShiftMask: Sized {
+	/// Output type of shift operation
 	type MaskedOutput;
 
 	/// Apply a right shift to a value, and return both the result and the
@@ -27,6 +31,8 @@ impl ShiftMask for i32 {
 	}
 }
 
+/// Combines a coordinate split into region, chunk and block number to
+/// a single linear coordinate
 #[inline]
 pub fn to_flat_coord<const AXIS: u8>(
 	region: i8,
@@ -36,6 +42,7 @@ pub fn to_flat_coord<const AXIS: u8>(
 	(region as i32) << (BLOCK_BITS + CHUNK_BITS) | ((chunk.0 as i32) << BLOCK_BITS | block.0 as i32)
 }
 
+/// Splits a flat (linear) coordinate into region, chunk and block numbers
 #[inline]
 pub fn from_flat_coord<const AXIS: u8>(coord: i32) -> (i8, ChunkCoord<AXIS>, BlockCoord<AXIS>) {
 	let (region_chunk, block) = coord.shift_mask(BLOCK_BITS);

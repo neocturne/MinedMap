@@ -1,3 +1,5 @@
+//! The [RegionProcessor] and related functions
+
 use std::{ffi::OsStr, path::Path, time::SystemTime};
 
 use anyhow::{Context, Result};
@@ -32,13 +34,20 @@ fn parse_region_filename(file_name: &OsStr) -> Option<TileCoords> {
 }
 
 /// Type with methods for processing the regions of a Minecraft save directory
+///
+/// The RegionProcessor builds lightmap tiles as well as processed region data
+/// consumed by subsequent generation steps.
 pub struct RegionProcessor<'a> {
+	/// Registry of known block types
 	block_types: resource::BlockTypes,
+	/// Registry of known biome types
 	biome_types: resource::BiomeTypes,
+	/// Common MinedMap configuration from command line
 	config: &'a Config,
 }
 
 impl<'a> RegionProcessor<'a> {
+	/// Constructs a new RegionProcessor
 	pub fn new(config: &'a Config) -> Self {
 		RegionProcessor {
 			block_types: resource::BlockTypes::default(),
@@ -47,6 +56,7 @@ impl<'a> RegionProcessor<'a> {
 		}
 	}
 
+	/// Generates a list of all regions of the input Minecraft save data
 	fn collect_regions(&self) -> Result<Vec<TileCoords>> {
 		Ok(self
 			.config
@@ -80,9 +90,11 @@ impl<'a> RegionProcessor<'a> {
 		world::layer::top_layer(biome_list, &chunk)
 	}
 
+	/// Renders a lightmap subtile from chunk block light data
 	fn render_chunk_lightmap(
 		block_light: Box<world::layer::BlockLightArray>,
 	) -> image::GrayAlphaImage {
+		/// Width/height of generated chunk lightmap
 		const N: u32 = BLOCKS_PER_CHUNK as u32;
 
 		image::GrayAlphaImage::from_fn(N, N, |x, z| {
@@ -95,6 +107,9 @@ impl<'a> RegionProcessor<'a> {
 		})
 	}
 
+	/// Saves processed region data
+	///
+	/// The timestamp is the time of the last modification of the input region data.
 	fn save_region(
 		path: &Path,
 		processed_region: &ProcessedRegion,
@@ -103,6 +118,9 @@ impl<'a> RegionProcessor<'a> {
 		storage::write(path, processed_region, FILE_META_VERSION, timestamp)
 	}
 
+	/// Saves a lightmap tile
+	///
+	/// The timestamp is the time of the last modification of the input region data.
 	fn save_lightmap(
 		path: &Path,
 		lightmap: &image::GrayAlphaImage,
@@ -117,6 +135,7 @@ impl<'a> RegionProcessor<'a> {
 
 	/// Processes a single region file
 	fn process_region(&self, coords: TileCoords) -> Result<()> {
+		/// Width/height of the region data
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
 		let mut processed_region = ProcessedRegion::default();

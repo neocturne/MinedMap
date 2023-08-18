@@ -1,3 +1,7 @@
+//! Functions for serializing and deserializing MinedMap data structures efficiently
+//!
+//! Data is serialized using Bincode and compressed using zstd.
+
 use std::{
 	fs::File,
 	io::{Read, Write},
@@ -10,6 +14,9 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::fs;
 
+/// Serializes data and stores it in a file
+///
+/// A timestamp is stored in an assiciated metadata file.
 pub fn write<T: Serialize>(
 	path: &Path,
 	value: &T,
@@ -29,6 +36,7 @@ pub fn write<T: Serialize>(
 	})
 }
 
+/// Reads data from a file and deserializes it
 pub fn read<T: DeserializeOwned>(path: &Path) -> Result<T> {
 	(|| -> Result<T> {
 		let mut file = File::open(path)?;

@@ -1,3 +1,5 @@
+//! Functions for reading and deserializing region data
+
 use std::{
 	fs::File,
 	io::{prelude::*, SeekFrom},
@@ -10,15 +12,24 @@ use serde::de::DeserializeOwned;
 
 use crate::types::*;
 
+/// Data block size of region data files
+///
+/// After one header block, the region file consists of one or more consecutive blocks
+/// of data for each populated chunk.
 const BLOCKSIZE: usize = 4096;
 
+/// Chunk descriptor extracted from region file header
 #[derive(Debug)]
 struct ChunkDesc {
+	/// Offset of data block where the chunk starts
 	offset: u32,
+	/// Number of data block used by the chunk
 	len: u8,
+	/// Coodinates of chunk described by this descriptor
 	coords: ChunkCoords,
 }
 
+/// Parses the header of a region data file
 fn parse_header(header: &ChunkArray<u32>) -> Vec<ChunkDesc> {
 	let mut chunks: Vec<_> = header
 		.iter()
@@ -45,6 +56,7 @@ fn parse_header(header: &ChunkArray<u32>) -> Vec<ChunkDesc> {
 	chunks
 }
 
+/// Decompresses chunk data and deserializes to a given data structure
 fn decode_chunk<T>(buf: &[u8]) -> Result<T>
 where
 	T: DeserializeOwned,
@@ -63,12 +75,18 @@ where
 	fastnbt::from_bytes(&decode_buffer).context("Failed to decode NBT data")
 }
 
+/// Wraps a reader used to read a region data file
 #[derive(Debug)]
 pub struct Region<R: Read + Seek> {
+	/// The wrapper reader
 	reader: R,
 }
 
 impl<R: Read + Seek> Region<R> {
+	/// Iterates over the chunks of the region data
+	///
+	/// The order of iteration is based on the order the chunks appear in the
+	/// data file.
 	pub fn foreach_chunk<T, F>(self, mut f: F) -> Result<()>
 	where
 		R: Read + Seek,
@@ -126,6 +144,7 @@ impl<R: Read + Seek> Region<R> {
 	}
 }
 
+/// Creates a new [Region] from a reader
 pub fn from_reader<R>(reader: R) -> Region<R>
 where
 	R: Read + Seek,
@@ -133,6 +152,7 @@ where
 	Region { reader }
 }
 
+/// Creates a new [Region] for a file
 pub fn from_file<P>(path: P) -> Result<Region<File>>
 where
 	P: AsRef<Path>,

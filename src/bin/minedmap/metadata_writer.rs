@@ -1,3 +1,5 @@
+//! The [MetadataWriter] and related types
+
 use anyhow::{Context, Result};
 use serde::Serialize;
 
@@ -6,43 +8,62 @@ use super::{
 	core::{self, io::fs, world::de},
 };
 
+/// Minimum and maximum X and Z tile coordinates for a mipmap level
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Bounds {
+	/// Minimum X coordinate
 	min_x: i32,
+	/// Maximum X coordinate
 	max_x: i32,
+	/// Minimum Z coordinate
 	min_z: i32,
+	/// Maximum Z coordinate
 	max_z: i32,
 }
 
+/// Mipmap level information in viewer metadata file
 #[derive(Debug, Serialize)]
 struct Mipmap<'t> {
+	/// Minimum and maximum tile coordinates of the mipmap level
 	bounds: Bounds,
+	/// Map of populated tiles for the mipmap level
 	regions: &'t TileCoordMap,
 }
 
+/// Initial spawn point for new players
 #[derive(Debug, Serialize)]
 struct Spawn {
+	/// Spawn X coordinate
 	x: i32,
+	/// Spawn Z coordinate
 	z: i32,
 }
 
+/// Viewer metadata JSON data structure
 #[derive(Debug, Serialize)]
 struct Metadata<'t> {
+	/// Tile information for each mipmap level
 	mipmaps: Vec<Mipmap<'t>>,
+	/// Initial spawn point for new players
 	spawn: Spawn,
 }
 
+/// The MetadataWriter is used to generate the viewer metadata file
 pub struct MetadataWriter<'a> {
+	/// Common MinedMap configuration from command line
 	config: &'a Config,
+	/// Map of generated tiles for each mipmap level
 	tiles: &'a [TileCoordMap],
 }
 
 impl<'a> MetadataWriter<'a> {
+	/// Creates a new MetadataWriter
 	pub fn new(config: &'a Config, tiles: &'a [TileCoordMap]) -> Self {
 		MetadataWriter { config, tiles }
 	}
 
+	/// Helper to construct a [Mipmap] data structure from a [TileCoordMap]
 	fn mipmap_entry(regions: &TileCoordMap) -> Mipmap {
 		let mut min_x = i32::MAX;
 		let mut max_x = i32::MIN;
@@ -78,10 +99,12 @@ impl<'a> MetadataWriter<'a> {
 		}
 	}
 
+	/// Reads and deserializes the `level.dat` of the Minecraft save data
 	fn read_level_dat(&self) -> Result<de::LevelDat> {
 		core::io::data::from_file(&self.config.level_dat_path).context("Failed to read level.dat")
 	}
 
+	/// Generates [Spawn] data from a [de::LevelDat]
 	fn spawn(level_dat: &de::LevelDat) -> Spawn {
 		Spawn {
 			x: level_dat.data.spawn_x,
@@ -89,6 +112,7 @@ impl<'a> MetadataWriter<'a> {
 		}
 	}
 
+	/// Runs the viewer metadata file generation
 	pub fn run(self) -> Result<()> {
 		let level_dat = self.read_level_dat()?;
 

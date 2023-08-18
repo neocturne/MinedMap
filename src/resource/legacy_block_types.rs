@@ -1,12 +1,18 @@
+//! Mapping of old numeric block type and damage/subtype IDs to new string IDs
+
+/// Helper for block types that don't use the damage/subtype data
 const fn simple(id: &str) -> [&str; 16] {
 	[
 		id, id, id, id, id, id, id, id, id, id, id, id, id, id, id, id,
 	]
 }
 
+/// Default block type for unassigned numeric IDs
 const DEF: &str = "air";
+/// Default entry for block type numbers that are unassigned regardless of subtype
 const EMPTY: [&str; 16] = simple(DEF);
 
+/// Mapping from each numeric block type and damage/subtype ID to new string ID
 pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 	/* 0 */
 	simple("air"),

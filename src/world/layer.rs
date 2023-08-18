@@ -1,3 +1,5 @@
+//! Functions to search the "top" layer of a chunk
+
 use std::num::NonZeroU16;
 
 use anyhow::{Context, Result};
@@ -10,6 +12,7 @@ use crate::{
 	types::*,
 };
 
+/// Height (Y coordinate) of a block
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BlockHeight(pub i32);
 
@@ -28,27 +31,52 @@ impl BlockHeight {
 	}
 }
 
+/// Array optionally storing a [BlockType] for each coordinate of a chunk
 pub type BlockArray = LayerBlockArray<Option<BlockType>>;
+
+/// Array optionally storing a biome index for each coordinate of a chunk
+///
+/// The entries refer to a biome list generated with the top layer data.
+/// Indices are stored incremented by 1 to allow using a [NonZeroU16].
 pub type BiomeArray = LayerBlockArray<Option<NonZeroU16>>;
+
+/// Array storing a block light value for each coordinate for a chunk
 pub type BlockLightArray = LayerBlockArray<u8>;
+
+/// Array optionally storing a depth value for each coordinate for a chunk
 pub type DepthArray = LayerBlockArray<Option<BlockHeight>>;
 
+/// References to LayerData entries for a single coordinate pair
 struct LayerEntry<'a> {
+	/// The block type of the referenced entry
 	block: &'a mut Option<BlockType>,
+	/// The biome type of the referenced entry
 	biome: &'a mut Option<NonZeroU16>,
+	/// The block light of the referenced entry
 	block_light: &'a mut u8,
+	/// The depth value of the referenced entry
 	depth: &'a mut Option<BlockHeight>,
 }
 
 impl<'a> LayerEntry<'a> {
+	/// Returns true if the entry has not been filled yet (no opaque block has been encountered)
+	///
+	/// The depth value is filled separately when a non-water block is encountered after the block type
+	/// has already been filled.
 	fn is_empty(&self) -> bool {
 		self.block.is_none()
 	}
 
+	/// Returns true if the entry has been filled including its depth (an opaque non-water block has been
+	/// encountered)
 	fn done(&self) -> bool {
 		self.depth.is_some()
 	}
 
+	/// Fills in the LayerEntry
+	///
+	/// Checks whether the passed coordinates point at an opaque or non-water block and
+	/// fills in the entry accordingly. Returns true when the block has been filled including its depth.
 	fn fill(
 		&mut self,
 		biome_list: &mut IndexSet<Biome>,
@@ -90,15 +118,24 @@ impl<'a> LayerEntry<'a> {
 	}
 }
 
+/// Top layer data
+///
+/// A LayerData stores block type, biome, block light and depth data for
+/// each coordinate of a chunk.
 #[derive(Debug, Default)]
 pub struct LayerData {
+	/// Block type data
 	pub blocks: Box<BlockArray>,
+	/// Biome data
 	pub biomes: Box<BiomeArray>,
+	/// Block light data
 	pub block_light: Box<BlockLightArray>,
+	/// Depth data
 	pub depths: Box<DepthArray>,
 }
 
 impl LayerData {
+	/// Builds a [LayerEntry] referencing the LayerData at a given coordinate pair
 	fn entry(&mut self, coords: LayerBlockCoords) -> LayerEntry {
 		LayerEntry {
 			block: &mut self.blocks[coords],
@@ -109,13 +146,14 @@ impl LayerData {
 	}
 }
 
-/// Fills in a [BlockInfoArray] with the information of the chunk's top
+/// Fills in a [LayerData] with the information of the chunk's top
 /// block layer
 ///
 /// For each (X, Z) coordinate pair, the topmost opaque block is
 /// determined as the block that should be visible on the rendered
 /// map. For water blocks, the height of the first non-water block
-/// is additionally filled in as the water depth.
+/// is additionally filled in as the water depth (the block height is
+/// used as depth otherwise).
 pub fn top_layer(biome_list: &mut IndexSet<Biome>, chunk: &Chunk) -> Result<Option<LayerData>> {
 	use BLOCKS_PER_CHUNK as N;
 
