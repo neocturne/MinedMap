@@ -6,7 +6,7 @@ import sys
 
 
 if len(sys.argv) != 3:
-	sys.exit('Usage: extract.py <colors.json> <block_types.rs>')
+	sys.exit('Usage: generate.py <colors.json> <block_types.rs>')
 
 with open(sys.argv[1]) as f:
 	colors = json.load(f)
