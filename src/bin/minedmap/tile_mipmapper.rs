@@ -1,9 +1,10 @@
 use anyhow::{Context, Result};
 use rayon::prelude::*;
 
-use minedmap::{io::fs, types::*};
-
-use super::common::*;
+use super::{
+	common::*,
+	core::{io::fs, types::*},
+};
 
 pub struct TileMipmapper<'a> {
 	config: &'a Config,

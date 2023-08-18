@@ -552,7 +552,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "minedmap"
+name = "minedmap-core"
 version = "0.1.0"
 dependencies = [
  "anyhow",

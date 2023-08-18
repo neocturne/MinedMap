@@ -1,8 +1,10 @@
 use anyhow::{Context, Result};
-use minedmap::{io::fs, world::de};
 use serde::Serialize;
 
-use super::common::*;
+use super::{
+	common::*,
+	core::{self, io::fs, world::de},
+};
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -77,8 +79,7 @@ impl<'a> MetadataWriter<'a> {
 	}
 
 	fn read_level_dat(&self) -> Result<de::LevelDat> {
-		minedmap::io::data::from_file(&self.config.level_dat_path)
-			.context("Failed to read level.dat")
+		core::io::data::from_file(&self.config.level_dat_path).context("Failed to read level.dat")
 	}
 
 	fn spawn(level_dat: &de::LevelDat) -> Spawn {

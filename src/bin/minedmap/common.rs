@@ -7,7 +7,7 @@ use std::{
 use indexmap::IndexSet;
 use serde::{Deserialize, Serialize};
 
-use minedmap::{io::fs::FileMetaVersion, resource::Biome, types::*, world::layer};
+use super::core::{io::fs::FileMetaVersion, resource::Biome, types::*, world::layer};
 
 // Increase to force regeneration of all output files
 pub const FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);

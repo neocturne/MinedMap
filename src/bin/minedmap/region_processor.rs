@@ -4,17 +4,19 @@ use anyhow::{Context, Result};
 use indexmap::IndexSet;
 use rayon::prelude::*;
 
-use minedmap::{
-	io::{fs, storage},
-	resource::{self, Biome},
-	types::*,
-	world::{
+use super::{
+	common::*,
+	core::{
 		self,
-		layer::{self, LayerData},
+		io::{fs, storage},
+		resource::{self, Biome},
+		types::*,
+		world::{
+			self,
+			layer::{self, LayerData},
+		},
 	},
 };
-
-use super::common::*;
 
 /// Parses a filename in the format r.X.Z.mca into the contained X and Z values
 fn parse_region_filename(file_name: &OsStr) -> Option<TileCoords> {
@@ -136,7 +138,7 @@ impl<'a> RegionProcessor<'a> {
 
 		println!("Processing region r.{}.{}.mca", coords.x, coords.z);
 
-		minedmap::io::region::from_file(path)?.foreach_chunk(
+		core::io::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
 				let Some(layer::LayerData {
 					blocks,

@@ -5,6 +5,8 @@ mod region_processor;
 mod tile_mipmapper;
 mod tile_renderer;
 
+use minedmap_core as core;
+
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};

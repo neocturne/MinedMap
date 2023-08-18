@@ -11,14 +11,16 @@ use lru::LruCache;
 use rayon::prelude::*;
 use tokio::sync::OnceCell;
 
-use minedmap::{
-	io::{fs, storage},
-	resource::{block_color, needs_biome},
-	types::*,
-	util::coord_offset,
+use super::{
+	common::*,
+	core::{
+		io::{fs, storage},
+		resource::{block_color, needs_biome},
+		types::*,
+		util::coord_offset,
+	},
+	region_group::RegionGroup,
 };
-
-use super::{common::*, region_group::RegionGroup};
 
 type RegionRef = Arc<ProcessedRegion>;
 
