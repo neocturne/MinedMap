@@ -130,6 +130,13 @@ pub const BIOMES: &[(&str, Biome)] = {
 		("bamboo_jungle", Biome::new(0_95, 0_90)),
 		("beach", Biome::new(0_80, 0_40)),
 		("birch_forest", Biome::new(0_60, 0_60)),
+		(
+			"cherry_grove",
+			Biome::new(0_50, 0_80)
+				.water([93, 183, 239])
+				.grass([182, 219, 97])
+				.foliage([182, 219, 97]),
+		),
 		("cold_ocean", Biome::new(0_50, 0_50).water([61, 87, 214])),
 		("dark_forest", Biome::new(0_70, 0_80).modify(DarkForest)),
 		(
