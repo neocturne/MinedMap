@@ -9,6 +9,7 @@
 	"acacia_fence_gate": {
 		"texture": "acacia_planks"
 	},
+	"acacia_hanging_sign": null,
 	"acacia_leaves": {
 		"foliage": true
 	},
@@ -30,6 +31,7 @@
 		"texture": "acacia_planks"
 	},
 	"acacia_trapdoor": {},
+	"acacia_wall_hanging_sign": null,
 	"acacia_wall_sign": null,
 	"acacia_wood": {
 		"texture": "acacia_log"
@@ -69,7 +71,44 @@
 	"bamboo": {
 		"texture": "bamboo_stalk"
 	},
+	"bamboo_block": {
+		"texture": "bamboo_block_top"
+	},
+	"bamboo_button": null,
+	"bamboo_door": {
+		"texture": "bamboo_door_top"
+	},
+	"bamboo_fence": {
+		"texture": "bamboo_planks"
+	},
+	"bamboo_fence_gate": {
+		"texture": "bamboo_planks"
+	},
+	"bamboo_hanging_sign": null,
+	"bamboo_mosaic": {},
+	"bamboo_mosaic_slab": {
+		"texture": "bamboo_mosaic"
+	},
+	"bamboo_mosaic_stairs": {
+		"texture": "bamboo_mosaic"
+	},
+	"bamboo_planks": {},
+	"bamboo_pressure_plate": {
+		"texture": "bamboo_planks"
+	},
 	"bamboo_sapling": null,
+	"bamboo_sign": {
+		"texture": "bamboo_planks"
+	},
+	"bamboo_slab": {
+		"texture": "bamboo_planks"
+	},
+	"bamboo_stairs": {
+		"texture": "bamboo_planks"
+	},
+	"bamboo_trapdoor": {},
+	"bamboo_wall_hanging_sign": null,
+	"bamboo_wall_sign": null,
 	"barrel": {
 		"texture": "barrel_top"
 	},
@@ -105,6 +144,7 @@
 	"birch_fence_gate": {
 		"texture": "birch_planks"
 	},
+	"birch_hanging_sign": null,
 	"birch_leaves": {
 		"birch": true
 	},
@@ -126,6 +166,7 @@
 		"texture": "birch_planks"
 	},
 	"birch_trapdoor": {},
+	"birch_wall_hanging_sign": null,
 	"birch_wall_sign": null,
 	"birch_wood": {
 		"texture": "birch_log"
@@ -246,6 +287,9 @@
 		"texture": "cake_top"
 	},
 	"calcite": {},
+	"calibrated_sculk_sensor": {
+		"texture": "calibrated_sculk_sensor_top"
+	},
 	"campfire": {
 		"texture": "campfire_log_lit"
 	},
@@ -272,11 +316,49 @@
 	"chain_command_block": {
 		"texture": "chain_command_block_side"
 	},
+	"cherry_button": null,
+	"cherry_door": {
+		"texture": "cherry_door_top"
+	},
+	"cherry_fence": {
+		"texture": "cherry_planks"
+	},
+	"cherry_fence_gate": {
+		"texture": "cherry_planks"
+	},
+	"cherry_hanging_sign": null,
+	"cherry_leaves": {},
+	"cherry_log": {
+		"texture": "cherry_log_top"
+	},
+	"cherry_planks": {},
+	"cherry_pressure_plate": {
+		"texture": "cherry_planks"
+	},
+	"cherry_sapling": null,
+	"cherry_sign": {
+		"texture": "cherry_planks"
+	},
+	"cherry_slab": {
+		"texture": "cherry_planks"
+	},
+	"cherry_stairs": {
+		"texture": "cherry_planks"
+	},
+	"cherry_trapdoor": {},
+	"cherry_wall_hanging_sign": null,
+	"cherry_wall_sign": null,
+	"cherry_wood": {
+		"texture": "cherry_log"
+	},
 	"chest": {
 		"texture": "oak_planks"
 	},
 	"chipped_anvil": {
 		"texture": "chipped_anvil_top"
+	},
+	"chiseled_bookshelf": {
+		"texture": "chiseled_bookshelf_top"
 	},
 	"chiseled_deepslate": {},
 	"chiseled_nether_bricks": {},
@@ -351,6 +433,7 @@
 		"texture": "crimson_planks"
 	},
 	"crimson_fungus": null,
+	"crimson_hanging_sign": null,
 	"crimson_hyphae": {
 		"texture": "crimson_stem"
 	},
@@ -373,6 +456,7 @@
 		"texture": "crimson_stem_top"
 	},
 	"crimson_trapdoor": {},
+	"crimson_wall_hanging_sign": null,
 	"crimson_wall_sign": null,
 	"crying_obsidian": {},
 	"cut_copper": {},
@@ -428,6 +512,7 @@
 	"dark_oak_fence_gate": {
 		"texture": "dark_oak_planks"
 	},
+	"dark_oak_hanging_sign": null,
 	"dark_oak_leaves": {
 		"foliage": true
 	},
@@ -449,6 +534,7 @@
 		"texture": "dark_oak_planks"
 	},
 	"dark_oak_trapdoor": {},
+	"dark_oak_wall_hanging_sign": null,
 	"dark_oak_wall_sign": null,
 	"dark_oak_wood": {
 		"texture": "dark_oak_log"
@@ -484,6 +570,9 @@
 	"dead_tube_coral_block": {},
 	"dead_tube_coral_fan": null,
 	"dead_tube_coral_wall_fan": null,
+	"decorated_pot": {
+		"texture": "flower_pot"
+	},
 	"deepslate": {},
 	"deepslate_brick_slab": {
 		"texture": "deepslate_bricks"
@@ -743,6 +832,7 @@
 	"jungle_fence_gate": {
 		"texture": "jungle_planks"
 	},
+	"jungle_hanging_sign": null,
 	"jungle_leaves": {
 		"foliage": true
 	},
@@ -764,6 +854,7 @@
 		"texture": "jungle_planks"
 	},
 	"jungle_trapdoor": {},
+	"jungle_wall_hanging_sign": null,
 	"jungle_wall_sign": null,
 	"jungle_wood": {
 		"texture": "jungle_log"
@@ -900,6 +991,7 @@
 	"mangrove_fence_gate": {
 		"texture": "mangrove_planks"
 	},
+	"mangrove_hanging_sign": null,
 	"mangrove_leaves": {
 		"foliage": true
 	},
@@ -924,6 +1016,7 @@
 		"texture": "mangrove_planks"
 	},
 	"mangrove_trapdoor": {},
+	"mangrove_wall_hanging_sign": null,
 	"mangrove_wall_sign": null,
 	"mangrove_wood": {
 		"texture": "mangrove_log"
@@ -1012,6 +1105,7 @@
 	"oak_fence_gate": {
 		"texture": "oak_planks"
 	},
+	"oak_hanging_sign": null,
 	"oak_leaves": {
 		"foliage": true
 	},
@@ -1033,6 +1127,7 @@
 		"texture": "oak_planks"
 	},
 	"oak_trapdoor": {},
+	"oak_wall_hanging_sign": null,
 	"oak_wall_sign": null,
 	"oak_wood": {
 		"texture": "oak_log"
@@ -1085,6 +1180,8 @@
 	"petrified_oak_slab": {
 		"texture": "oak_planks"
 	},
+	"piglin_head": null,
+	"piglin_wall_head": null,
 	"pink_banner": null,
 	"pink_bed": null,
 	"pink_candle": null,
@@ -1097,6 +1194,7 @@
 	"pink_concrete": {},
 	"pink_concrete_powder": {},
 	"pink_glazed_terracotta": {},
+	"pink_petals": null,
 	"pink_shulker_box": {},
 	"pink_stained_glass": {},
 	"pink_stained_glass_pane": {
@@ -1111,6 +1209,12 @@
 	},
 	"piston_head": {
 		"texture": "piston_top"
+	},
+	"pitcher_crop": {
+		"texture": "pitcher_crop_top"
+	},
+	"pitcher_plant": {
+		"texture": "pitcher_crop_top_stage_4"
 	},
 	"player_head": null,
 	"player_wall_head": null,
@@ -1209,6 +1313,9 @@
 	"potted_cactus": {
 		"texture": "cactus_top"
 	},
+	"potted_cherry_sapling": {
+		"texture": "cherry_sapling"
+	},
 	"potted_cornflower": {
 		"texture": "cornflower"
 	},
@@ -1266,6 +1373,9 @@
 	},
 	"potted_spruce_sapling": {
 		"texture": "spruce_sapling"
+	},
+	"potted_torchflower": {
+		"texture": "torchflower"
 	},
 	"potted_warped_fungus": {
 		"texture": "warped_fungus"
@@ -1496,6 +1606,9 @@
 	"smooth_stone_slab": {
 		"texture": "smooth_stone"
 	},
+	"sniffer_egg": {
+		"texture": "sniffer_egg_not_cracked_top"
+	},
 	"snow": {},
 	"snow_block": {
 		"texture": "snow"
@@ -1524,6 +1637,7 @@
 	"spruce_fence_gate": {
 		"texture": "spruce_planks"
 	},
+	"spruce_hanging_sign": null,
 	"spruce_leaves": {
 		"spruce": true
 	},
@@ -1545,6 +1659,7 @@
 		"texture": "spruce_planks"
 	},
 	"spruce_trapdoor": {},
+	"spruce_wall_hanging_sign": null,
 	"spruce_wall_sign": null,
 	"spruce_wood": {
 		"texture": "spruce_log"
@@ -1582,11 +1697,20 @@
 	"stripped_acacia_wood": {
 		"texture": "stripped_acacia_log"
 	},
+	"stripped_bamboo_block": {
+		"texture": "stripped_bamboo_block_top"
+	},
 	"stripped_birch_log": {
 		"texture": "stripped_birch_log_top"
 	},
 	"stripped_birch_wood": {
 		"texture": "stripped_birch_log"
+	},
+	"stripped_cherry_log": {
+		"texture": "stripped_cherry_log_top"
+	},
+	"stripped_cherry_wood": {
+		"texture": "stripped_cherry_log"
 	},
 	"stripped_crimson_hyphae": {
 		"texture": "stripped_crimson_stem"
@@ -1636,6 +1760,12 @@
 	"sunflower": {
 		"texture": "sunflower_front"
 	},
+	"suspicious_gravel": {
+		"texture": "suspicious_gravel_0"
+	},
+	"suspicious_sand": {
+		"texture": "suspicious_sand_0"
+	},
 	"sweet_berry_bush": {
 		"texture": "sweet_berry_bush_stage3"
 	},
@@ -1655,6 +1785,8 @@
 		"texture": "tnt_top"
 	},
 	"torch": null,
+	"torchflower": null,
+	"torchflower_crop": null,
 	"trapped_chest": {
 		"texture": "oak_planks"
 	},
@@ -1688,6 +1820,7 @@
 		"texture": "warped_planks"
 	},
 	"warped_fungus": null,
+	"warped_hanging_sign": null,
 	"warped_hyphae": {
 		"texture": "warped_stem"
 	},
@@ -1710,6 +1843,7 @@
 		"texture": "warped_stem_top"
 	},
 	"warped_trapdoor": {},
+	"warped_wall_hanging_sign": null,
 	"warped_wall_sign": null,
 	"warped_wart_block": {},
 	"water": {

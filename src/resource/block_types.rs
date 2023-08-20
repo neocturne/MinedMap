@@ -32,6 +32,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"acacia_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
 		"acacia_leaves",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque|Foliage}),
@@ -92,6 +99,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([156, 87, 51]),
+		},
+	),
+	(
+		"acacia_wall_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
 		},
 	),
 	(
@@ -228,7 +242,126 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"bamboo_block",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([139, 141, 62]),
+		},
+	),
+	(
+		"bamboo_button",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"bamboo_door",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([191, 171, 81]),
+		},
+	),
+	(
+		"bamboo_fence",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([193, 173, 80]),
+		},
+	),
+	(
+		"bamboo_fence_gate",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([193, 173, 80]),
+		},
+	),
+	(
+		"bamboo_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"bamboo_mosaic",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([190, 170, 78]),
+		},
+	),
+	(
+		"bamboo_mosaic_slab",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([190, 170, 78]),
+		},
+	),
+	(
+		"bamboo_mosaic_stairs",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([190, 170, 78]),
+		},
+	),
+	(
+		"bamboo_planks",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([193, 173, 80]),
+		},
+	),
+	(
+		"bamboo_pressure_plate",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([193, 173, 80]),
+		},
+	),
+	(
 		"bamboo_sapling",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"bamboo_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([193, 173, 80]),
+		},
+	),
+	(
+		"bamboo_slab",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([193, 173, 80]),
+		},
+	),
+	(
+		"bamboo_stairs",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([193, 173, 80]),
+		},
+	),
+	(
+		"bamboo_trapdoor",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([198, 179, 85]),
+		},
+	),
+	(
+		"bamboo_wall_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"bamboo_wall_sign",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{}),
 			color: Color([0, 0, 0]),
@@ -340,6 +473,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"birch_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
 		"birch_leaves",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque|Birch}),
@@ -400,6 +540,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([207, 194, 157]),
+		},
+	),
+	(
+		"birch_wall_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
 		},
 	),
 	(
@@ -914,6 +1061,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"calibrated_sculk_sensor",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([27, 79, 100]),
+		},
+	),
+	(
 		"campfire",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -998,6 +1152,125 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"cherry_button",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"cherry_door",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([223, 170, 164]),
+		},
+	),
+	(
+		"cherry_fence",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([226, 178, 172]),
+		},
+	),
+	(
+		"cherry_fence_gate",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([226, 178, 172]),
+		},
+	),
+	(
+		"cherry_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"cherry_leaves",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([229, 172, 194]),
+		},
+	),
+	(
+		"cherry_log",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([185, 141, 137]),
+		},
+	),
+	(
+		"cherry_planks",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([226, 178, 172]),
+		},
+	),
+	(
+		"cherry_pressure_plate",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([226, 178, 172]),
+		},
+	),
+	(
+		"cherry_sapling",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"cherry_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([226, 178, 172]),
+		},
+	),
+	(
+		"cherry_slab",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([226, 178, 172]),
+		},
+	),
+	(
+		"cherry_stairs",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([226, 178, 172]),
+		},
+	),
+	(
+		"cherry_trapdoor",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([226, 178, 172]),
+		},
+	),
+	(
+		"cherry_wall_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"cherry_wall_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"cherry_wood",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([54, 33, 44]),
+		},
+	),
+	(
 		"chest",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -1009,6 +1282,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([72, 72, 72]),
+		},
+	),
+	(
+		"chiseled_bookshelf",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([178, 144, 88]),
 		},
 	),
 	(
@@ -1313,6 +1593,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"crimson_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
 		"crimson_hyphae",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -1380,6 +1667,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([103, 50, 72]),
+		},
+	),
+	(
+		"crimson_wall_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
 		},
 	),
 	(
@@ -1586,6 +1880,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"dark_oak_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
 		"dark_oak_leaves",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque|Foliage}),
@@ -1646,6 +1947,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([75, 49, 23]),
+		},
+	),
+	(
+		"dark_oak_wall_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
 		},
 	),
 	(
@@ -1835,6 +2143,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{}),
 			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"decorated_pot",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([124, 68, 53]),
 		},
 	),
 	(
@@ -2818,6 +3133,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"jungle_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
 		"jungle_leaves",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque|Foliage}),
@@ -2878,6 +3200,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([152, 110, 77]),
+		},
+	),
+	(
+		"jungle_wall_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
 		},
 	),
 	(
@@ -3462,6 +3791,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"mangrove_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
 		"mangrove_leaves",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque|Foliage}),
@@ -3529,6 +3865,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([110, 46, 42]),
+		},
+	),
+	(
+		"mangrove_wall_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
 		},
 	),
 	(
@@ -3826,6 +4169,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"oak_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
 		"oak_leaves",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque|Foliage}),
@@ -3886,6 +4236,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([124, 99, 56]),
+		},
+	),
+	(
+		"oak_wall_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
 		},
 	),
 	(
@@ -4099,6 +4456,20 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"piglin_head",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"piglin_wall_head",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
 		"pink_banner",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{}),
@@ -4152,6 +4523,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([235, 154, 181]),
+		},
+	),
+	(
+		"pink_petals",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
 		},
 	),
 	(
@@ -4215,6 +4593,20 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([153, 127, 85]),
+		},
+	),
+	(
+		"pitcher_crop",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([193, 165, 103]),
+		},
+	),
+	(
+		"pitcher_plant",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([122, 144, 189]),
 		},
 	),
 	(
@@ -4491,6 +4883,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"potted_cherry_sapling",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([164, 117, 143]),
+		},
+	),
+	(
 		"potted_cornflower",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -4621,6 +5020,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([44, 60, 36]),
+		},
+	),
+	(
+		"potted_torchflower",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([100, 101, 77]),
 		},
 	),
 	(
@@ -4788,7 +5194,7 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		"purple_glazed_terracotta",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
-			color: Color([109, 48, 152]),
+			color: Color([109, 47, 152]),
 		},
 	),
 	(
@@ -5229,7 +5635,7 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		"scaffolding",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
-			color: Color([174, 134, 80]),
+			color: Color([170, 131, 73]),
 		},
 	),
 	(
@@ -5443,6 +5849,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"sniffer_egg",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([135, 105, 67]),
+		},
+	),
+	(
 		"snow",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -5555,6 +5968,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"spruce_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
 		"spruce_leaves",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque|Spruce}),
@@ -5615,6 +6035,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([103, 79, 47]),
+		},
+	),
+	(
+		"spruce_wall_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
 		},
 	),
 	(
@@ -5723,6 +6150,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"stripped_bamboo_block",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([178, 158, 72]),
+		},
+	),
+	(
 		"stripped_birch_log",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -5734,6 +6168,20 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([196, 176, 118]),
+		},
+	),
+	(
+		"stripped_cherry_log",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([221, 164, 157]),
+		},
+	),
+	(
+		"stripped_cherry_wood",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([215, 145, 148]),
 		},
 	),
 	(
@@ -5863,6 +6311,20 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"suspicious_gravel",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([129, 125, 124]),
+		},
+	),
+	(
+		"suspicious_sand",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{Opaque}),
+			color: Color([217, 204, 159]),
+		},
+	),
+	(
 		"sweet_berry_bush",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -5913,6 +6375,20 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 	),
 	(
 		"torch",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"torchflower",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
+		"torchflower_crop",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{}),
 			color: Color([0, 0, 0]),
@@ -6066,6 +6542,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"warped_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
 		"warped_hyphae",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -6133,6 +6616,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
 			color: Color([47, 119, 111]),
+		},
+	),
+	(
+		"warped_wall_hanging_sign",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
 		},
 	),
 	(
