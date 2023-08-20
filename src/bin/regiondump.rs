@@ -8,7 +8,7 @@ use std::path::PathBuf;
 use anyhow::Result;
 use clap::Parser;
 
-/// Command line arguments for regiondump
+/// Dump a Minecraft NBT region file in a human-readable format
 #[derive(Debug, Parser)]
 struct Args {
 	/// Filename to dump
