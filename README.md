@@ -2,14 +2,15 @@
 
 * Render beautiful maps of your [Minecraft](https://minecraft.net/) worlds!
 * Put them on a webserver and view them in your browser!
-* Compatible with unmodified Minecraft Java Edition 1.8 up to 1.19 (no mod installation necessary!)
+* Compatible with unmodified Minecraft Java Edition 1.8 up to 1.20 (no mod installation necessary!)
 * Illumination layer: the world at night
-* Fast: create a full map for a huge 3GB savegame in less than 5 minutes
+* Fast: create a full map for a huge 3GB savegame in less than 5 minutes in single-threaded operation
+* Multi-threading support: pass `-j N` to the renderer to use `N` parallel threads for generation
 * Incremental updates: only recreate map tiles for regions that have changed
-* Very low memory usage: typically uses less than 5MB of RAM
+* Typically uses less than 100MB of RAM in single-threaded operation (may be higher when `-j` is passed)
+* Cross-platform: runs on Linux, Windows, and likely other systems like MacOS as well
 
 ![Screenshot](docs/images/MinedMap.png)
-
 
 ## How to use
 
@@ -24,7 +25,7 @@ map, create this empty directory inside the viewer directory. Next, to generate 
 map files run MinedMap passing the source and the destination paths on the command
 line:
 ```shell
-./MinedMap /path/to/save/game /path/to/viewer/data
+minedmap /path/to/save/game /path/to/viewer/data
 ```
 The save game is stored in `saves` inside your Minecraft main directory
 (`~/.minecraft` on Linux, `C:\Users\<username>\AppData\Roaming\.minecraft` on Windows)
@@ -45,27 +46,20 @@ This test server is very slow and cannot handle multiple requests concurrently, 
 a proper webserver like [nginx](https://nginx.org/) or upload the viewer together with
 the generated map files to public webspace to make the map available to others.
 
+## Installation
 
-## Building MinedMap
-
-Precompiled MinedMap binaries for Windows (32bit and 64bit versions) are available under
-"Releases" on the Github page. On other platforms, MinedMap must be built from source.
-
-MinedMap has been tested to work on Windows and Linux. I assume it can also be
-built for MacOS and pretty much any POSIX-like system, but I didn't check. ¯\\\_(ツ)\_/¯
-
-To build from source, you need Git, CMake, the GCC toolchain and the development
-files for the libraries *zlib* and *libpng* (packages *git*, *cmake*, *build-essential*,
-*zlib1g-dev* and *libpng-dev* on Debian/Ubuntu).
-
-Use the following commands to build:
+Building the MinedMap map generator requires a recent Rust toolchain. There are no
+releases on crates.io or binary releases yet. For now, it can be installed using the
+following command:
 ```shell
-git clone https://github.com/NeoRaider/MinedMap.git # Or download a release ZIP and unpack it
-mkdir MinedMap-build
-cd MinedMap-build
-cmake ../MinedMap -DCMAKE_BUILD_TYPE=RELEASE
-make
+cargo install --git 'https://github.com/NeoRaider/MinedMap.git'
 ```
-After a successful build, the MinedMap renderer binary can be found in the *src*
-subdirectory of the build dir `MinedMap-build`. The viewer is located in the cloned
-Git repository `MinedMap`.
+
+In addition, CMake is needed to build the zlib-ng library. If you do not have
+CMake installed, you can disable the zlib-ng feature by passing `--no-default-features`
+to cargo. A pure-Rust zlib implementation will be used, which is more portable,
+but slower than zlib-ng.
+
+If you are looking for the older C++ implementation of the MinedMap tile renderer,
+see the (v1.19.1)[https://github.com/NeoRaider/MinedMap/tree/v1.19.1] tag.
+
