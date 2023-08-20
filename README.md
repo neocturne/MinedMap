@@ -61,5 +61,5 @@ to cargo. A pure-Rust zlib implementation will be used, which is more portable,
 but slower than zlib-ng.
 
 If you are looking for the older C++ implementation of the MinedMap tile renderer,
-see the (v1.19.1)[https://github.com/NeoRaider/MinedMap/tree/v1.19.1] tag.
+see the [v1.19.1](https://github.com/NeoRaider/MinedMap/tree/v1.19.1) tag.
 
