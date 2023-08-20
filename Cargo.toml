@@ -1,3 +1,6 @@
+[workspace]
+members = ["crates/*"]
+
 [package]
 name = "minedmap"
 version = "0.1.0"
@@ -5,23 +8,19 @@ edition = "2021"
 license = "MIT"
 default-run = "minedmap"
 
-[lib]
-name = "minedmap_core"
-
 [dependencies]
 anyhow = "1.0.68"
 bincode = "1.3.3"
-bytemuck = "1.13.0"
 clap = { version = "4.1.4", features = ["derive"] }
 enumflags2 = { version = "0.7.5", features = ["serde"] }
 fastnbt = "2.3.2"
-flate2 = "1.0.25"
 futures-util = "0.3.28"
 glam = "0.24.0"
 image = { version = "0.24.5", default-features = false, features = ["png"] }
 indexmap = { version = "2.0.0", features = ["serde"] }
-itertools = "0.11.0"
 lru = "0.11.0"
+minedmap-nbt = { version = "0.1.0", path = "crates/nbt", default-features = false }
+minedmap-types = { version = "0.1.0", path = "crates/types" }
 num-integer = "0.1.45"
 num_cpus = "1.16.0"
 rayon = "1.7.0"
@@ -33,4 +32,4 @@ zstd = "0.12.3"
 
 [features]
 default = ["zlib-ng"]
-zlib-ng = ["flate2/zlib-ng"]
+zlib-ng = ["minedmap-nbt/zlib-ng"]

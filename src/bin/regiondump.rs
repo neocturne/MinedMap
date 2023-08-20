@@ -18,7 +18,7 @@ struct Args {
 fn main() -> Result<()> {
 	let args = Args::parse();
 
-	minedmap_core::io::region::from_file(args.file.as_path())?.foreach_chunk(
+	minedmap_nbt::region::from_file(args.file.as_path())?.foreach_chunk(
 		|coords, value: fastnbt::Value| {
 			println!("Chunk {:?}: {:#x?}", coords, value);
 			Ok(())

@@ -10,7 +10,7 @@ use anyhow::{bail, Context, Result};
 use flate2::read::ZlibDecoder;
 use serde::de::DeserializeOwned;
 
-use crate::types::*;
+use minedmap_types::*;
 
 /// Data block size of region data files
 ///

@@ -3,10 +3,7 @@
 use anyhow::{Context, Result};
 use serde::Serialize;
 
-use super::{
-	common::*,
-	core::{self, io::fs, world::de},
-};
+use crate::{core::common::*, io::fs, world::de};
 
 /// Minimum and maximum X and Z tile coordinates for a mipmap level
 #[derive(Debug, Serialize)]
@@ -101,7 +98,7 @@ impl<'a> MetadataWriter<'a> {
 
 	/// Reads and deserializes the `level.dat` of the Minecraft save data
 	fn read_level_dat(&self) -> Result<de::LevelDat> {
-		core::io::data::from_file(&self.config.level_dat_path).context("Failed to read level.dat")
+		crate::nbt::data::from_file(&self.config.level_dat_path).context("Failed to read level.dat")
 	}
 
 	/// Generates [Spawn] data from a [de::LevelDat]

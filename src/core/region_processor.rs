@@ -6,17 +6,14 @@ use anyhow::{Context, Result};
 use indexmap::IndexSet;
 use rayon::prelude::*;
 
-use super::{
-	common::*,
-	core::{
+use super::common::*;
+use crate::{
+	io::{fs, storage},
+	resource::{self, Biome},
+	types::*,
+	world::{
 		self,
-		io::{fs, storage},
-		resource::{self, Biome},
-		types::*,
-		world::{
-			self,
-			layer::{self, LayerData},
-		},
+		layer::{self, LayerData},
 	},
 };
 
@@ -157,7 +154,7 @@ impl<'a> RegionProcessor<'a> {
 
 		println!("Processing region r.{}.{}.mca", coords.x, coords.z);
 
-		core::io::region::from_file(path)?.foreach_chunk(
+		crate::nbt::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
 				let Some(layer::LayerData {
 					blocks,

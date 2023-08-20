@@ -3,10 +3,8 @@
 use anyhow::{Context, Result};
 use rayon::prelude::*;
 
-use super::{
-	common::*,
-	core::{io::fs, types::*},
-};
+use super::common::*;
+use crate::{io::fs, types::*};
 
 /// Generates mipmap tiles from full-resolution tile images
 pub struct TileMipmapper<'a> {

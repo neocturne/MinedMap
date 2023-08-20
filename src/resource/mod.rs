@@ -46,6 +46,7 @@ pub struct BlockType {
 
 impl BlockType {
 	/// Checks whether a block type has a given [BlockFlag] set
+	#[inline]
 	pub fn is(&self, flag: BlockFlag) -> bool {
 		self.flags.contains(flag)
 	}

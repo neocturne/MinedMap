@@ -1,5 +1,8 @@
 //! Common types used by MinedMap
 
+#![warn(missing_docs)]
+#![warn(clippy::missing_docs_in_private_items)]
+
 use std::{
 	fmt::Debug,
 	iter::FusedIterator,
@@ -32,6 +35,7 @@ macro_rules! coord_type {
 			/// Constructs a new value
 			///
 			/// Will panic if the value is not in the valid range
+			#[inline]
 			pub fn new<T: TryInto<u8>>(value: T) -> Self {
 				Self(
 					value
@@ -43,6 +47,7 @@ macro_rules! coord_type {
 			}
 
 			/// Returns an iterator over all possible values of the type
+			#[inline]
 			pub fn iter() -> impl Iterator<Item = $t<AXIS>>
 			       + DoubleEndedIterator
 			       + ExactSizeIterator
@@ -95,6 +100,7 @@ impl LayerBlockCoords {
 	/// Many chunk data structures store block and biome data in the same
 	/// order. This method computes the offset at which the data for the
 	/// block at a given coordinate is stored.
+	#[inline]
 	pub fn offset(&self) -> usize {
 		use BLOCKS_PER_CHUNK as N;
 		let x = self.x.0 as usize;
@@ -112,12 +118,14 @@ pub struct LayerBlockArray<T>(pub [[T; BLOCKS_PER_CHUNK]; BLOCKS_PER_CHUNK]);
 impl<T> Index<LayerBlockCoords> for LayerBlockArray<T> {
 	type Output = T;
 
+	#[inline]
 	fn index(&self, index: LayerBlockCoords) -> &Self::Output {
 		&self.0[index.z.0 as usize][index.x.0 as usize]
 	}
 }
 
 impl<T> IndexMut<LayerBlockCoords> for LayerBlockArray<T> {
+	#[inline]
 	fn index_mut(&mut self, index: LayerBlockCoords) -> &mut Self::Output {
 		&mut self.0[index.z.0 as usize][index.x.0 as usize]
 	}
@@ -138,6 +146,7 @@ impl SectionBlockCoords {
 	/// Many chunk data structures store block and biome data in the same
 	/// order. This method computes the offset at which the data for the
 	/// block at a given coordinate is stored.
+	#[inline]
 	pub fn offset(&self) -> usize {
 		use BLOCKS_PER_CHUNK as N;
 		let y = self.y.0 as usize;
@@ -194,16 +203,19 @@ pub struct ChunkArray<T>(pub [[T; CHUNKS_PER_REGION]; CHUNKS_PER_REGION]);
 
 impl<T> ChunkArray<T> {
 	/// Iterates over all possible chunk coordinate pairs used as [ChunkArray] keys
+	#[inline]
 	pub fn keys() -> impl Iterator<Item = ChunkCoords> + Clone + Debug {
 		iproduct!(ChunkZ::iter(), ChunkX::iter()).map(|(z, x)| ChunkCoords { x, z })
 	}
 
 	/// Iterates over all values stored in the [ChunkArray]
+	#[inline]
 	pub fn values(&self) -> impl Iterator<Item = &T> + Clone + Debug {
 		Self::keys().map(|k| &self[k])
 	}
 
 	/// Iterates over pairs of chunk coordinate pairs and corresponding stored values
+	#[inline]
 	pub fn iter(&self) -> impl Iterator<Item = (ChunkCoords, &T)> + Clone + Debug {
 		Self::keys().map(|k| (k, &self[k]))
 	}
@@ -212,12 +224,14 @@ impl<T> ChunkArray<T> {
 impl<T> Index<ChunkCoords> for ChunkArray<T> {
 	type Output = T;
 
+	#[inline]
 	fn index(&self, index: ChunkCoords) -> &Self::Output {
 		&self.0[index.z.0 as usize][index.x.0 as usize]
 	}
 }
 
 impl<T> IndexMut<ChunkCoords> for ChunkArray<T> {
+	#[inline]
 	fn index_mut(&mut self, index: ChunkCoords) -> &mut Self::Output {
 		&mut self.0[index.z.0 as usize][index.x.0 as usize]
 	}

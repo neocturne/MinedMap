@@ -9,7 +9,7 @@ use std::{
 use indexmap::IndexSet;
 use serde::{Deserialize, Serialize};
 
-use super::core::{io::fs::FileMetaVersion, resource::Biome, types::*, world::layer};
+use crate::{io::fs::FileMetaVersion, resource::Biome, types::*, world::layer};
 
 /// MinedMap data version number
 ///

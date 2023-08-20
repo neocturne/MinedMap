@@ -1,0 +1,17 @@
+[package]
+name = "minedmap-nbt"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.75"
+bytemuck = "1.13.1"
+fastnbt = "2.4.4"
+flate2 = "1.0.27"
+minedmap-types = { version = "0.1.0", path = "../types" }
+serde = "1.0.183"
+
+[features]
+zlib-ng = ["flate2/zlib-ng"]

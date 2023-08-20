@@ -1,7 +1,4 @@
-//! The minedmap generator renders map tile images from Minecraft save data
-
-#![warn(missing_docs)]
-#![warn(clippy::missing_docs_in_private_items)]
+//! Core functions of the MinedMap CLI
 
 mod common;
 mod metadata_writer;
@@ -9,8 +6,6 @@ mod region_group;
 mod region_processor;
 mod tile_mipmapper;
 mod tile_renderer;
-
-use minedmap_core as core;
 
 use std::path::PathBuf;
 
@@ -46,7 +41,8 @@ fn setup_threads(num_threads: usize) -> Result<()> {
 		.context("Failed to configure thread pool")
 }
 
-fn main() -> Result<()> {
+/// MinedMap CLI main function
+pub fn cli() -> Result<()> {
 	let args = Args::parse();
 	let config = Config::new(&args);
 
