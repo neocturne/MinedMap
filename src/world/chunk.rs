@@ -112,27 +112,36 @@ impl<'a> Chunk<'a> {
 		let mut section_map = BTreeMap::new();
 
 		for section in sections {
-			section_map.insert(
-				SectionY(section.y),
-				(
-					SectionV1_13::new(
-						data_version,
-						section.block_states.data.as_deref(),
-						&section.block_states.palette,
-						block_types,
-					)
-					.with_context(|| format!("Failed to load section at Y={}", section.y))?,
-					BiomesV1_18::new(
-						section.biomes.data.as_deref(),
-						&section.biomes.palette,
-						biome_types,
-					)
-					.with_context(|| format!("Failed to load section biomes at Y={}", section.y))?,
-					BlockLight::new(section.block_light.as_deref()).with_context(|| {
-						format!("Failed to load section block light at Y={}", section.y)
-					})?,
-				),
-			);
+			match &section.section {
+				de::SectionV1_18Variants::V1_18 {
+					block_states,
+					biomes,
+					block_light,
+				} => {
+					section_map.insert(
+						SectionY(section.y),
+						(
+							SectionV1_13::new(
+								data_version,
+								block_states.data.as_deref(),
+								&block_states.palette,
+								block_types,
+							)
+							.with_context(|| {
+								format!("Failed to load section at Y={}", section.y)
+							})?,
+							BiomesV1_18::new(biomes.data.as_deref(), &biomes.palette, biome_types)
+								.with_context(|| {
+									format!("Failed to load section biomes at Y={}", section.y)
+								})?,
+							BlockLight::new(block_light.as_deref()).with_context(|| {
+								format!("Failed to load section block light at Y={}", section.y)
+							})?,
+						),
+					);
+				}
+				de::SectionV1_18Variants::Empty {} => {}
+			};
 		}
 
 		Ok(Chunk::V1_18 { section_map })

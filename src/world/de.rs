@@ -28,19 +28,33 @@ pub struct BiomesV1_18 {
 	pub data: Option<fastnbt::LongArray>,
 }
 
+/// Variable part of a [SectionV1_18]
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum SectionV1_18Variants {
+	/// Populated 1.18+ section
+	V1_18 {
+		/// Block type data
+		block_states: BlockStatesV1_18,
+		/// Biome data
+		biomes: BiomesV1_18,
+		/// Block light data
+		#[serde(rename = "BlockLight")]
+		block_light: Option<fastnbt::ByteArray>,
+	},
+	/// Empty section
+	Empty {},
+}
+
 /// Element of the 1.18+ `sections` list found in a [Chunk]
 #[derive(Debug, Deserialize)]
 pub struct SectionV1_18 {
 	/// Y coordinate
 	#[serde(rename = "Y")]
 	pub y: i32,
-	/// Block type data
-	pub block_states: BlockStatesV1_18,
-	/// Biome data
-	pub biomes: BiomesV1_18,
-	/// Block light data
-	#[serde(rename = "BlockLight")]
-	pub block_light: Option<fastnbt::ByteArray>,
+	/// Variable part of section
+	#[serde(flatten)]
+	pub section: SectionV1_18Variants,
 }
 
 /// Version-specific part of a pre-1.18 [Section](SectionV0)
