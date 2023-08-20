@@ -559,7 +559,6 @@ dependencies = [
  "anyhow",
  "bincode",
  "clap",
- "enumflags2",
  "fastnbt",
  "futures-util",
  "glam",
@@ -567,6 +566,7 @@ dependencies = [
  "indexmap",
  "lru",
  "minedmap-nbt",
+ "minedmap-resource",
  "minedmap-types",
  "num-integer",
  "num_cpus",
@@ -587,6 +587,15 @@ dependencies = [
  "fastnbt",
  "flate2",
  "minedmap-types",
+ "serde",
+]
+
+[[package]]
+name = "minedmap-resource"
+version = "0.1.0"
+dependencies = [
+ "enumflags2",
+ "glam",
  "serde",
 ]
 

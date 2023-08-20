@@ -12,7 +12,6 @@ default-run = "minedmap"
 anyhow = "1.0.68"
 bincode = "1.3.3"
 clap = { version = "4.1.4", features = ["derive"] }
-enumflags2 = { version = "0.7.5", features = ["serde"] }
 fastnbt = "2.3.2"
 futures-util = "0.3.28"
 glam = "0.24.0"
@@ -20,6 +19,7 @@ image = { version = "0.24.5", default-features = false, features = ["png"] }
 indexmap = { version = "2.0.0", features = ["serde"] }
 lru = "0.11.0"
 minedmap-nbt = { version = "0.1.0", path = "crates/nbt", default-features = false }
+minedmap-resource = { version = "0.1.0", path = "crates/resource" }
 minedmap-types = { version = "0.1.0", path = "crates/types" }
 num-integer = "0.1.45"
 num_cpus = "1.16.0"

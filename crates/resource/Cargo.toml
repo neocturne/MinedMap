@@ -1,0 +1,11 @@
+[package]
+name = "minedmap-resource"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+enumflags2 = { version = "0.7.7", features = ["serde"] }
+glam = "0.24.1"
+serde = "1.0.183"

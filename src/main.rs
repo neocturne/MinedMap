@@ -5,11 +5,11 @@
 
 mod core;
 mod io;
-mod resource;
 mod util;
 mod world;
 
 use minedmap_nbt as nbt;
+use minedmap_resource as resource;
 use minedmap_types as types;
 
 use anyhow::Result;

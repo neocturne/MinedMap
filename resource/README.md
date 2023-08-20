@@ -63,8 +63,8 @@ with MinedMap's resource metadata.
 7. Update the source code with the new block colors:
 
      ```sh
-     ./generate.py colors.json ../src/resource/block_types.rs
-     cargo fmt
+     ./generate.py colors.json ../crates/resource/src/block_types.rs
+     cargo fmt --all
      ```
 
 After the update, the new version should be tested with old savegames (both
