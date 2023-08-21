@@ -1,11 +1,17 @@
 [workspace]
 members = ["crates/*"]
 
+[workspace.package]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/NeoRaider/MinedMap"
+
 [package]
 name = "minedmap"
 version = "0.1.0"
-edition = "2021"
-license = "MIT"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 default-run = "minedmap"
 
 [dependencies]
