@@ -10,6 +10,7 @@ use clap::Parser;
 
 /// Dump a Minecraft NBT region file in a human-readable format
 #[derive(Debug, Parser)]
+#[command(version)]
 struct Args {
 	/// Filename to dump
 	file: PathBuf,

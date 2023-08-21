@@ -20,6 +20,7 @@ use tile_renderer::TileRenderer;
 
 /// Generate map tiles from Minecraft save data
 #[derive(Debug, Parser)]
+#[command(version)]
 pub struct Args {
 	/// Number of parallel threads to use for processing
 	///
