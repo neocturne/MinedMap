@@ -584,6 +584,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bytemuck",
+ "clap",
  "fastnbt",
  "flate2",
  "minedmap-types",

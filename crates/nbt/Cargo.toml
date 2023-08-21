@@ -15,3 +15,6 @@ serde = "1.0.183"
 
 [features]
 zlib-ng = ["flate2/zlib-ng"]
+
+[dev-dependencies]
+clap = { version = "4.3.23", features = ["derive"] }
