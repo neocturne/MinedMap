@@ -14,7 +14,6 @@ edition.workspace = true
 license.workspace = true
 readme.workspace = true
 repository.workspace = true
-default-run = "minedmap"
 
 [dependencies]
 anyhow = "1.0.68"
