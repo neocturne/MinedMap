@@ -18,9 +18,9 @@ use region_processor::RegionProcessor;
 use tile_mipmapper::TileMipmapper;
 use tile_renderer::TileRenderer;
 
-/// Generate map tiles from Minecraft save data
+/// Command line arguments for minedmap CLI
 #[derive(Debug, Parser)]
-#[command(version)]
+#[command(version, about)]
 pub struct Args {
 	/// Number of parallel threads to use for processing
 	///

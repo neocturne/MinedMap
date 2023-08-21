@@ -1,5 +1,4 @@
-//! The minedmap generator renders map tile images from Minecraft save data
-
+#![doc = env!("CARGO_PKG_DESCRIPTION")]
 #![warn(missing_docs)]
 #![warn(clippy::missing_docs_in_private_items)]
 

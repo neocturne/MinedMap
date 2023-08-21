@@ -9,8 +9,10 @@ repository = "https://github.com/NeoRaider/MinedMap"
 [package]
 name = "minedmap"
 version = "0.1.0"
+description = "Generate browsable maps from Minecraft save data"
 edition.workspace = true
 license.workspace = true
+readme.workspace = true
 repository.workspace = true
 default-run = "minedmap"
 

@@ -10,7 +10,7 @@
 * Typically uses less than 100MB of RAM in single-threaded operation (may be higher when `-j` is passed)
 * Cross-platform: runs on Linux, Windows, and likely other systems like MacOS as well
 
-![Screenshot](docs/images/MinedMap.png)
+![Screenshot](https://raw.githubusercontent.com/NeoRaider/MinedMap/main/docs/images/MinedMap.png)
 
 ## How to use
 

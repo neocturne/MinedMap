@@ -1,11 +1,11 @@
 [package]
 name = "minedmap-nbt"
 version = "0.1.0"
+description = "MinedMap's handling of Minecraft NBT data and region files"
 edition.workspace = true
 license.workspace = true
+readme.workspace = true
 repository.workspace = true
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0.75"
