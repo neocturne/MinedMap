@@ -11,6 +11,7 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 use clap::Parser;
+use git_version::git_version;
 
 use common::Config;
 use metadata_writer::MetadataWriter;
@@ -18,9 +19,15 @@ use region_processor::RegionProcessor;
 use tile_mipmapper::TileMipmapper;
 use tile_renderer::TileRenderer;
 
+/// MinedMap version number
+const VERSION: &str = git_version!(
+	args = ["--abbrev=7", "--match=v*", "--dirty=-modified"],
+	cargo_prefix = "v",
+);
+
 /// Command line arguments for minedmap CLI
 #[derive(Debug, Parser)]
-#[command(version, about)]
+#[command(about, version = VERSION.strip_prefix("v").unwrap())]
 pub struct Args {
 	/// Number of parallel threads to use for processing
 	///
