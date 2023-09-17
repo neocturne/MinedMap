@@ -92,16 +92,21 @@ jobs:
       matrix:
         include:
         - os: 'macos-11'
+          label: 'MacOS-Intel'
           target: 'aarch64-apple-darwin'
         - os: 'macos-11'
+          label: 'MacOS-ARM'
           target: 'x86_64-apple-darwin'
         - os: 'windows-2019'
+          label: 'Win64'
           target: 'x86_64-pc-windows-msvc'
           ext: '.exe'
         - os: 'windows-2019'
+          label: 'Win32'
           target: 'i686-pc-windows-msvc'
           ext: '.exe'
         - os: 'ubuntu-20.04'
+          label: 'x86_64-unknown-linux-gnu'
           target: 'x86_64-unknown-linux-gnu'
 
     steps:
@@ -126,7 +131,7 @@ jobs:
       - name: 'Build'
         shell: 'bash'
         run: |
-          pkgdir='target/pkg/MinedMap-${{ steps.tag.outputs.tag }}-${{ matrix.target }}'
+          pkgdir='target/pkg/MinedMap-${{ steps.tag.outputs.tag }}-${{ matrix.label }}'
           mkdir -p "$pkgdir"
           cargo build --release --target=${{ matrix.target }}
           cp target/${{ matrix.target }}/release/minedmap${{ matrix.ext }} "$pkgdir"/
@@ -134,5 +139,5 @@ jobs:
       - name: 'Archive'
         uses: 'actions/upload-artifact@v3'
         with:
-          name: 'MinedMap-${{ steps.tag.outputs.tag }}-${{ matrix.target }}'
+          name: 'MinedMap-${{ steps.tag.outputs.tag }}-${{ matrix.label }}'
           path: 'target/pkg'
