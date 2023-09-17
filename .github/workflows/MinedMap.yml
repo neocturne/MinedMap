@@ -1,9 +1,12 @@
 name: 'MinedMap'
 on: ['push', 'pull_request', 'workflow_dispatch']
 
+env:
+  RUSTFLAGS: -Dwarnings
+  RUSTDOCFLAGS: -Dwarnings
+
 jobs:
   viewer:
-    name: 'Package viewer'
     runs-on: 'ubuntu-20.04'
 
     steps:
@@ -28,3 +31,56 @@ jobs:
         with:
           name: 'MinedMap-${{ steps.tag.outputs.tag }}-viewer'
           path: 'build/pkg'
+
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: clippy
+      - uses: swatinem/rust-cache@v2
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --workspace --tests --examples
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: rust-docs
+      - uses: swatinem/rust-cache@v2
+      - run: cargo doc --workspace --no-deps --document-private-items
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        rust: [stable]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+      - uses: swatinem/rust-cache@v2
+      - run: cargo test --workspace
+      - run: cargo test --workspace --no-default-features
+      - run: cargo test --workspace --examples --bins
+      - run: cargo test --workspace --no-default-features --examples --bins
