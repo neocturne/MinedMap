@@ -125,6 +125,8 @@ jobs:
 
       - name: 'Build'
         shell: 'bash'
+        env:
+          RUSTFLAGS: -Dwarnings -Cstrip=symbols
         run: |
           pkgdir='target/pkg/MinedMap-${{ steps.tag.outputs.tag }}-${{ matrix.target }}'
           mkdir -p "$pkgdir"
