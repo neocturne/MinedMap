@@ -5,6 +5,7 @@ use std::{ffi::OsStr, path::Path, time::SystemTime};
 use anyhow::{Context, Result};
 use indexmap::IndexSet;
 use rayon::prelude::*;
+use tracing::{debug, error};
 
 use super::common::*;
 use crate::{
@@ -148,11 +149,11 @@ impl<'a> RegionProcessor<'a> {
 
 		if Some(input_timestamp) <= output_timestamp && Some(input_timestamp) <= lightmap_timestamp
 		{
-			println!("Skipping unchanged region r.{}.{}.mca", coords.x, coords.z);
+			debug!("Skipping unchanged region r.{}.{}.mca", coords.x, coords.z);
 			return Ok(());
 		}
 
-		println!("Processing region r.{}.{}.mca", coords.x, coords.z);
+		debug!("Processing region r.{}.{}.mca", coords.x, coords.z);
 
 		crate::nbt::region::from_file(path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
@@ -204,7 +205,7 @@ impl<'a> RegionProcessor<'a> {
 
 		regions.par_iter().for_each(|&coords| {
 			if let Err(err) = self.process_region(coords) {
-				eprintln!("Failed to process region {:?}: {:?}", coords, err);
+				error!("Failed to process region {:?}: {:?}", coords, err);
 			}
 		});
 

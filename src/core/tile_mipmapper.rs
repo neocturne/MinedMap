@@ -2,6 +2,7 @@
 
 use anyhow::{Context, Result};
 use rayon::prelude::*;
+use tracing::{debug, warn};
 
 use super::common::*;
 use crate::{io::fs, types::*};
@@ -83,7 +84,7 @@ impl<'a> TileMipmapper<'a> {
 				let timestamp = match fs::modified_timestamp(&source_path) {
 					Ok(timestamp) => timestamp,
 					Err(err) => {
-						eprintln!("{}", err);
+						warn!("{}", err);
 						return None;
 					}
 				};
@@ -96,7 +97,7 @@ impl<'a> TileMipmapper<'a> {
 		};
 
 		if Some(input_timestamp) <= output_timestamp {
-			println!(
+			debug!(
 				"Skipping unchanged mipmap tile {}",
 				output_path
 					.strip_prefix(&self.config.output_dir)
@@ -106,7 +107,7 @@ impl<'a> TileMipmapper<'a> {
 			return Ok(());
 		}
 
-		println!(
+		debug!(
 			"Rendering mipmap tile {}",
 			output_path
 				.strip_prefix(&self.config.output_dir)
@@ -121,7 +122,7 @@ impl<'a> TileMipmapper<'a> {
 			let source = match image::open(&source_path) {
 				Ok(source) => source,
 				Err(err) => {
-					eprintln!(
+					warn!(
 						"Failed to read source image {}: {}",
 						source_path.display(),
 						err,

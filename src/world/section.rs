@@ -7,6 +7,7 @@ use std::fmt::Debug;
 
 use anyhow::{bail, Context, Result};
 use num_integer::div_rem;
+use tracing::warn;
 
 use super::de;
 use crate::{
@@ -94,7 +95,7 @@ impl<'a> SectionV1_13<'a> {
 			.map(|entry| {
 				let block_type = block_types.get(&entry.name);
 				if block_type.is_none() {
-					eprintln!("Unknown block type: {}", entry.name);
+					warn!("Unknown block type: {}", entry.name);
 				}
 				block_type
 			})
@@ -246,7 +247,7 @@ impl<'a> BiomesV1_18<'a> {
 			.map(|entry| {
 				let biome_type = biome_types.get(entry);
 				if biome_type.is_none() {
-					eprintln!("Unknown biome type: {}", entry);
+					warn!("Unknown biome type: {}", entry);
 				}
 				biome_type
 			})

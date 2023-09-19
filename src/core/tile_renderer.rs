@@ -12,6 +12,7 @@ use glam::Vec3;
 use lru::LruCache;
 use rayon::prelude::*;
 use tokio::sync::OnceCell;
+use tracing::debug;
 
 use super::{common::*, region_group::RegionGroup};
 use crate::{
@@ -272,7 +273,7 @@ impl<'a> TileRenderer<'a> {
 		let output_timestamp = fs::read_timestamp(&output_path, FILE_META_VERSION);
 
 		if Some(processed_timestamp) <= output_timestamp {
-			println!(
+			debug!(
 				"Skipping unchanged tile {}",
 				output_path
 					.strip_prefix(&self.config.output_dir)
@@ -282,7 +283,7 @@ impl<'a> TileRenderer<'a> {
 			return Ok(());
 		}
 
-		println!(
+		debug!(
 			"Rendering tile {}",
 			output_path
 				.strip_prefix(&self.config.output_dir)

@@ -35,6 +35,9 @@ pub struct Args {
 	/// use one thread per logical CPU core.
 	#[arg(short, long)]
 	pub jobs: Option<usize>,
+	/// Enable verbose messages
+	#[arg(short, long)]
+	pub verbose: bool,
 	/// Minecraft save directory
 	pub input_dir: PathBuf,
 	/// MinedMap data directory
@@ -53,6 +56,15 @@ fn setup_threads(num_threads: usize) -> Result<()> {
 pub fn cli() -> Result<()> {
 	let args = Args::parse();
 	let config = Config::new(&args);
+
+	tracing_subscriber::fmt()
+		.with_max_level(if args.verbose {
+			tracing::Level::DEBUG
+		} else {
+			tracing::Level::INFO
+		})
+		.with_target(false)
+		.init();
 
 	setup_threads(config.num_threads)?;
 
