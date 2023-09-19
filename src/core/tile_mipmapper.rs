@@ -2,7 +2,7 @@
 
 use anyhow::{Context, Result};
 use rayon::prelude::*;
-use tracing::{debug, warn};
+use tracing::{debug, info, warn};
 
 use super::common::*;
 use crate::{io::fs, types::*};
@@ -58,7 +58,7 @@ impl<'a> TileMipmapper<'a> {
 		level: usize,
 		coords: TileCoords,
 		prev: &TileCoordMap,
-	) -> Result<()>
+	) -> Result<(bool, bool)>
 	where
 		[P::Subpixel]: image::EncodableLayout,
 		image::ImageBuffer<P, Vec<P::Subpixel>>: Into<image::DynamicImage>,
@@ -93,7 +93,7 @@ impl<'a> TileMipmapper<'a> {
 			.collect();
 
 		let Some(input_timestamp) = sources.iter().map(|(_, _, ts)| *ts).max() else {
-			return Ok(());
+			return Ok((false, false));
 		};
 
 		if Some(input_timestamp) <= output_timestamp {
@@ -104,7 +104,7 @@ impl<'a> TileMipmapper<'a> {
 					.expect("tile path must be in output directory")
 					.display(),
 			);
-			return Ok(());
+			return Ok((true, false));
 		}
 
 		debug!(
@@ -143,7 +143,9 @@ impl<'a> TileMipmapper<'a> {
 			image
 				.write_to(file, image::ImageFormat::Png)
 				.context("Failed to save image")
-		})
+		})?;
+
+		Ok((true, true))
 	}
 
 	/// Runs the mipmap generation
@@ -165,24 +167,48 @@ impl<'a> TileMipmapper<'a> {
 				break;
 			}
 
+			info!("Generating level {} mipmaps...", level);
+
 			fs::create_dir_all(&self.config.tile_dir(TileKind::Map, level))?;
 			fs::create_dir_all(&self.config.tile_dir(TileKind::Lightmap, level))?;
 
 			let next = Self::map_coords(prev);
 
-			next.0.par_iter().try_for_each(|(&z, xs)| {
-				xs.par_iter().try_for_each(|&x| {
-					let coords = TileCoords { x, z };
-					self.render_mipmap::<image::Rgba<u8>>(TileKind::Map, level, coords, prev)?;
-					self.render_mipmap::<image::LumaA<u8>>(
-						TileKind::Lightmap,
-						level,
-						coords,
-						prev,
-					)?;
-					anyhow::Ok(())
+			let (total, processed) = next
+				.0
+				.par_iter()
+				.flat_map(|(&z, xs)| {
+					let mipmapper = &self;
+					xs.par_iter().map(move |&x| {
+						let coords = TileCoords { x, z };
+						let (found_map, processed_map) = mipmapper
+							.render_mipmap::<image::Rgba<u8>>(TileKind::Map, level, coords, prev)?;
+						let (found_light, processed_light) = mipmapper
+							.render_mipmap::<image::LumaA<u8>>(
+								TileKind::Lightmap,
+								level,
+								coords,
+								prev,
+							)?;
+						anyhow::Ok((
+							usize::from(found_map) + usize::from(found_light),
+							usize::from(processed_map) + usize::from(processed_light),
+						))
+					})
 				})
-			})?;
+				.try_reduce(
+					|| (0, 0),
+					|(found_a, processed_a), (found_b, processed_b)| {
+						Ok((found_a + found_b, processed_a + processed_b))
+					},
+				)?;
+
+			info!(
+				"Generated level {} mipmaps ({} processed, {} unchanged)",
+				level,
+				processed,
+				total - processed,
+			);
 
 			tile_stack.push(next);
 		}

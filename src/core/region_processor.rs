@@ -5,7 +5,7 @@ use std::{ffi::OsStr, path::Path, time::SystemTime};
 use anyhow::{Context, Result};
 use indexmap::IndexSet;
 use rayon::prelude::*;
-use tracing::{debug, error};
+use tracing::{debug, error, info};
 
 use super::common::*;
 use crate::{
@@ -132,7 +132,7 @@ impl<'a> RegionProcessor<'a> {
 	}
 
 	/// Processes a single region file
-	fn process_region(&self, coords: TileCoords) -> Result<()> {
+	fn process_region(&self, coords: TileCoords) -> Result<bool> {
 		/// Width/height of the region data
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
@@ -150,7 +150,7 @@ impl<'a> RegionProcessor<'a> {
 		if Some(input_timestamp) <= output_timestamp && Some(input_timestamp) <= lightmap_timestamp
 		{
 			debug!("Skipping unchanged region r.{}.{}.mca", coords.x, coords.z);
-			return Ok(());
+			return Ok(false);
 		}
 
 		debug!("Processing region r.{}.{}.mca", coords.x, coords.z);
@@ -188,7 +188,7 @@ impl<'a> RegionProcessor<'a> {
 			Self::save_lightmap(&lightmap_path, &lightmap, input_timestamp)?;
 		}
 
-		Ok(())
+		Ok(true)
 	}
 
 	/// Iterates over all region files of a Minecraft save directory
@@ -203,11 +203,31 @@ impl<'a> RegionProcessor<'a> {
 		fs::create_dir_all(&self.config.processed_dir)?;
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Lightmap, 0))?;
 
-		regions.par_iter().for_each(|&coords| {
-			if let Err(err) = self.process_region(coords) {
-				error!("Failed to process region {:?}: {:?}", coords, err);
-			}
-		});
+		info!("Processing region files...");
+
+		let mut results = vec![];
+		regions
+			.par_iter()
+			.map(|&coords| {
+				let result = self.process_region(coords);
+				if let Err(err) = &result {
+					error!("Failed to process region {:?}: {:?}", coords, err);
+				}
+				result
+			})
+			.collect_into_vec(&mut results);
+
+		let processed = results
+			.iter()
+			.filter(|result| matches!(result, Ok(true)))
+			.count();
+		let errors = results.iter().filter(|result| result.is_err()).count();
+		info!(
+			"Processed region files ({} processed, {} unchanged, {} errors)",
+			processed,
+			results.len() - processed,
+			errors,
+		);
 
 		Ok(regions)
 	}

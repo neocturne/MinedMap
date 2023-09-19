@@ -12,7 +12,7 @@ use glam::Vec3;
 use lru::LruCache;
 use rayon::prelude::*;
 use tokio::sync::OnceCell;
-use tracing::debug;
+use tracing::{debug, info};
 
 use super::{common::*, region_group::RegionGroup};
 use crate::{
@@ -263,7 +263,7 @@ impl<'a> TileRenderer<'a> {
 	}
 
 	/// Renders and saves a region tile image
-	fn render_tile(&self, coords: TileCoords) -> Result<()> {
+	fn render_tile(&self, coords: TileCoords) -> Result<bool> {
 		/// Width/height of a tile image
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
@@ -280,7 +280,7 @@ impl<'a> TileRenderer<'a> {
 					.expect("tile path must be in output directory")
 					.display(),
 			);
-			return Ok(());
+			return Ok(false);
 		}
 
 		debug!(
@@ -307,18 +307,35 @@ impl<'a> TileRenderer<'a> {
 					.write_to(file, image::ImageFormat::Png)
 					.context("Failed to save image")
 			},
-		)
+		)?;
+
+		Ok(true)
 	}
 
 	/// Runs the tile generation
 	pub fn run(self) -> Result<()> {
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Map, 0))?;
 
+		info!("Rendering map tiles...");
+
 		// Use par_bridge to process items in order (for better use of region cache)
-		self.regions.iter().par_bridge().try_for_each(|&coords| {
-			self.render_tile(coords)
-				.with_context(|| format!("Failed to render tile {:?}", coords))
-		})?;
+		let processed = self
+			.regions
+			.iter()
+			.par_bridge()
+			.map(|&coords| {
+				anyhow::Ok(usize::from(
+					self.render_tile(coords)
+						.with_context(|| format!("Failed to render tile {:?}", coords))?,
+				))
+			})
+			.try_reduce(|| 0, |a, b| Ok(a + b))?;
+
+		info!(
+			"Rendered map tiles ({} processed, {} unchanged)",
+			processed,
+			self.regions.len() - processed,
+		);
 
 		Ok(())
 	}
