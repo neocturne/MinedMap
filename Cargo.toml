@@ -7,6 +7,9 @@ license = "MIT"
 readme = "README.md"
 repository = "https://github.com/NeoRaider/MinedMap"
 
+[workspace.metadata.release]
+consolidate-commits = false
+
 [package]
 name = "minedmap"
 version = "0.1.0"
@@ -20,6 +23,17 @@ exclude = [
   "/docs/",
   "/viewer/",
   "/resource/",
+]
+
+[package.metadata.release]
+pre-release-commit-message = "{{crate_name}} {{version}}"
+tag-message = "{{crate_name}} {{version}}"
+pre-release-replacements = [
+  {file="CHANGELOG.md", search="Unreleased", replace="{{version}}"},
+  {file="CHANGELOG.md", search="\\.\\.\\.HEAD", replace="...{{tag_name}}", exactly=1},
+  {file="CHANGELOG.md", search="ReleaseDate", replace="{{date}}"},
+  {file="CHANGELOG.md", search="<!-- next-header -->", replace="<!-- next-header -->\n\n## [Unreleased] - ReleaseDate", exactly=1},
+  {file="CHANGELOG.md", search="<!-- next-url -->", replace="<!-- next-url -->\n[Unreleased]: https://github.com/neocturne/MinedMap/compare/{{tag_name}}...HEAD", exactly=1},
 ]
 
 [dependencies]
