@@ -2,6 +2,8 @@
 
 ## [Unreleased] - ReleaseDate
 
+## [2.0.0] - 2023-09-30
+
 This is a complete rewrite of the map renderer in Rust, as the previous C++
 implementation was getting more and more difficult to maintain and keep current
 versions of Minecraft supported.
@@ -38,4 +40,5 @@ intermediate data.
   Full support for custom biomes datapacks might be added in a future release.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/NeoRaider/MinedMap/compare/v1.19.1...HEAD
+[Unreleased]: https://github.com/neocturne/MinedMap/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/NeoRaider/MinedMap/compare/v1.19.1...v2.0.0
