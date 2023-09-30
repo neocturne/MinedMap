@@ -48,9 +48,8 @@ the generated map files to public webspace to make the map available to others.
 
 ## Installation
 
-Building the MinedMap map generator requires a recent Rust toolchain. There are no
-releases on crates.io or binary releases yet. For now, it can be installed using the
-following command:
+Building the MinedMap map generator requires a recent Rust toolchain. The
+following command can be used to build the current development version from source:
 ```shell
 cargo install --git 'https://github.com/NeoRaider/MinedMap.git'
 ```
