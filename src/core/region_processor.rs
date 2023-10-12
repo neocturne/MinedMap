@@ -1,6 +1,6 @@
 //! The [RegionProcessor] and related functions
 
-use std::{ffi::OsStr, path::Path, time::SystemTime};
+use std::{ffi::OsStr, path::Path, sync::mpsc, time::SystemTime};
 
 use anyhow::{Context, Result};
 use indexmap::IndexSet;
@@ -32,7 +32,7 @@ fn parse_region_filename(file_name: &OsStr) -> Option<TileCoords> {
 }
 
 /// [RegionProcessor::process_region] return values
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum RegionProcessorStatus {
 	/// Region was processed
 	Ok,
@@ -224,22 +224,27 @@ impl<'a> RegionProcessor<'a> {
 	///
 	/// Returns a list of the coordinates of all processed regions
 	pub fn run(self) -> Result<Vec<TileCoords>> {
-		let mut regions = self.collect_regions()?;
-
-		// Sort regions in a zig-zag pattern to optimize cache usage
-		regions.sort_unstable_by_key(|&TileCoords { x, z }| (x, if x % 2 == 0 { z } else { -z }));
-
 		fs::create_dir_all(&self.config.processed_dir)?;
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Lightmap, 0))?;
 
 		info!("Processing region files...");
 
-		regions.par_iter().try_for_each(|&coords| {
-			let _ = self
+		let (region_send, region_recv) = mpsc::channel();
+
+		self.collect_regions()?.par_iter().try_for_each(|&coords| {
+			let ret = self
 				.process_region(coords)
 				.with_context(|| format!("Failed to process region {:?}", coords))?;
+
+			if ret != RegionProcessorStatus::ErrorMissing {
+				region_send.send(coords).unwrap();
+			}
+
 			anyhow::Ok(())
 		})?;
+
+		drop(region_send);
+		let mut regions: Vec<_> = region_recv.into_iter().collect();
 
 		// info!(
 		// 	"Processed region files ({} processed, {} unchanged, {} errors)",
@@ -247,6 +252,9 @@ impl<'a> RegionProcessor<'a> {
 		// 	results.len() - processed,
 		// 	errors,
 		// );
+
+		// Sort regions in a zig-zag pattern to optimize cache usage
+		regions.sort_unstable_by_key(|&TileCoords { x, z }| (x, if x % 2 == 0 { z } else { -z }));
 
 		Ok(regions)
 	}
