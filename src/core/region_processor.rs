@@ -230,6 +230,8 @@ impl<'a> RegionProcessor<'a> {
 		info!("Processing region files...");
 
 		let (region_send, region_recv) = mpsc::channel();
+		let (processed_send, processed_recv) = mpsc::channel();
+		let (error_send, error_recv) = mpsc::channel();
 
 		self.collect_regions()?.par_iter().try_for_each(|&coords| {
 			let ret = self
@@ -240,18 +242,31 @@ impl<'a> RegionProcessor<'a> {
 				region_send.send(coords).unwrap();
 			}
 
+			match ret {
+				RegionProcessorStatus::Ok => processed_send.send(()).unwrap(),
+				RegionProcessorStatus::Skipped => {}
+				RegionProcessorStatus::ErrorOk | RegionProcessorStatus::ErrorMissing => {
+					error_send.send(()).unwrap()
+				}
+			}
+
 			anyhow::Ok(())
 		})?;
 
 		drop(region_send);
 		let mut regions: Vec<_> = region_recv.into_iter().collect();
 
-		// info!(
-		// 	"Processed region files ({} processed, {} unchanged, {} errors)",
-		// 	processed,
-		// 	results.len() - processed,
-		// 	errors,
-		// );
+		drop(processed_send);
+		let processed = processed_recv.into_iter().count();
+		drop(error_send);
+		let errors = error_recv.into_iter().count();
+
+		info!(
+			"Processed region files ({} processed, {} unchanged, {} errors)",
+			processed,
+			regions.len() - processed - errors,
+			errors,
+		);
 
 		// Sort regions in a zig-zag pattern to optimize cache usage
 		regions.sort_unstable_by_key(|&TileCoords { x, z }| (x, if x % 2 == 0 { z } else { -z }));
