@@ -139,8 +139,8 @@ impl<'a> RegionProcessor<'a> {
 		let mut processed_region = ProcessedRegion::default();
 		let mut lightmap = image::GrayAlphaImage::new(N, N);
 
-		let path = self.config.region_path(coords);
-		let input_timestamp = fs::modified_timestamp(&path)?;
+		let input_path = self.config.region_path(coords);
+		let input_timestamp = fs::modified_timestamp(&input_path)?;
 
 		let output_path = self.config.processed_path(coords);
 		let output_timestamp = fs::read_timestamp(&output_path, FILE_META_VERSION);
@@ -155,7 +155,7 @@ impl<'a> RegionProcessor<'a> {
 
 		debug!("Processing region r.{}.{}.mca", coords.x, coords.z);
 
-		crate::nbt::region::from_file(path)?.foreach_chunk(
+		crate::nbt::region::from_file(input_path)?.foreach_chunk(
 			|chunk_coords, data: world::de::Chunk| {
 				let Some(layer::LayerData {
 					blocks,
