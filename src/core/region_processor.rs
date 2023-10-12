@@ -205,29 +205,19 @@ impl<'a> RegionProcessor<'a> {
 
 		info!("Processing region files...");
 
-		let mut results = vec![];
-		regions
-			.par_iter()
-			.map(|&coords| {
-				let result = self.process_region(coords);
-				if let Err(err) = &result {
-					error!("Failed to process region {:?}: {:?}", coords, err);
-				}
-				result
-			})
-			.collect_into_vec(&mut results);
+		regions.par_iter().for_each(|&coords| {
+			let result = self.process_region(coords);
+			if let Err(err) = &result {
+				error!("Failed to process region {:?}: {:?}", coords, err);
+			}
+		});
 
-		let processed = results
-			.iter()
-			.filter(|result| matches!(result, Ok(true)))
-			.count();
-		let errors = results.iter().filter(|result| result.is_err()).count();
-		info!(
-			"Processed region files ({} processed, {} unchanged, {} errors)",
-			processed,
-			results.len() - processed,
-			errors,
-		);
+		// info!(
+		// 	"Processed region files ({} processed, {} unchanged, {} errors)",
+		// 	processed,
+		// 	results.len() - processed,
+		// 	errors,
+		// );
 
 		Ok(regions)
 	}
