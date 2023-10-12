@@ -5,7 +5,7 @@ use std::{ffi::OsStr, path::Path, time::SystemTime};
 use anyhow::{Context, Result};
 use indexmap::IndexSet;
 use rayon::prelude::*;
-use tracing::{debug, error, info};
+use tracing::{debug, info};
 
 use super::common::*;
 use crate::{
@@ -205,12 +205,12 @@ impl<'a> RegionProcessor<'a> {
 
 		info!("Processing region files...");
 
-		regions.par_iter().for_each(|&coords| {
-			let result = self.process_region(coords);
-			if let Err(err) = &result {
-				error!("Failed to process region {:?}: {:?}", coords, err);
-			}
-		});
+		regions.par_iter().try_for_each(|&coords| {
+			let _ = self
+				.process_region(coords)
+				.with_context(|| format!("Failed to process region {:?}", coords))?;
+			anyhow::Ok(())
+		})?;
 
 		// info!(
 		// 	"Processed region files ({} processed, {} unchanged, {} errors)",
