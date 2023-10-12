@@ -31,6 +31,19 @@ fn parse_region_filename(file_name: &OsStr) -> Option<TileCoords> {
 	})
 }
 
+/// [RegionProcessor::process_region] return values
+#[derive(Debug, Clone, Copy)]
+enum RegionProcessorStatus {
+	/// Region was processed
+	Ok,
+	/// Region was unchanged and skipped
+	Skipped,
+	/// Reading the region failed, previous processed data is reused
+	ErrorOk,
+	/// Reading the region failed, no previous data available
+	ErrorMissing,
+}
+
 /// Type with methods for processing the regions of a Minecraft save directory
 ///
 /// The RegionProcessor builds lightmap tiles as well as processed region data
@@ -132,7 +145,7 @@ impl<'a> RegionProcessor<'a> {
 	}
 
 	/// Processes a single region file
-	fn process_region(&self, coords: TileCoords) -> Result<bool> {
+	fn process_region(&self, coords: TileCoords) -> Result<RegionProcessorStatus> {
 		/// Width/height of the region data
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
@@ -150,7 +163,7 @@ impl<'a> RegionProcessor<'a> {
 		if Some(input_timestamp) <= output_timestamp && Some(input_timestamp) <= lightmap_timestamp
 		{
 			debug!("Skipping unchanged region r.{}.{}.mca", coords.x, coords.z);
-			return Ok(false);
+			return Ok(RegionProcessorStatus::Skipped);
 		}
 
 		debug!("Processing region r.{}.{}.mca", coords.x, coords.z);
@@ -188,7 +201,7 @@ impl<'a> RegionProcessor<'a> {
 			Self::save_lightmap(&lightmap_path, &lightmap, input_timestamp)?;
 		}
 
-		Ok(true)
+		Ok(RegionProcessorStatus::Ok)
 	}
 
 	/// Iterates over all region files of a Minecraft save directory
