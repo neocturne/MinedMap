@@ -5,7 +5,7 @@ use std::{ffi::OsStr, path::Path, time::SystemTime};
 use anyhow::{Context, Result};
 use indexmap::IndexSet;
 use rayon::prelude::*;
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 
 use super::common::*;
 use crate::{
@@ -168,31 +168,47 @@ impl<'a> RegionProcessor<'a> {
 
 		debug!("Processing region r.{}.{}.mca", coords.x, coords.z);
 
-		crate::nbt::region::from_file(input_path)?.foreach_chunk(
-			|chunk_coords, data: world::de::Chunk| {
-				let Some(layer::LayerData {
-					blocks,
-					biomes,
-					block_light,
-					depths,
-				}) = self
-					.process_chunk(&mut processed_region.biome_list, data)
-					.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
-				else {
-					return Ok(());
-				};
-				processed_region.chunks[chunk_coords] = Some(Box::new(ProcessedChunk {
-					blocks,
-					biomes,
-					depths,
-				}));
+		if let Err(err) = (|| -> Result<()> {
+			crate::nbt::region::from_file(input_path)?.foreach_chunk(
+				|chunk_coords, data: world::de::Chunk| {
+					let Some(layer::LayerData {
+						blocks,
+						biomes,
+						block_light,
+						depths,
+					}) = self
+						.process_chunk(&mut processed_region.biome_list, data)
+						.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
+					else {
+						return Ok(());
+					};
+					processed_region.chunks[chunk_coords] = Some(Box::new(ProcessedChunk {
+						blocks,
+						biomes,
+						depths,
+					}));
 
-				let chunk_lightmap = Self::render_chunk_lightmap(block_light);
-				overlay_chunk(&mut lightmap, &chunk_lightmap, chunk_coords);
+					let chunk_lightmap = Self::render_chunk_lightmap(block_light);
+					overlay_chunk(&mut lightmap, &chunk_lightmap, chunk_coords);
 
-				Ok(())
-			},
-		)?;
+					Ok(())
+				},
+			)
+		})() {
+			if output_timestamp.is_some() && lightmap_timestamp.is_some() {
+				warn!(
+					"Failed to process region {:?}, using old data: {:?}",
+					coords, err
+				);
+				return Ok(RegionProcessorStatus::ErrorOk);
+			} else {
+				warn!(
+					"Failed to process region {:?}, no old data available: {:?}",
+					coords, err
+				);
+				return Ok(RegionProcessorStatus::ErrorMissing);
+			}
+		}
 
 		if Some(input_timestamp) > output_timestamp {
 			Self::save_region(&output_path, &processed_region, input_timestamp)?;
