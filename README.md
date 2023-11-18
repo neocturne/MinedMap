@@ -48,8 +48,8 @@ the generated map files to public webspace to make the map available to others.
 
 ## Installation
 
-Building the MinedMap map generator from source requires a recent Rust toolchain. The
-following command can be used to build the current development version:
+Building the MinedMap map generator from source requires a recent Rust toolchain (1.72.0
+or newer). The following command can be used to build the current development version:
 ```shell
 cargo install --git 'https://github.com/NeoRaider/MinedMap.git'
 ```
