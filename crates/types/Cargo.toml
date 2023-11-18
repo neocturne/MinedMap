@@ -1,6 +1,6 @@
 [package]
 name = "minedmap-types"
-version = "0.1.0"
+version = "0.1.1"
 description = "Common types used by several MinedMap crates"
 edition.workspace = true
 license.workspace = true
