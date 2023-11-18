@@ -17,8 +17,8 @@
 MinedMap consists of two components: a map renderer generating map tiles from
 Minecraft save games, and a viewer for displaying and navigating maps in a browser
 based on [Leaflet](https://leafletjs.com/). The map renderer is heavily inspired by
-[MapRend](https://github.com/YSelfTool/MapRend), but it has been implemented in C++
-from scratch for highest performance.
+[MapRend](https://github.com/YSelfTool/MapRend), but has been reimplemented from scratch
+(first in C++, now in Rust) for highest performance.
 
 The viewer expects the the map data in a directory named `data`. To generate a new
 map, create this empty directory inside the viewer directory. Next, to generate the
@@ -48,8 +48,8 @@ the generated map files to public webspace to make the map available to others.
 
 ## Installation
 
-Building the MinedMap map generator requires a recent Rust toolchain. The
-following command can be used to build the current development version from source:
+Building the MinedMap map generator from source requires a recent Rust toolchain. The
+following command can be used to build the current development version:
 ```shell
 cargo install --git 'https://github.com/NeoRaider/MinedMap.git'
 ```
