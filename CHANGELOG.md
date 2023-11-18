@@ -2,6 +2,8 @@
 
 ## [Unreleased] - ReleaseDate
 
+## [2.0.1] - 2023-11-18
+
 ### Fixed
 
 - Proceed with missing tiles rather can failing completely when an invalid
@@ -45,5 +47,6 @@ intermediate data.
   Full support for custom biomes datapacks might be added in a future release.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/neocturne/MinedMap/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/neocturne/MinedMap/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/neocturne/MinedMap/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/NeoRaider/MinedMap/compare/v1.19.1...v2.0.0
