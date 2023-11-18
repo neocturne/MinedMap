@@ -1,11 +1,11 @@
 //! The [RegionProcessor] and related functions
 
-use std::{ffi::OsStr, path::Path, time::SystemTime};
+use std::{ffi::OsStr, path::Path, sync::mpsc, time::SystemTime};
 
 use anyhow::{Context, Result};
 use indexmap::IndexSet;
 use rayon::prelude::*;
-use tracing::{debug, error, info};
+use tracing::{debug, info, warn};
 
 use super::common::*;
 use crate::{
@@ -29,6 +29,19 @@ fn parse_region_filename(file_name: &OsStr) -> Option<TileCoords> {
 		x: x.parse().ok()?,
 		z: z.parse().ok()?,
 	})
+}
+
+/// [RegionProcessor::process_region] return values
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum RegionProcessorStatus {
+	/// Region was processed
+	Ok,
+	/// Region was unchanged and skipped
+	Skipped,
+	/// Reading the region failed, previous processed data is reused
+	ErrorOk,
+	/// Reading the region failed, no previous data available
+	ErrorMissing,
 }
 
 /// Type with methods for processing the regions of a Minecraft save directory
@@ -132,15 +145,15 @@ impl<'a> RegionProcessor<'a> {
 	}
 
 	/// Processes a single region file
-	fn process_region(&self, coords: TileCoords) -> Result<bool> {
+	fn process_region(&self, coords: TileCoords) -> Result<RegionProcessorStatus> {
 		/// Width/height of the region data
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
 		let mut processed_region = ProcessedRegion::default();
 		let mut lightmap = image::GrayAlphaImage::new(N, N);
 
-		let path = self.config.region_path(coords);
-		let input_timestamp = fs::modified_timestamp(&path)?;
+		let input_path = self.config.region_path(coords);
+		let input_timestamp = fs::modified_timestamp(&input_path)?;
 
 		let output_path = self.config.processed_path(coords);
 		let output_timestamp = fs::read_timestamp(&output_path, FILE_META_VERSION);
@@ -150,36 +163,52 @@ impl<'a> RegionProcessor<'a> {
 		if Some(input_timestamp) <= output_timestamp && Some(input_timestamp) <= lightmap_timestamp
 		{
 			debug!("Skipping unchanged region r.{}.{}.mca", coords.x, coords.z);
-			return Ok(false);
+			return Ok(RegionProcessorStatus::Skipped);
 		}
 
 		debug!("Processing region r.{}.{}.mca", coords.x, coords.z);
 
-		crate::nbt::region::from_file(path)?.foreach_chunk(
-			|chunk_coords, data: world::de::Chunk| {
-				let Some(layer::LayerData {
-					blocks,
-					biomes,
-					block_light,
-					depths,
-				}) = self
-					.process_chunk(&mut processed_region.biome_list, data)
-					.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
-				else {
-					return Ok(());
-				};
-				processed_region.chunks[chunk_coords] = Some(Box::new(ProcessedChunk {
-					blocks,
-					biomes,
-					depths,
-				}));
+		if let Err(err) = (|| -> Result<()> {
+			crate::nbt::region::from_file(input_path)?.foreach_chunk(
+				|chunk_coords, data: world::de::Chunk| {
+					let Some(layer::LayerData {
+						blocks,
+						biomes,
+						block_light,
+						depths,
+					}) = self
+						.process_chunk(&mut processed_region.biome_list, data)
+						.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
+					else {
+						return Ok(());
+					};
+					processed_region.chunks[chunk_coords] = Some(Box::new(ProcessedChunk {
+						blocks,
+						biomes,
+						depths,
+					}));
 
-				let chunk_lightmap = Self::render_chunk_lightmap(block_light);
-				overlay_chunk(&mut lightmap, &chunk_lightmap, chunk_coords);
+					let chunk_lightmap = Self::render_chunk_lightmap(block_light);
+					overlay_chunk(&mut lightmap, &chunk_lightmap, chunk_coords);
 
-				Ok(())
-			},
-		)?;
+					Ok(())
+				},
+			)
+		})() {
+			if output_timestamp.is_some() && lightmap_timestamp.is_some() {
+				warn!(
+					"Failed to process region {:?}, using old data: {:?}",
+					coords, err
+				);
+				return Ok(RegionProcessorStatus::ErrorOk);
+			} else {
+				warn!(
+					"Failed to process region {:?}, no old data available: {:?}",
+					coords, err
+				);
+				return Ok(RegionProcessorStatus::ErrorMissing);
+			}
+		}
 
 		if Some(input_timestamp) > output_timestamp {
 			Self::save_region(&output_path, &processed_region, input_timestamp)?;
@@ -188,46 +217,59 @@ impl<'a> RegionProcessor<'a> {
 			Self::save_lightmap(&lightmap_path, &lightmap, input_timestamp)?;
 		}
 
-		Ok(true)
+		Ok(RegionProcessorStatus::Ok)
 	}
 
 	/// Iterates over all region files of a Minecraft save directory
 	///
 	/// Returns a list of the coordinates of all processed regions
 	pub fn run(self) -> Result<Vec<TileCoords>> {
-		let mut regions = self.collect_regions()?;
-
-		// Sort regions in a zig-zag pattern to optimize cache usage
-		regions.sort_unstable_by_key(|&TileCoords { x, z }| (x, if x % 2 == 0 { z } else { -z }));
-
 		fs::create_dir_all(&self.config.processed_dir)?;
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Lightmap, 0))?;
 
 		info!("Processing region files...");
 
-		let mut results = vec![];
-		regions
-			.par_iter()
-			.map(|&coords| {
-				let result = self.process_region(coords);
-				if let Err(err) = &result {
-					error!("Failed to process region {:?}: {:?}", coords, err);
-				}
-				result
-			})
-			.collect_into_vec(&mut results);
+		let (region_send, region_recv) = mpsc::channel();
+		let (processed_send, processed_recv) = mpsc::channel();
+		let (error_send, error_recv) = mpsc::channel();
 
-		let processed = results
-			.iter()
-			.filter(|result| matches!(result, Ok(true)))
-			.count();
-		let errors = results.iter().filter(|result| result.is_err()).count();
+		self.collect_regions()?.par_iter().try_for_each(|&coords| {
+			let ret = self
+				.process_region(coords)
+				.with_context(|| format!("Failed to process region {:?}", coords))?;
+
+			if ret != RegionProcessorStatus::ErrorMissing {
+				region_send.send(coords).unwrap();
+			}
+
+			match ret {
+				RegionProcessorStatus::Ok => processed_send.send(()).unwrap(),
+				RegionProcessorStatus::Skipped => {}
+				RegionProcessorStatus::ErrorOk | RegionProcessorStatus::ErrorMissing => {
+					error_send.send(()).unwrap()
+				}
+			}
+
+			anyhow::Ok(())
+		})?;
+
+		drop(region_send);
+		let mut regions: Vec<_> = region_recv.into_iter().collect();
+
+		drop(processed_send);
+		let processed = processed_recv.into_iter().count();
+		drop(error_send);
+		let errors = error_recv.into_iter().count();
+
 		info!(
 			"Processed region files ({} processed, {} unchanged, {} errors)",
 			processed,
-			results.len() - processed,
+			regions.len() - processed - errors,
 			errors,
 		);
+
+		// Sort regions in a zig-zag pattern to optimize cache usage
+		regions.sort_unstable_by_key(|&TileCoords { x, z }| (x, if x % 2 == 0 { z } else { -z }));
 
 		Ok(regions)
 	}
