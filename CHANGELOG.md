@@ -2,6 +2,11 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Fixed
+
+- Proceed with missing tiles rather can failing completely when an invalid
+  region file is encountered and no processed data from a previous run exists
+
 ## [2.0.0] - 2023-09-30
 
 This is a complete rewrite of the map renderer in Rust, as the previous C++
