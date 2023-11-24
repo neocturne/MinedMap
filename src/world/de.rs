@@ -2,6 +2,8 @@
 
 use serde::Deserialize;
 
+use super::json_text::JSONText;
+
 /// Element of the `palette` list of 1.18+ [block states](BlockStatesV1_18)
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -104,6 +106,77 @@ pub enum BiomesV0 {
 	ByteArray(fastnbt::ByteArray),
 }
 
+/// Front/back text of a Minecraft 1.20+ sign block entry
+#[derive(Debug, Deserialize)]
+pub struct BlockEntitySignV1_20Text {
+	/// Lines of sign text
+	pub messages: Vec<JSONText>,
+	/// Default text color
+	pub color: Option<String>,
+}
+
+/// A sign (standing or hanging) block entity
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum BlockEntitySign {
+	/// Pre-1.20 sign block entity
+	///
+	/// Pre-1.20 signs only have front text.
+	#[serde(rename_all = "PascalCase")]
+	V0 {
+		/// Line 1 of the sign text
+		text1: JSONText,
+		/// Line 2 of the sign text
+		text2: JSONText,
+		/// Line 3 of the sign text
+		text3: JSONText,
+		/// Line 4 of the sign text
+		text4: JSONText,
+		/// Default text color
+		color: Option<String>,
+	},
+	/// 1.20+ sign block entity
+	V1_20 {
+		/// The sign's front text
+		front_text: BlockEntitySignV1_20Text,
+		/// The sign's back text
+		back_text: BlockEntitySignV1_20Text,
+	},
+}
+
+/// Data for different kinds of block entities
+#[derive(Debug, Deserialize)]
+#[serde(tag = "id")]
+pub enum BlockEntityData {
+	/// Regular sign
+	///
+	/// This includes standing signs and signs attached to the side of blocks
+	#[serde(rename = "minecraft:sign", alias = "minecraft:standing_sign")]
+	Sign(BlockEntitySign),
+	/// Hanging sign
+	#[serde(rename = "minecraft:hanging_sign")]
+	HangingSign(BlockEntitySign),
+	/// Other block entity types not handled by MinedMap
+	#[serde(other)]
+	Other,
+}
+
+/// A block entity
+///
+/// Block entities were called tile entities pre-1.18
+#[derive(Debug, Deserialize)]
+pub struct BlockEntity {
+	/// Entity global X coordinate
+	pub x: i32,
+	/// Entity global Y coordinate
+	pub y: i32,
+	/// Entity global Z coordinate
+	pub z: i32,
+	/// Kind-specific entity data
+	#[serde(flatten)]
+	pub data: BlockEntityData,
+}
+
 /// `Level` compound element found in pre-1.18 [chunks](Chunk)
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -113,6 +186,9 @@ pub struct LevelV0 {
 	pub sections: Vec<SectionV0>,
 	/// Biome data
 	pub biomes: Option<BiomesV0>,
+	/// List of block entities
+	#[serde(default)]
+	pub tile_entities: Vec<BlockEntity>,
 }
 
 /// Version-specific part of a [Chunk] compound
@@ -123,6 +199,9 @@ pub enum ChunkVariant {
 	V1_18 {
 		/// List of chunk sections
 		sections: Vec<SectionV1_18>,
+		/// List of block entities
+		#[serde(default)]
+		block_entities: Vec<BlockEntity>,
 	},
 	/// Pre-1.18 chunk data
 	#[serde(rename_all = "PascalCase")]

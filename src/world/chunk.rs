@@ -60,9 +60,10 @@ impl<'a> Chunk<'a> {
 		let data_version = data.data_version.unwrap_or_default();
 
 		match &data.chunk {
-			de::ChunkVariant::V1_18 { sections } => {
-				Self::new_v1_18(data_version, sections, block_types, biome_types)
-			}
+			de::ChunkVariant::V1_18 {
+				sections,
+				block_entities: _,
+			} => Self::new_v1_18(data_version, sections, block_types, biome_types),
 			de::ChunkVariant::V0 { level } => {
 				Self::new_v0(data_version, level, block_types, biome_types)
 			}
