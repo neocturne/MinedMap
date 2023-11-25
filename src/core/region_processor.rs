@@ -65,6 +65,10 @@ struct SingleRegionProcessor<'a> {
 	output_timestamp: Option<SystemTime>,
 	/// Timestamp of last modification of lightmap output file (if valid)
 	lightmap_timestamp: Option<SystemTime>,
+	/// True if processed region output file needs to be updated
+	output_needed: bool,
+	/// True if lightmap output file needs to be updated
+	lightmap_needed: bool,
 	/// Processed region intermediate data
 	processed_region: ProcessedRegion,
 	/// Lightmap intermediate data
@@ -85,6 +89,9 @@ impl<'a> SingleRegionProcessor<'a> {
 		let lightmap_path = processor.config.tile_path(TileKind::Lightmap, 0, coords);
 		let lightmap_timestamp = fs::read_timestamp(&lightmap_path, LIGHTMAP_FILE_META_VERSION);
 
+		let output_needed = Some(input_timestamp) > output_timestamp;
+		let lightmap_needed = Some(input_timestamp) > lightmap_timestamp;
+
 		let processed_region = ProcessedRegion::default();
 		let lightmap = image::GrayAlphaImage::new(N, N);
 
@@ -98,6 +105,8 @@ impl<'a> SingleRegionProcessor<'a> {
 			input_timestamp,
 			output_timestamp,
 			lightmap_timestamp,
+			output_needed,
+			lightmap_needed,
 			processed_region,
 			lightmap,
 		})
@@ -148,9 +157,7 @@ impl<'a> SingleRegionProcessor<'a> {
 
 	/// Processes the region
 	fn run(mut self) -> Result<RegionProcessorStatus> {
-		if Some(self.input_timestamp) <= self.output_timestamp
-			&& Some(self.input_timestamp) <= self.lightmap_timestamp
-		{
+		if !self.output_needed && !self.lightmap_needed {
 			debug!(
 				"Skipping unchanged region r.{}.{}.mca",
 				self.coords.x, self.coords.z
@@ -178,14 +185,20 @@ impl<'a> SingleRegionProcessor<'a> {
 					else {
 						return Ok(());
 					};
-					self.processed_region.chunks[chunk_coords] = Some(Box::new(ProcessedChunk {
-						blocks,
-						biomes,
-						depths,
-					}));
 
-					let chunk_lightmap = Self::render_chunk_lightmap(block_light);
-					overlay_chunk(&mut self.lightmap, &chunk_lightmap, chunk_coords);
+					if self.output_needed {
+						self.processed_region.chunks[chunk_coords] =
+							Some(Box::new(ProcessedChunk {
+								blocks,
+								biomes,
+								depths,
+							}));
+					}
+
+					if self.lightmap_needed {
+						let chunk_lightmap = Self::render_chunk_lightmap(block_light);
+						overlay_chunk(&mut self.lightmap, &chunk_lightmap, chunk_coords);
+					}
 
 					Ok(())
 				},
@@ -206,14 +219,14 @@ impl<'a> SingleRegionProcessor<'a> {
 			}
 		}
 
-		if Some(self.input_timestamp) > self.output_timestamp {
+		if self.output_needed {
 			Self::save_region(
 				&self.output_path,
 				&self.processed_region,
 				self.input_timestamp,
 			)?;
 		}
-		if Some(self.input_timestamp) > self.lightmap_timestamp {
+		if self.lightmap_needed {
 			Self::save_lightmap(&self.lightmap_path, &self.lightmap, self.input_timestamp)?;
 		}
 
