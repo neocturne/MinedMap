@@ -9,7 +9,12 @@ use std::{
 use indexmap::IndexSet;
 use serde::{Deserialize, Serialize};
 
-use crate::{io::fs::FileMetaVersion, resource::Biome, types::*, world::layer};
+use crate::{
+	io::fs::FileMetaVersion,
+	resource::Biome,
+	types::*,
+	world::{block_entity::BlockEntity, layer},
+};
 
 /// Increase to force regeneration of all output files
 
@@ -35,6 +40,11 @@ pub const LIGHTMAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 ///
 /// Increase when the mipmap generation changes (this should not happen)
 pub const MIPMAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
+
+/// MinedMap processed entity data version number
+///
+/// Increase when entity collection changes bacause of code changes.
+pub const ENTITIES_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 
 /// Coordinate pair of a generated tile
 ///
@@ -94,6 +104,13 @@ pub struct ProcessedRegion {
 	pub chunks: ChunkArray<Option<Box<ProcessedChunk>>>,
 }
 
+/// Data structure for storing entity data between processing and collection steps
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct ProcessedEntities {
+	/// List of block entities
+	pub block_entities: Vec<BlockEntity>,
+}
+
 /// Derives a filename from region coordinates and a file extension
 ///
 /// Can be used for input regions, processed data or rendered tiles
@@ -122,6 +139,8 @@ pub struct Config {
 	pub output_dir: PathBuf,
 	/// Path for storage of intermediate processed data files
 	pub processed_dir: PathBuf,
+	/// Path for storage of processed entity data files
+	pub entities_dir: PathBuf,
 	/// Path of viewer metadata file
 	pub metadata_path: PathBuf,
 }
@@ -137,7 +156,8 @@ impl Config {
 
 		let region_dir = [&args.input_dir, Path::new("region")].iter().collect();
 		let level_dat_path = [&args.input_dir, Path::new("level.dat")].iter().collect();
-		let processed_dir = [&args.output_dir, Path::new("processed")].iter().collect();
+		let processed_dir: PathBuf = [&args.output_dir, Path::new("processed")].iter().collect();
+		let entities_dir = [&processed_dir, Path::new("entities")].iter().collect();
 		let metadata_path = [&args.output_dir, Path::new("info.json")].iter().collect();
 
 		Config {
@@ -146,6 +166,7 @@ impl Config {
 			level_dat_path,
 			output_dir: args.output_dir.clone(),
 			processed_dir,
+			entities_dir,
 			metadata_path,
 		}
 	}
@@ -160,6 +181,20 @@ impl Config {
 	pub fn processed_path(&self, coords: TileCoords) -> PathBuf {
 		let filename = coord_filename(coords, "bin");
 		[&self.processed_dir, Path::new(&filename)].iter().collect()
+	}
+
+	/// Constructs the base output path for processed entity data
+	pub fn entities_dir(&self, level: usize) -> PathBuf {
+		[&self.entities_dir, Path::new(&level.to_string())]
+			.iter()
+			.collect()
+	}
+
+	/// Constructs the path of a processed entity data file
+	pub fn entities_path(&self, level: usize, coords: TileCoords) -> PathBuf {
+		let filename = coord_filename(coords, "bin");
+		let dir = self.entities_dir(level);
+		[Path::new(&dir), Path::new(&filename)].iter().collect()
 	}
 
 	/// Constructs the base output path for a [TileKind] and mipmap level
