@@ -2,6 +2,8 @@
 
 use std::sync::Arc;
 
+use serde::{Deserialize, Serialize};
+
 use super::{
 	de,
 	json_text::{FormattedText, FormattedTextList, JSONText},
@@ -77,6 +79,7 @@ impl BlockEntitySignExt for de::BlockEntitySign {
 	}
 }
 
+#[derive(Debug, Default, Serialize, Deserialize)]
 /// Deserialized and linearized sign text
 pub struct SignText(pub Vec<FormattedTextList>);
 

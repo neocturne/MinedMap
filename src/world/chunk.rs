@@ -10,7 +10,7 @@ use std::{
 
 use anyhow::{bail, Context, Result};
 
-use super::{de, section::*};
+use super::{block_entity::BlockEntity, de, section::*};
 use crate::{
 	resource::{BiomeTypes, BlockTypes},
 	types::*,
@@ -55,6 +55,8 @@ pub enum ChunkInner<'a> {
 pub struct Chunk<'a> {
 	/// Version-specific data
 	inner: ChunkInner<'a>,
+	/// Unprocessed block entities
+	block_entities: &'a Vec<de::BlockEntity>,
 }
 
 impl<'a> Chunk<'a> {
@@ -66,17 +68,27 @@ impl<'a> Chunk<'a> {
 	) -> Result<(Self, bool)> {
 		let data_version = data.data_version.unwrap_or_default();
 
-		let (inner, has_unknown) = match &data.chunk {
+		let ((inner, has_unknown), block_entities) = match &data.chunk {
 			de::ChunkVariant::V1_18 {
 				sections,
-				block_entities: _,
-			} => Self::new_v1_18(data_version, sections, block_types, biome_types)?,
-			de::ChunkVariant::V0 { level } => {
-				Self::new_v0(data_version, level, block_types, biome_types)?
-			}
+				block_entities,
+			} => (
+				Self::new_v1_18(data_version, sections, block_types, biome_types)?,
+				block_entities,
+			),
+			de::ChunkVariant::V0 { level } => (
+				Self::new_v0(data_version, level, block_types, biome_types)?,
+				&level.tile_entities,
+			),
 		};
 
-		Ok((Chunk { inner }, has_unknown))
+		Ok((
+			Chunk {
+				inner,
+				block_entities,
+			},
+			has_unknown,
+		))
 	}
 
 	/// [Chunk::new] implementation for Minecraft v1.18+ chunks
@@ -229,6 +241,14 @@ impl<'a> Chunk<'a> {
 				ChunkInner::Empty => Empty,
 			},
 		}
+	}
+
+	/// Processes all of the chunk's block entities
+	pub fn block_entities(&self) -> Vec<BlockEntity> {
+		self.block_entities
+			.iter()
+			.filter_map(BlockEntity::new)
+			.collect()
 	}
 }
 

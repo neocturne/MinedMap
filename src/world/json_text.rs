@@ -2,7 +2,7 @@
 
 use std::{collections::VecDeque, sync::Arc};
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// A span of formatted text
 ///
@@ -11,22 +11,28 @@ use serde::Deserialize;
 /// is handled by [DeserializedText].
 ///
 /// Formatting that is not set in a node is inherited from the parent.
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct FormattedText {
 	#[serde(default)]
 	/// Text content
 	pub text: String,
 	/// Text color
+	#[serde(skip_serializing_if = "Option::is_none")]
 	pub color: Option<Arc<String>>,
 	/// Bold formatting
+	#[serde(skip_serializing_if = "Option::is_none")]
 	pub bold: Option<bool>,
 	/// Italic formatting
+	#[serde(skip_serializing_if = "Option::is_none")]
 	pub italic: Option<bool>,
 	/// Underlines formatting
+	#[serde(skip_serializing_if = "Option::is_none")]
 	pub underlined: Option<bool>,
 	/// Strikethrough formatting
+	#[serde(skip_serializing_if = "Option::is_none")]
 	pub strikethrough: Option<bool>,
 	/// Obfuscated formatting
+	#[serde(skip_serializing_if = "Option::is_none")]
 	pub obfuscated: Option<bool>,
 }
 
@@ -71,7 +77,7 @@ impl From<String> for FormattedTextTree {
 }
 
 /// List of [FormattedText]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct FormattedTextList(pub Vec<FormattedText>);
 
 impl FormattedTextList {
