@@ -70,8 +70,12 @@ impl<'a> TileMipmapper<'a> {
 		/// Tile width/height
 		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
 
+		let version = match kind {
+			TileKind::Map => REGION_FILE_META_VERSION,
+			TileKind::Lightmap => LIGHTMAP_FILE_META_VERSION,
+		};
 		let output_path = self.config.tile_path(kind, level, coords);
-		let output_timestamp = fs::read_timestamp(&output_path, FILE_META_VERSION);
+		let output_timestamp = fs::read_timestamp(&output_path, version);
 
 		let sources: Vec<_> = [(0, 0), (0, 1), (1, 0), (1, 1)]
 			.into_iter()
@@ -145,7 +149,7 @@ impl<'a> TileMipmapper<'a> {
 			);
 		}
 
-		fs::create_with_timestamp(&output_path, FILE_META_VERSION, input_timestamp, |file| {
+		fs::create_with_timestamp(&output_path, version, input_timestamp, |file| {
 			image
 				.write_to(file, image::ImageFormat::Png)
 				.context("Failed to save image")

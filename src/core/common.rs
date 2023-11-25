@@ -11,10 +11,16 @@ use serde::{Deserialize, Serialize};
 
 use crate::{io::fs::FileMetaVersion, resource::Biome, types::*, world::layer};
 
-/// MinedMap data version number
-///
 /// Increase to force regeneration of all output files
-pub const FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
+
+/// MinedMap processed region data version number
+pub const REGION_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
+
+/// MinedMap map tile data version number
+pub const MAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
+
+/// MinedMap lightmap data version number
+pub const LIGHTMAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 
 /// Coordinate pair of a generated tile
 ///

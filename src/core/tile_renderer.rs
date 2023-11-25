@@ -270,7 +270,7 @@ impl<'a> TileRenderer<'a> {
 		let (processed_paths, processed_timestamp) = self.processed_sources(coords)?;
 
 		let output_path = self.config.tile_path(TileKind::Map, 0, coords);
-		let output_timestamp = fs::read_timestamp(&output_path, FILE_META_VERSION);
+		let output_timestamp = fs::read_timestamp(&output_path, MAP_FILE_META_VERSION);
 
 		if Some(processed_timestamp) <= output_timestamp {
 			debug!(
@@ -300,7 +300,7 @@ impl<'a> TileRenderer<'a> {
 
 		fs::create_with_timestamp(
 			&output_path,
-			FILE_META_VERSION,
+			MAP_FILE_META_VERSION,
 			processed_timestamp,
 			|file| {
 				image

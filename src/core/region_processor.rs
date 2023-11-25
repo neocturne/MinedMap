@@ -126,7 +126,7 @@ impl<'a> RegionProcessor<'a> {
 		processed_region: &ProcessedRegion,
 		timestamp: SystemTime,
 	) -> Result<()> {
-		storage::write(path, processed_region, FILE_META_VERSION, timestamp)
+		storage::write(path, processed_region, REGION_FILE_META_VERSION, timestamp)
 	}
 
 	/// Saves a lightmap tile
@@ -137,7 +137,7 @@ impl<'a> RegionProcessor<'a> {
 		lightmap: &image::GrayAlphaImage,
 		timestamp: SystemTime,
 	) -> Result<()> {
-		fs::create_with_timestamp(path, FILE_META_VERSION, timestamp, |file| {
+		fs::create_with_timestamp(path, LIGHTMAP_FILE_META_VERSION, timestamp, |file| {
 			lightmap
 				.write_to(file, image::ImageFormat::Png)
 				.context("Failed to save image")
@@ -156,9 +156,9 @@ impl<'a> RegionProcessor<'a> {
 		let input_timestamp = fs::modified_timestamp(&input_path)?;
 
 		let output_path = self.config.processed_path(coords);
-		let output_timestamp = fs::read_timestamp(&output_path, FILE_META_VERSION);
+		let output_timestamp = fs::read_timestamp(&output_path, REGION_FILE_META_VERSION);
 		let lightmap_path = self.config.tile_path(TileKind::Lightmap, 0, coords);
-		let lightmap_timestamp = fs::read_timestamp(&lightmap_path, FILE_META_VERSION);
+		let lightmap_timestamp = fs::read_timestamp(&lightmap_path, LIGHTMAP_FILE_META_VERSION);
 
 		if Some(input_timestamp) <= output_timestamp && Some(input_timestamp) <= lightmap_timestamp
 		{
