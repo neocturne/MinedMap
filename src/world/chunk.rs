@@ -93,10 +93,10 @@ impl<'a> Chunk<'a> {
 		let data_version = data.data_version.unwrap_or_default();
 
 		match &data.chunk {
-			de::ChunkVariants::V1_18 { sections } => {
+			de::ChunkVariant::V1_18 { sections } => {
 				Self::new_v1_18(data_version, sections, block_types, biome_types)
 			}
-			de::ChunkVariants::V0 { level } => {
+			de::ChunkVariant::V0 { level } => {
 				Self::new_v0(data_version, level, block_types, biome_types)
 			}
 		}
@@ -113,7 +113,7 @@ impl<'a> Chunk<'a> {
 
 		for section in sections {
 			match &section.section {
-				de::SectionV1_18Variants::V1_18 {
+				de::SectionV1_18Variant::V1_18 {
 					block_states,
 					biomes,
 					block_light,
@@ -140,7 +140,7 @@ impl<'a> Chunk<'a> {
 						),
 					);
 				}
-				de::SectionV1_18Variants::Empty {} => {}
+				de::SectionV1_18Variant::Empty {} => {}
 			};
 		}
 
@@ -163,7 +163,7 @@ impl<'a> Chunk<'a> {
 					format!("Failed to load section block light at Y={}", section.y)
 				})?;
 			match &section.section {
-				de::SectionV0Variants::V1_13 {
+				de::SectionV0Variant::V1_13 {
 					block_states,
 					palette,
 				} => {
@@ -183,7 +183,7 @@ impl<'a> Chunk<'a> {
 						),
 					);
 				}
-				de::SectionV0Variants::V0 { blocks, data } => {
+				de::SectionV0Variant::V0 { blocks, data } => {
 					section_map_v0.insert(
 						SectionY(section.y.into()),
 						(
@@ -194,7 +194,7 @@ impl<'a> Chunk<'a> {
 						),
 					);
 				}
-				de::SectionV0Variants::Empty {} => {}
+				de::SectionV0Variant::Empty {} => {}
 			}
 		}
 
