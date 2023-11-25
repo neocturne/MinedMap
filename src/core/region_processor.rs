@@ -1,11 +1,6 @@
 //! The [RegionProcessor] and related functions
 
-use std::{
-	ffi::OsStr,
-	path::{Path, PathBuf},
-	sync::mpsc,
-	time::SystemTime,
-};
+use std::{ffi::OsStr, path::PathBuf, sync::mpsc, time::SystemTime};
 
 use anyhow::{Context, Result};
 use rayon::prelude::*;
@@ -132,27 +127,74 @@ impl<'a> SingleRegionProcessor<'a> {
 	/// Saves processed region data
 	///
 	/// The timestamp is the time of the last modification of the input region data.
-	fn save_region(
-		path: &Path,
-		processed_region: &ProcessedRegion,
-		timestamp: SystemTime,
-	) -> Result<()> {
-		storage::write(path, processed_region, REGION_FILE_META_VERSION, timestamp)
+	fn save_region(&self) -> Result<()> {
+		if !self.output_needed {
+			return Ok(());
+		}
+
+		storage::write(
+			&self.output_path,
+			&self.processed_region,
+			REGION_FILE_META_VERSION,
+			self.input_timestamp,
+		)
 	}
 
 	/// Saves a lightmap tile
 	///
 	/// The timestamp is the time of the last modification of the input region data.
-	fn save_lightmap(
-		path: &Path,
-		lightmap: &image::GrayAlphaImage,
-		timestamp: SystemTime,
-	) -> Result<()> {
-		fs::create_with_timestamp(path, LIGHTMAP_FILE_META_VERSION, timestamp, |file| {
-			lightmap
-				.write_to(file, image::ImageFormat::Png)
-				.context("Failed to save image")
-		})
+	fn save_lightmap(&self) -> Result<()> {
+		if !self.lightmap_needed {
+			return Ok(());
+		}
+
+		fs::create_with_timestamp(
+			&self.lightmap_path,
+			LIGHTMAP_FILE_META_VERSION,
+			self.input_timestamp,
+			|file| {
+				self.lightmap
+					.write_to(file, image::ImageFormat::Png)
+					.context("Failed to save image")
+			},
+		)
+	}
+
+	/// Processes a single chunk
+	fn process_chunk(&mut self, chunk_coords: ChunkCoords, data: world::de::Chunk) -> Result<()> {
+		let chunk = world::chunk::Chunk::new(&data, self.block_types, self.biome_types)
+			.with_context(|| format!("Failed to decode chunk {:?}", chunk_coords))?;
+		let Some(layer::LayerData {
+			blocks,
+			biomes,
+			block_light,
+			depths,
+		}) = world::layer::top_layer(&mut self.processed_region.biome_list, &chunk)
+			.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
+		else {
+			return Ok(());
+		};
+
+		if self.output_needed {
+			self.processed_region.chunks[chunk_coords] = Some(Box::new(ProcessedChunk {
+				blocks,
+				biomes,
+				depths,
+			}));
+		}
+
+		if self.lightmap_needed {
+			let chunk_lightmap = Self::render_chunk_lightmap(block_light);
+			overlay_chunk(&mut self.lightmap, &chunk_lightmap, chunk_coords);
+		}
+
+		Ok(())
+	}
+
+	/// Processes the chunks of the region
+	fn process_chunks(&mut self) -> Result<()> {
+		crate::nbt::region::from_file(&self.input_path)?
+			.foreach_chunk(|chunk_coords, data| self.process_chunk(chunk_coords, data))
 	}
 
 	/// Processes the region
@@ -170,40 +212,7 @@ impl<'a> SingleRegionProcessor<'a> {
 			self.coords.x, self.coords.z
 		);
 
-		if let Err(err) = (|| -> Result<()> {
-			crate::nbt::region::from_file(&self.input_path)?.foreach_chunk(
-				|chunk_coords, data: world::de::Chunk| {
-					let chunk = world::chunk::Chunk::new(&data, self.block_types, self.biome_types)
-						.with_context(|| format!("Failed to decode chunk {:?}", chunk_coords))?;
-					let Some(layer::LayerData {
-						blocks,
-						biomes,
-						block_light,
-						depths,
-					}) = world::layer::top_layer(&mut self.processed_region.biome_list, &chunk)
-						.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
-					else {
-						return Ok(());
-					};
-
-					if self.output_needed {
-						self.processed_region.chunks[chunk_coords] =
-							Some(Box::new(ProcessedChunk {
-								blocks,
-								biomes,
-								depths,
-							}));
-					}
-
-					if self.lightmap_needed {
-						let chunk_lightmap = Self::render_chunk_lightmap(block_light);
-						overlay_chunk(&mut self.lightmap, &chunk_lightmap, chunk_coords);
-					}
-
-					Ok(())
-				},
-			)
-		})() {
+		if let Err(err) = self.process_chunks() {
 			if self.output_timestamp.is_some() && self.lightmap_timestamp.is_some() {
 				warn!(
 					"Failed to process region {:?}, using old data: {:?}",
@@ -219,16 +228,8 @@ impl<'a> SingleRegionProcessor<'a> {
 			}
 		}
 
-		if self.output_needed {
-			Self::save_region(
-				&self.output_path,
-				&self.processed_region,
-				self.input_timestamp,
-			)?;
-		}
-		if self.lightmap_needed {
-			Self::save_lightmap(&self.lightmap_path, &self.lightmap, self.input_timestamp)?;
-		}
+		self.save_region()?;
+		self.save_lightmap()?;
 
 		Ok(RegionProcessorStatus::Ok)
 	}
