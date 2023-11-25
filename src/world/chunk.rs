@@ -16,10 +16,9 @@ use crate::{
 	types::*,
 };
 
-/// Chunk data structure wrapping a [de::Chunk] for convenient access to
-/// block and biome data
+/// Version-specific part of [Chunk]
 #[derive(Debug)]
-pub enum Chunk<'a> {
+pub enum ChunkInner<'a> {
 	/// Minecraft v1.18+ chunk with biome data moved into sections
 	V1_18 {
 		/// Section data
@@ -50,6 +49,14 @@ pub enum Chunk<'a> {
 	Empty,
 }
 
+/// Chunk data structure wrapping a [de::Chunk] for convenient access to
+/// block and biome data
+#[derive(Debug)]
+pub struct Chunk<'a> {
+	/// Version-specific data
+	inner: ChunkInner<'a>,
+}
+
 impl<'a> Chunk<'a> {
 	/// Creates a new [Chunk] from a deserialized [de::Chunk]
 	pub fn new(
@@ -59,15 +66,17 @@ impl<'a> Chunk<'a> {
 	) -> Result<(Self, bool)> {
 		let data_version = data.data_version.unwrap_or_default();
 
-		match &data.chunk {
+		let (inner, has_unknown) = match &data.chunk {
 			de::ChunkVariant::V1_18 {
 				sections,
 				block_entities: _,
-			} => Self::new_v1_18(data_version, sections, block_types, biome_types),
+			} => Self::new_v1_18(data_version, sections, block_types, biome_types)?,
 			de::ChunkVariant::V0 { level } => {
-				Self::new_v0(data_version, level, block_types, biome_types)
+				Self::new_v0(data_version, level, block_types, biome_types)?
 			}
-		}
+		};
+
+		Ok((Chunk { inner }, has_unknown))
 	}
 
 	/// [Chunk::new] implementation for Minecraft v1.18+ chunks
@@ -76,7 +85,7 @@ impl<'a> Chunk<'a> {
 		sections: &'a Vec<de::SectionV1_18>,
 		block_types: &'a BlockTypes,
 		biome_types: &'a BiomeTypes,
-	) -> Result<(Self, bool)> {
+	) -> Result<(ChunkInner<'a>, bool)> {
 		let mut section_map = BTreeMap::new();
 		let mut has_unknown = false;
 
@@ -118,7 +127,7 @@ impl<'a> Chunk<'a> {
 			};
 		}
 
-		let chunk = Chunk::V1_18 { section_map };
+		let chunk = ChunkInner::V1_18 { section_map };
 		Ok((chunk, has_unknown))
 	}
 
@@ -128,7 +137,7 @@ impl<'a> Chunk<'a> {
 		level: &'a de::LevelV0,
 		block_types: &'a BlockTypes,
 		biome_types: &'a BiomeTypes,
-	) -> Result<(Self, bool)> {
+	) -> Result<(ChunkInner<'a>, bool)> {
 		let mut section_map_v1_13 = BTreeMap::new();
 		let mut section_map_v0 = BTreeMap::new();
 		let mut has_unknown = false;
@@ -168,12 +177,12 @@ impl<'a> Chunk<'a> {
 
 		let biomes = BiomesV0::new(level.biomes.as_ref(), biome_types);
 		let chunk = match (section_map_v1_13.is_empty(), section_map_v0.is_empty()) {
-			(true, true) => Chunk::Empty,
-			(false, true) => Chunk::V1_13 {
+			(true, true) => ChunkInner::Empty,
+			(false, true) => ChunkInner::V1_13 {
 				section_map: section_map_v1_13,
 				biomes: biomes?,
 			},
-			(true, false) => Chunk::V0 {
+			(true, false) => ChunkInner::V0 {
 				section_map: section_map_v0,
 				biomes: biomes?,
 			},
@@ -187,11 +196,11 @@ impl<'a> Chunk<'a> {
 
 	/// Returns true if the chunk does not contain any sections
 	pub fn is_empty(&self) -> bool {
-		match self {
-			Chunk::V1_18 { section_map } => section_map.is_empty(),
-			Chunk::V1_13 { section_map, .. } => section_map.is_empty(),
-			Chunk::V0 { section_map, .. } => section_map.is_empty(),
-			Chunk::Empty => true,
+		match &self.inner {
+			ChunkInner::V1_18 { section_map } => section_map.is_empty(),
+			ChunkInner::V1_13 { section_map, .. } => section_map.is_empty(),
+			ChunkInner::V0 { section_map, .. } => section_map.is_empty(),
+			ChunkInner::Empty => true,
 		}
 	}
 
@@ -199,25 +208,25 @@ impl<'a> Chunk<'a> {
 	pub fn sections(&self) -> SectionIter {
 		use SectionIterInner::*;
 		SectionIter {
-			inner: match self {
-				Chunk::V1_18 { section_map } => V1_18 {
+			inner: match &self.inner {
+				ChunkInner::V1_18 { section_map } => V1_18 {
 					iter: section_map.iter(),
 				},
-				Chunk::V1_13 {
+				ChunkInner::V1_13 {
 					section_map,
 					biomes,
 				} => V1_13 {
 					iter: section_map.iter(),
 					biomes,
 				},
-				Chunk::V0 {
+				ChunkInner::V0 {
 					section_map,
 					biomes,
 				} => V0 {
 					iter: section_map.iter(),
 					biomes,
 				},
-				Chunk::Empty => Empty,
+				ChunkInner::Empty => Empty,
 			},
 		}
 	}
@@ -253,26 +262,26 @@ impl<'a, T> SectionIterTrait<'a> for T where
 /// Inner data structure of [SectionIter]
 #[derive(Debug, Clone)]
 enum SectionIterInner<'a> {
-	/// Iterator over sections of [Chunk::V1_18]
+	/// Iterator over sections of [ChunkInner::V1_18]
 	V1_18 {
 		/// Inner iterator into section map
 		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BiomesV1_18<'a>, BlockLight<'a>)>,
 	},
-	/// Iterator over sections of [Chunk::V1_13]
+	/// Iterator over sections of [ChunkInner::V1_13]
 	V1_13 {
 		/// Inner iterator into section map
 		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BlockLight<'a>)>,
 		/// Chunk biome data
 		biomes: &'a BiomesV0<'a>,
 	},
-	/// Iterator over sections of [Chunk::V0]
+	/// Iterator over sections of [ChunkInner::V0]
 	V0 {
 		/// Inner iterator into section map
 		iter: btree_map::Iter<'a, SectionY, (SectionV0<'a>, BlockLight<'a>)>,
 		/// Chunk biome data
 		biomes: &'a BiomesV0<'a>,
 	},
-	/// Empty iterator over an unpopulated chunk ([Chunk::Empty])
+	/// Empty iterator over an unpopulated chunk ([ChunkInner::Empty])
 	Empty,
 }
 
