@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 /// is handled by [DeserializedText].
 ///
 /// Formatting that is not set in a node is inherited from the parent.
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FormattedText {
 	#[serde(default)]
 	/// Text content
@@ -77,7 +77,7 @@ impl From<String> for FormattedTextTree {
 }
 
 /// List of [FormattedText]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FormattedTextList(pub Vec<FormattedText>);
 
 impl FormattedTextList {

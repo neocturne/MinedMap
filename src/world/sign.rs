@@ -79,7 +79,7 @@ impl BlockEntitySignExt for de::BlockEntitySign {
 	}
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 /// Deserialized and linearized sign text
 pub struct SignText(pub Vec<FormattedTextList>);
 
