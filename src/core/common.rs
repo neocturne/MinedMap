@@ -144,7 +144,9 @@ pub struct Config {
 	/// Path for storage of the final merged processed entity data file
 	pub entities_path_final: PathBuf,
 	/// Path of viewer metadata file
-	pub metadata_path: PathBuf,
+	pub viewer_info_path: PathBuf,
+	/// Path of viewer entities file
+	pub viewer_entities_path: PathBuf,
 }
 
 impl Config {
@@ -161,7 +163,10 @@ impl Config {
 		let processed_dir: PathBuf = [&args.output_dir, Path::new("processed")].iter().collect();
 		let entities_dir: PathBuf = [&processed_dir, Path::new("entities")].iter().collect();
 		let entities_path_final = [&entities_dir, Path::new("entities.bin")].iter().collect();
-		let metadata_path = [&args.output_dir, Path::new("info.json")].iter().collect();
+		let viewer_info_path = [&args.output_dir, Path::new("info.json")].iter().collect();
+		let viewer_entities_path = [&args.output_dir, Path::new("entities.json")]
+			.iter()
+			.collect();
 
 		Config {
 			num_threads,
@@ -171,7 +176,8 @@ impl Config {
 			processed_dir,
 			entities_dir,
 			entities_path_final,
-			metadata_path,
+			viewer_info_path,
+			viewer_entities_path,
 		}
 	}
 

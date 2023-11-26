@@ -3,7 +3,11 @@
 use anyhow::{Context, Result};
 use serde::Serialize;
 
-use crate::{core::common::*, io::fs, world::de};
+use crate::{
+	core::common::*,
+	io::{fs, storage},
+	world::{block_entity::BlockEntity, de},
+};
 
 /// Minimum and maximum X and Z tile coordinates for a mipmap level
 #[derive(Debug, Serialize)]
@@ -44,6 +48,13 @@ struct Metadata<'t> {
 	mipmaps: Vec<Mipmap<'t>>,
 	/// Initial spawn point for new players
 	spawn: Spawn,
+}
+
+/// Viewer entity JSON data structure
+#[derive(Debug, Serialize, Default)]
+struct Entities {
+	/// List of signs
+	signs: Vec<BlockEntity>,
 }
 
 /// The MetadataWriter is used to generate the viewer metadata file
@@ -109,6 +120,19 @@ impl<'a> MetadataWriter<'a> {
 		}
 	}
 
+	/// Generates [Entities] data from collected entity lists
+	fn entities(&self) -> Result<Entities> {
+		let data: ProcessedEntities =
+			storage::read_file(&self.config.entities_path_final, storage::Format::Json)
+				.context("Failed to read entity data file")?;
+
+		let ret = Entities {
+			signs: data.block_entities,
+		};
+
+		Ok(ret)
+	}
+
 	/// Runs the viewer metadata file generation
 	pub fn run(self) -> Result<()> {
 		let level_dat = self.read_level_dat()?;
@@ -122,8 +146,15 @@ impl<'a> MetadataWriter<'a> {
 			metadata.mipmaps.push(Self::mipmap_entry(tile_map));
 		}
 
-		fs::create_with_tmpfile(&self.config.metadata_path, |file| {
-			serde_json::to_writer(file, &metadata).context("Failed to write metadata")
-		})
+		fs::create_with_tmpfile(&self.config.viewer_info_path, |file| {
+			serde_json::to_writer(file, &metadata).context("Failed to write info.json")
+		})?;
+
+		let entities = self.entities()?;
+		fs::create_with_tmpfile(&self.config.viewer_entities_path, |file| {
+			serde_json::to_writer(file, &entities).context("Failed to write entities.json")
+		})?;
+
+		Ok(())
 	}
 }
