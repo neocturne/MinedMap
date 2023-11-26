@@ -98,6 +98,106 @@ const parseHash = function () {
 	return args;
 }
 
+const colors = {
+	black: '#000000',
+	dark_blue: '#0000AA',
+	dark_green: '#00AA00',
+	dark_aqua: '#00AAAA',
+	dark_red: '#AA0000',
+	dark_purple: '#AA00AA',
+	gold: '#FFAA00',
+	gray: '#AAAAAA',
+	dark_gray: '#555555',
+	blue: '#5555FF',
+	green: '#55FF55',
+	aqua: '#55FFFF',
+	red: '#FF5555',
+	light_purple: '#FF55FF',
+	yellow: '#FFFF55',
+	white: '#FFFFFF',
+};
+
+function formatSignLine(line) {
+	const el = document.createElement('span');
+	el.style.whiteSpace = 'pre';
+	el.style.fontFamily = 'sans';
+
+	for (const span of line) {
+		const child = document.createElement('span');
+		child.textContent = span.text;
+
+		const color = colors[span.color ?? 'black'] || colors['black'];
+
+		if (span.bold)
+			child.style.fontWeight = 'bold';
+		if (span.italic)
+			child.style.fontStyle = 'italic';
+
+		child.style.textDecoration = '';
+		if (span.underlined)
+			child.style.textDecoration += ' underline';
+		if (span.strikethrough)
+			child.style.textDecoration += ' line-through';
+
+		child.style.color = color;
+		if (span.obfuscated) {
+			child.style.backgroundColor = color;
+			child.className = 'obfuscated';
+		}
+
+		el.appendChild(child);
+	}
+	return el;
+}
+
+function loadSigns(signLayer) {
+	const xhr = new XMLHttpRequest();
+	xhr.onload = function () {
+		const res = JSON.parse(this.responseText);
+		const groups = {};
+
+		// Group signs by x,z coordinates
+		for (const sign of res.signs) {
+			const key = `${sign.x},${sign.z}`;
+			const group = groups[key] ??= [];
+			group[sign.y] = sign;
+		}
+
+		for (const [key, group] of Object.entries(groups)) {
+			const el = document.createElement('span');
+			const [x, z] = key.split(',').map((i) => +i);
+
+			group.forEach((sign) => {
+				if (sign.front_text) {
+					for (const line of sign.front_text) {
+						el.appendChild(formatSignLine(line));
+						el.appendChild(document.createElement('br'));
+					}
+
+					el.appendChild(document.createElement('hr'));
+				}
+
+				if (sign.back_text) {
+					for (let line of sign.back_text) {
+						el.appendChild(formatSignLine(line));
+						el.appendChild(document.createElement('br'));
+					}
+
+					el.appendChild(document.createElement('hr'));
+				}
+			});
+
+			const lastChild = el.lastChild;
+			if (lastChild)
+				lastChild.remove();
+
+			L.marker([-z-0.5, x+0.5]).addTo(signLayer).bindPopup(el);
+		}
+	}
+
+	xhr.open('GET', 'data/entities.json', true);
+	xhr.send();
+}
 
 window.createMap = function () {
 	const xhr = new XMLHttpRequest();
@@ -106,7 +206,7 @@ window.createMap = function () {
 		    mipmaps = res.mipmaps,
 		    spawn = res.spawn;
 
-		let x, z, zoom, light;
+		let x, z, zoom, light, signs;
 
 		const updateParams = function () {
 			const args = parseHash();
@@ -115,6 +215,7 @@ window.createMap = function () {
 			x = parseFloat(args['x']);
 			z = parseFloat(args['z']);
 			light = parseInt(args['light']);
+			signs = parseInt(args['signs'] ?? '1');
 
 			if (isNaN(zoom))
 				zoom = 0;
@@ -140,14 +241,20 @@ window.createMap = function () {
 
 		const mapLayer = new MinedMapLayer(mipmaps, 'map');
 		const lightLayer = new MinedMapLayer(mipmaps, 'light');
+		const signLayer = L.layerGroup();
+
+		loadSigns(signLayer);
 
 		mapLayer.addTo(map);
 
 		if (light)
 			map.addLayer(lightLayer);
+		if (signs)
+			map.addLayer(signLayer);
 
 		const overlayMaps = {
 			"Illumination": lightLayer,
+			"Signs": signLayer,
 		};
 
 		L.control.layers({}, overlayMaps).addTo(map);
@@ -167,6 +274,8 @@ window.createMap = function () {
 
 			if (map.hasLayer(lightLayer))
 				ret += '&light=1';
+			if (!map.hasLayer(signLayer))
+				ret += '&signs=0';
 
 			return ret;
 		};
@@ -175,7 +284,12 @@ window.createMap = function () {
 			window.location.hash = makeHash();
 		};
 
-		const refreshHash = function () {
+		const refreshHash = function (ev) {
+			if (ev.type === 'layeradd' || ev.type === 'layerremove') {
+				if (ev.layer !== lightLayer && ev.layer !== signLayer)
+					return;
+			}
+
 			zoom = map.getZoom();
 			center = map.getCenter();
 			x = Math.round(center.lng);
@@ -203,6 +317,10 @@ window.createMap = function () {
 				map.addLayer(lightLayer);
 			else
 				map.removeLayer(lightLayer);
+			if (signs)
+				map.addLayer(signLayer);
+			else
+				map.removeLayer(signLayer);
 
 			updateHash();
 		};
