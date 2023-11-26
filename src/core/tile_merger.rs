@@ -68,7 +68,7 @@ pub trait TileMerger {
 				let timestamp = match fs::modified_timestamp(&source_path) {
 					Ok(timestamp) => timestamp,
 					Err(err) => {
-						warn!("{}", err);
+						warn!("{:?}", err);
 						return None;
 					}
 				};

@@ -127,7 +127,7 @@ where
 				Ok(source) => source,
 				Err(err) => {
 					warn!(
-						"Failed to read source image {}: {}",
+						"Failed to read source image {}: {:?}",
 						source_path.display(),
 						err,
 					);
