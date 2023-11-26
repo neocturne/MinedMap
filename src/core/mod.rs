@@ -1,6 +1,7 @@
 //! Core functions of the MinedMap CLI
 
 mod common;
+mod entity_collector;
 mod metadata_writer;
 mod region_group;
 mod region_processor;
@@ -20,6 +21,8 @@ use metadata_writer::MetadataWriter;
 use region_processor::RegionProcessor;
 use tile_mipmapper::TileMipmapper;
 use tile_renderer::TileRenderer;
+
+use self::entity_collector::EntityCollector;
 
 /// MinedMap version number
 const VERSION: &str = git_version!(
@@ -77,6 +80,7 @@ pub fn cli() -> Result<()> {
 	let regions = RegionProcessor::new(&config).run()?;
 	TileRenderer::new(&config, &rt, &regions).run()?;
 	let tiles = TileMipmapper::new(&config, &regions).run()?;
+	EntityCollector::new(&config, &regions).run()?;
 	MetadataWriter::new(&config, &tiles).run()?;
 
 	Ok(())
