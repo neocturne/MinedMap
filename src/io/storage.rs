@@ -14,9 +14,24 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::fs;
 
+/// Storage format
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum Format {
+	/// Encode as Bincode
+	///
+	/// Bincode is more efficient than JSON, but cannot handle many of
+	/// serde's features like flatten, conditional skipping, ...
+	Bincode,
+	/// Encode as JSON
+	Json,
+}
+
 /// Serializes data and writes it to a writer
-pub fn write<W: Write, T: Serialize>(writer: &mut W, value: &T) -> Result<()> {
-	let data = bincode::serialize(value)?;
+pub fn write<W: Write, T: Serialize>(writer: &mut W, value: &T, format: Format) -> Result<()> {
+	let data = match format {
+		Format::Bincode => bincode::serialize(value)?,
+		Format::Json => serde_json::to_vec(value)?,
+	};
 	let len = u32::try_from(data.len())?;
 	let compressed = zstd::bulk::compress(&data, 1)?;
 	drop(data);
@@ -33,14 +48,15 @@ pub fn write<W: Write, T: Serialize>(writer: &mut W, value: &T) -> Result<()> {
 pub fn write_file<T: Serialize>(
 	path: &Path,
 	value: &T,
+	format: Format,
 	version: fs::FileMetaVersion,
 	timestamp: SystemTime,
 ) -> Result<()> {
-	fs::create_with_timestamp(path, version, timestamp, |file| write(file, value))
+	fs::create_with_timestamp(path, version, timestamp, |file| write(file, value, format))
 }
 
 /// Reads data from a reader and deserializes it
-pub fn read<R: Read, T: DeserializeOwned>(reader: &mut R) -> Result<T> {
+pub fn read<R: Read, T: DeserializeOwned>(reader: &mut R, format: Format) -> Result<T> {
 	let mut len_buf = [0u8; 4];
 	reader.read_exact(&mut len_buf)?;
 	let len = usize::try_from(u32::from_be_bytes(len_buf))?;
@@ -50,14 +66,18 @@ pub fn read<R: Read, T: DeserializeOwned>(reader: &mut R) -> Result<T> {
 	let data = zstd::bulk::decompress(&compressed, len)?;
 	drop(compressed);
 
-	Ok(bincode::deserialize(&data)?)
+	let value = match format {
+		Format::Bincode => bincode::deserialize(&data)?,
+		Format::Json => serde_json::from_slice(&data)?,
+	};
+	Ok(value)
 }
 
 /// Reads data from a file and deserializes it
-pub fn read_file<T: DeserializeOwned>(path: &Path) -> Result<T> {
+pub fn read_file<T: DeserializeOwned>(path: &Path, format: Format) -> Result<T> {
 	(|| -> Result<T> {
 		let mut file = File::open(path)?;
-		read(&mut file)
+		read(&mut file, format)
 	})()
 	.with_context(|| format!("Failed to read file {}", path.display()))
 }
