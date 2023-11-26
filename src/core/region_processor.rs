@@ -195,10 +195,12 @@ impl<'a> SingleRegionProcessor<'a> {
 	/// Saves processed entity data
 	///
 	/// The timestamp is the time of the last modification of the input region data.
-	fn save_entities(&self) -> Result<()> {
+	fn save_entities(&mut self) -> Result<()> {
 		if !self.entities_needed {
 			return Ok(());
 		}
+
+		self.entities.block_entities.sort_unstable();
 
 		storage::write_file(
 			&self.entities_path,
