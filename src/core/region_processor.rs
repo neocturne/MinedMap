@@ -145,7 +145,7 @@ impl<'a> SingleRegionProcessor<'a> {
 			return Ok(());
 		}
 
-		storage::write(
+		storage::write_file(
 			&self.output_path,
 			&self.processed_region,
 			REGION_FILE_META_VERSION,
