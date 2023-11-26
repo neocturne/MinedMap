@@ -1,11 +1,15 @@
 //! The [TileMipmapper]
 
-use std::ops::Add;
+use std::{marker::PhantomData, ops::Add};
 
 use anyhow::{Context, Result};
 use tracing::{debug, info, warn};
 
-use super::{common::*, tile_collector::TileCollector};
+use super::{
+	common::*,
+	tile_collector::TileCollector,
+	tile_merger::{self, TileMerger},
+};
 use crate::{io::fs, types::*};
 
 /// Counters for the number of processed and total tiles
@@ -19,22 +23,23 @@ pub struct MipmapStat {
 	processed: usize,
 }
 
-impl MipmapStat {
-	/// Mipmap step return when none of the input files exist
-	const NOT_FOUND: MipmapStat = MipmapStat {
-		total: 0,
-		processed: 0,
-	};
-	/// Mipmap step return when output file is up-to-date
-	const SKIPPED: MipmapStat = MipmapStat {
-		total: 1,
-		processed: 0,
-	};
-	/// Mipmap step return when a new output file has been generated
-	const PROCESSED: MipmapStat = MipmapStat {
-		total: 1,
-		processed: 1,
-	};
+impl From<tile_merger::Stat> for MipmapStat {
+	fn from(value: tile_merger::Stat) -> Self {
+		match value {
+			tile_merger::Stat::NotFound => MipmapStat {
+				total: 0,
+				processed: 0,
+			},
+			tile_merger::Stat::Skipped => MipmapStat {
+				total: 1,
+				processed: 0,
+			},
+			tile_merger::Stat::Regenerate => MipmapStat {
+				total: 1,
+				processed: 1,
+			},
+		}
+	}
 }
 
 impl Add for MipmapStat {
@@ -45,6 +50,102 @@ impl Add for MipmapStat {
 			total: self.total + rhs.total,
 			processed: self.processed + rhs.processed,
 		}
+	}
+}
+
+/// [TileMerger] for map tile images
+struct MapMerger<'a, P> {
+	/// Common MinedMap configuration from command line
+	config: &'a Config,
+	/// Tile kind (map or lightmap)
+	kind: TileKind,
+	/// Pixel format type
+	_pixel: PhantomData<P>,
+}
+
+impl<'a, P> MapMerger<'a, P> {
+	/// Creates a new [MapMerger]
+	fn new(config: &'a Config, kind: TileKind) -> Self {
+		MapMerger {
+			config,
+			kind,
+			_pixel: PhantomData,
+		}
+	}
+}
+
+impl<'a, P: image::PixelWithColorType> TileMerger for MapMerger<'a, P>
+where
+	[P::Subpixel]: image::EncodableLayout,
+	image::ImageBuffer<P, Vec<P::Subpixel>>: Into<image::DynamicImage>,
+{
+	fn file_meta_version(&self) -> fs::FileMetaVersion {
+		MIPMAP_FILE_META_VERSION
+	}
+
+	fn tile_path(&self, level: usize, coords: TileCoords) -> std::path::PathBuf {
+		self.config.tile_path(self.kind, level, coords)
+	}
+
+	fn log(&self, output_path: &std::path::Path, stat: super::tile_merger::Stat) {
+		match stat {
+			super::tile_merger::Stat::NotFound => {}
+			super::tile_merger::Stat::Skipped => {
+				debug!(
+					"Skipping unchanged mipmap tile {}",
+					output_path
+						.strip_prefix(&self.config.output_dir)
+						.expect("tile path must be in output directory")
+						.display(),
+				);
+			}
+			super::tile_merger::Stat::Regenerate => {
+				debug!(
+					"Rendering mipmap tile {}",
+					output_path
+						.strip_prefix(&self.config.output_dir)
+						.expect("tile path must be in output directory")
+						.display(),
+				);
+			}
+		};
+	}
+
+	fn write_tile(
+		&self,
+		file: &mut std::io::BufWriter<std::fs::File>,
+		sources: &[super::tile_merger::Source],
+	) -> Result<()> {
+		/// Tile width/height
+		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
+
+		let mut image: image::DynamicImage =
+			image::ImageBuffer::<P, Vec<P::Subpixel>>::new(N, N).into();
+
+		for ((dx, dz), source_path, _) in sources {
+			let source = match image::open(source_path) {
+				Ok(source) => source,
+				Err(err) => {
+					warn!(
+						"Failed to read source image {}: {}",
+						source_path.display(),
+						err,
+					);
+					continue;
+				}
+			};
+			let resized = source.resize(N / 2, N / 2, image::imageops::FilterType::Triangle);
+			image::imageops::overlay(
+				&mut image,
+				&resized,
+				*dx as i64 * (N / 2) as i64,
+				*dz as i64 * (N / 2) as i64,
+			);
+		}
+
+		image
+			.write_to(file, image::ImageFormat::Png)
+			.context("Failed to save image")
 	}
 }
 
@@ -128,94 +229,9 @@ impl<'a> TileMipmapper<'a> {
 		[P::Subpixel]: image::EncodableLayout,
 		image::ImageBuffer<P, Vec<P::Subpixel>>: Into<image::DynamicImage>,
 	{
-		/// Tile width/height
-		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
-
-		let output_path = self.config.tile_path(kind, level, coords);
-		let output_timestamp = fs::read_timestamp(&output_path, MIPMAP_FILE_META_VERSION);
-
-		let sources: Vec<_> = [(0, 0), (0, 1), (1, 0), (1, 1)]
-			.into_iter()
-			.filter_map(|(dx, dz)| {
-				let source_coords = TileCoords {
-					x: 2 * coords.x + dx,
-					z: 2 * coords.z + dz,
-				};
-				if !prev.contains(source_coords) {
-					return None;
-				}
-
-				let source_path = self.config.tile_path(kind, level - 1, source_coords);
-				let timestamp = match fs::modified_timestamp(&source_path) {
-					Ok(timestamp) => timestamp,
-					Err(err) => {
-						warn!("{}", err);
-						return None;
-					}
-				};
-				Some(((dx, dz), source_path, timestamp))
-			})
-			.collect();
-
-		let Some(input_timestamp) = sources.iter().map(|(_, _, ts)| *ts).max() else {
-			return Ok(MipmapStat::NOT_FOUND);
-		};
-
-		if Some(input_timestamp) <= output_timestamp {
-			debug!(
-				"Skipping unchanged mipmap tile {}",
-				output_path
-					.strip_prefix(&self.config.output_dir)
-					.expect("tile path must be in output directory")
-					.display(),
-			);
-			return Ok(MipmapStat::SKIPPED);
-		}
-
-		debug!(
-			"Rendering mipmap tile {}",
-			output_path
-				.strip_prefix(&self.config.output_dir)
-				.expect("tile path must be in output directory")
-				.display(),
-		);
-
-		let mut image: image::DynamicImage =
-			image::ImageBuffer::<P, Vec<P::Subpixel>>::new(N, N).into();
-
-		for ((dx, dz), source_path, _) in sources {
-			let source = match image::open(&source_path) {
-				Ok(source) => source,
-				Err(err) => {
-					warn!(
-						"Failed to read source image {}: {}",
-						source_path.display(),
-						err,
-					);
-					continue;
-				}
-			};
-			let resized = source.resize(N / 2, N / 2, image::imageops::FilterType::Triangle);
-			image::imageops::overlay(
-				&mut image,
-				&resized,
-				dx as i64 * (N / 2) as i64,
-				dz as i64 * (N / 2) as i64,
-			);
-		}
-
-		fs::create_with_timestamp(
-			&output_path,
-			MIPMAP_FILE_META_VERSION,
-			input_timestamp,
-			|file| {
-				image
-					.write_to(file, image::ImageFormat::Png)
-					.context("Failed to save image")
-			},
-		)?;
-
-		Ok(MipmapStat::PROCESSED)
+		let merger = MapMerger::<P>::new(self.config, kind);
+		let ret = merger.merge_tiles(level, coords, prev)?;
+		Ok(ret.into())
 	}
 
 	/// Runs the mipmap generation
