@@ -27,7 +27,7 @@ pub enum BlockFlag {
 	Foliage,
 	/// The block type is birch foliage
 	Birch,
-	/// The block type is spurce foliage
+	/// The block type is spruce foliage
 	Spruce,
 	/// The block type is colored using biome water colors
 	Water,
