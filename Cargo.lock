@@ -528,7 +528,6 @@ dependencies = [
  "fastnbt",
  "futures-util",
  "git-version",
- "glam",
  "image",
  "indexmap",
  "lru",
