@@ -57,11 +57,31 @@ impl BlockColor {
 	}
 }
 
+/// A block type specification (for use in constants)
+#[derive(Debug, Clone)]
+struct ConstBlockType {
+	/// Determines the rendered color of the block type
+	pub block_color: BlockColor,
+	/// Material of a sign block
+	pub sign_material: Option<&'static str>,
+}
+
 /// A block type specification
 #[derive(Debug, Clone)]
 pub struct BlockType {
 	/// Determines the rendered color of the block type
 	pub block_color: BlockColor,
+	/// Material of a sign block
+	pub sign_material: Option<String>,
+}
+
+impl From<&ConstBlockType> for BlockType {
+	fn from(value: &ConstBlockType) -> Self {
+		BlockType {
+			block_color: value.block_color,
+			sign_material: value.sign_material.map(String::from),
+		}
+	}
 }
 
 /// Used to look up standard Minecraft block types
@@ -77,7 +97,7 @@ impl Default for BlockTypes {
 	fn default() -> Self {
 		let block_type_map: HashMap<_, _> = block_types::BLOCK_TYPES
 			.iter()
-			.map(|(k, v)| (String::from(*k), v.clone()))
+			.map(|(k, v)| (String::from(*k), BlockType::from(v)))
 			.collect();
 		let legacy_block_types = Box::new(legacy_block_types::LEGACY_BLOCK_TYPES.map(|inner| {
 			inner.map(|id| {

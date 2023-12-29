@@ -45,12 +45,17 @@ for name, info in blocks.items():
 		'birch': False,
 		'spruce': False,
 		'water': False,
+		'sign_material': None,
 	}
 
 	if info is None:
 		continue
 
-	color = mean_color(info.get('texture', name))
+	texture = info.get('texture', name)
+
+	color = None
+	if texture:
+		color = mean_color(texture)
 	if color:
 		output[id]['color'] = color
 		output[id]['opaque'] = True
@@ -59,6 +64,8 @@ for name, info in blocks.items():
 		output[id]['birch'] = info.get('birch', False)
 		output[id]['spruce'] = info.get('spruce', False)
 		output[id]['water'] = info.get('water', False)
+
+	output[id]['sign_material'] = info.get('sign_material')
 
 with open(sys.argv[3], 'w') as f:
 	json.dump(output, f)

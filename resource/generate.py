@@ -18,7 +18,7 @@ with open(sys.argv[2], 'w') as f:
 	print('', file=f)
 	print('use super::*;', file=f)
 	print('', file=f)
-	print('pub const BLOCK_TYPES: &[(&str, BlockType)] = &[', file=f)
+	print('pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[', file=f)
 
 	for name, info in colors.items():
 		flags = []
@@ -36,13 +36,18 @@ with open(sys.argv[2], 'w') as f:
 			flags.append('Water')
 		flags = 'make_bitflags!(BlockFlag::{' + '|'.join(flags) + '})'
 
-		print('\t("%s", BlockType { ' % name, file=f)
+		sign_material = 'None'
+		if info['sign_material']:
+			sign_material = 'Some("%s")' % info['sign_material']
+
+		print('\t("%s", ConstBlockType { ' % name, file=f)
 		print('\t\tblock_color: BlockColor { flags: %s, color: Color([%u, %u, %u]) },' % (
 			flags,
 			info['color']['r'],
 			info['color']['g'],
 			info['color']['b'],
 		), file=f)
+		print('\t\tsign_material: %s,' % sign_material, file=f)
 		print('}),', file=f)
 
 	print('];', file=f)
