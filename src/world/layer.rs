@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use super::chunk::{Chunk, SectionIterItem};
 use crate::{
-	resource::{Biome, BlockFlag, BlockType},
+	resource::{Biome, BlockColor, BlockFlag},
 	types::*,
 };
 
@@ -31,8 +31,8 @@ impl BlockHeight {
 	}
 }
 
-/// Array optionally storing a [BlockType] for each coordinate of a chunk
-pub type BlockArray = LayerBlockArray<Option<BlockType>>;
+/// Array optionally storing a [BlockColor] for each coordinate of a chunk
+pub type BlockArray = LayerBlockArray<Option<BlockColor>>;
 
 /// Array optionally storing a biome index for each coordinate of a chunk
 ///
@@ -49,7 +49,7 @@ pub type DepthArray = LayerBlockArray<Option<BlockHeight>>;
 /// References to LayerData entries for a single coordinate pair
 struct LayerEntry<'a> {
 	/// The block type of the referenced entry
-	block: &'a mut Option<BlockType>,
+	block: &'a mut Option<BlockColor>,
 	/// The biome type of the referenced entry
 	biome: &'a mut Option<NonZeroU16>,
 	/// The block light of the referenced entry
@@ -86,7 +86,7 @@ impl<'a> LayerEntry<'a> {
 		let Some(block_type) = section
 			.section
 			.block_at(coords)?
-			.filter(|block_type| block_type.is(BlockFlag::Opaque))
+			.filter(|block_type| block_type.block_color.is(BlockFlag::Opaque))
 		else {
 			if self.is_empty() {
 				*self.block_light = section.block_light.block_light_at(coords);
@@ -96,7 +96,7 @@ impl<'a> LayerEntry<'a> {
 		};
 
 		if self.is_empty() {
-			*self.block = Some(block_type);
+			*self.block = Some(block_type.block_color);
 			if let Some(biome) = section.biomes.biome_at(section.y, coords)? {
 				let (biome_index, _) = biome_list.insert_full(*biome);
 				*self.biome = NonZeroU16::new(
@@ -107,7 +107,7 @@ impl<'a> LayerEntry<'a> {
 			}
 		}
 
-		if block_type.is(BlockFlag::Water) {
+		if block_type.block_color.is(BlockFlag::Water) {
 			return Ok(false);
 		}
 

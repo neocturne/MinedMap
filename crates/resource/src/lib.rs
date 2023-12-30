@@ -42,19 +42,26 @@ pub type Colorf = glam::Vec3;
 
 /// A block type specification
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct BlockType {
+pub struct BlockColor {
 	/// Bit set of [BlockFlag]s describing special properties of the block type
 	pub flags: BitFlags<BlockFlag>,
 	/// Base color of the block type
 	pub color: Color,
 }
 
-impl BlockType {
-	/// Checks whether a block type has a given [BlockFlag] set
+impl BlockColor {
+	/// Checks whether a block color has a given [BlockFlag] set
 	#[inline]
 	pub fn is(&self, flag: BlockFlag) -> bool {
 		self.flags.contains(flag)
 	}
+}
+
+/// A block type specification
+#[derive(Debug, Clone)]
+pub struct BlockType {
+	/// Determines the rendered color of the block type
+	pub block_color: BlockColor,
 }
 
 /// Used to look up standard Minecraft block types
@@ -70,10 +77,15 @@ impl Default for BlockTypes {
 	fn default() -> Self {
 		let block_type_map: HashMap<_, _> = block_types::BLOCK_TYPES
 			.iter()
-			.map(|(k, v)| (String::from(*k), *v))
+			.map(|(k, v)| (String::from(*k), v.clone()))
 			.collect();
 		let legacy_block_types = Box::new(legacy_block_types::LEGACY_BLOCK_TYPES.map(|inner| {
-			inner.map(|id| *block_type_map.get(id).expect("Unknown legacy block type"))
+			inner.map(|id| {
+				block_type_map
+					.get(id)
+					.expect("Unknown legacy block type")
+					.clone()
+			})
 		}));
 
 		BlockTypes {
@@ -86,15 +98,15 @@ impl Default for BlockTypes {
 impl BlockTypes {
 	/// Resolves a Minecraft 1.13+ string block type ID
 	#[inline]
-	pub fn get(&self, id: &str) -> Option<BlockType> {
+	pub fn get(&self, id: &str) -> Option<&BlockType> {
 		let suffix = id.strip_prefix("minecraft:")?;
-		self.block_type_map.get(suffix).copied()
+		self.block_type_map.get(suffix)
 	}
 
 	/// Resolves a Minecraft pre-1.13 numeric block type ID
 	#[inline]
-	pub fn get_legacy(&self, id: u8, data: u8) -> Option<BlockType> {
-		Some(self.legacy_block_types[id as usize][data as usize])
+	pub fn get_legacy(&self, id: u8, data: u8) -> Option<&BlockType> {
+		Some(&self.legacy_block_types[id as usize][data as usize])
 	}
 }
 
