@@ -33,9 +33,12 @@ pub enum BlockFlag {
 	Water,
 }
 
-/// An RGB color
+/// An RGB color with u8 components
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Color(pub [u8; 3]);
+
+/// An RGB color with f32 components
+pub type Colorf = glam::Vec3;
 
 /// A block type specification
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]

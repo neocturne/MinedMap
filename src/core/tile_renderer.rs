@@ -8,7 +8,6 @@ use std::{
 };
 
 use anyhow::{Context, Result};
-use glam::Vec3;
 use lru::LruCache;
 use rayon::prelude::*;
 use tokio::sync::OnceCell;
@@ -17,7 +16,7 @@ use tracing::{debug, info};
 use super::{common::*, region_group::RegionGroup};
 use crate::{
 	io::{fs, storage},
-	resource::{block_color, needs_biome},
+	resource::{block_color, needs_biome, Colorf},
 	types::*,
 	util::coord_offset,
 };
@@ -128,7 +127,7 @@ impl<'a> TileRenderer<'a> {
 		chunk: &ProcessedChunk,
 		chunk_coords: ChunkCoords,
 		block_coords: LayerBlockCoords,
-	) -> Option<Vec3> {
+	) -> Option<Colorf> {
 		/// Helper for keys in the weight table
 		///
 		/// Hashing the value as a single u32 is more efficient than hashing
@@ -182,7 +181,7 @@ impl<'a> TileRenderer<'a> {
 			return None;
 		}
 
-		let mut color = Vec3::ZERO;
+		let mut color = Colorf::ZERO;
 		let mut total = 0.0;
 
 		for ((region_x, region_z, index), w) in weights.into_values() {
@@ -270,7 +269,7 @@ impl<'a> TileRenderer<'a> {
 		let (processed_paths, processed_timestamp) = self.processed_sources(coords)?;
 
 		let output_path = self.config.tile_path(TileKind::Map, 0, coords);
-		let output_timestamp = fs::read_timestamp(&output_path, FILE_META_VERSION);
+		let output_timestamp = fs::read_timestamp(&output_path, MAP_FILE_META_VERSION);
 
 		if Some(processed_timestamp) <= output_timestamp {
 			debug!(
@@ -300,7 +299,7 @@ impl<'a> TileRenderer<'a> {
 
 		fs::create_with_timestamp(
 			&output_path,
-			FILE_META_VERSION,
+			MAP_FILE_META_VERSION,
 			processed_timestamp,
 			|file| {
 				image

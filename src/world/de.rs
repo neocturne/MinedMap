@@ -31,7 +31,7 @@ pub struct BiomesV1_18 {
 /// Variable part of a [SectionV1_18]
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
-pub enum SectionV1_18Variants {
+pub enum SectionV1_18Variant {
 	/// Populated 1.18+ section
 	V1_18 {
 		/// Block type data
@@ -54,13 +54,13 @@ pub struct SectionV1_18 {
 	pub y: i32,
 	/// Variable part of section
 	#[serde(flatten)]
-	pub section: SectionV1_18Variants,
+	pub section: SectionV1_18Variant,
 }
 
 /// Version-specific part of a pre-1.18 [Section](SectionV0)
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
-pub enum SectionV0Variants {
+pub enum SectionV0Variant {
 	/// v1.13+ data
 	#[serde(rename_all = "PascalCase")]
 	V1_13 {
@@ -91,7 +91,7 @@ pub struct SectionV0 {
 	pub block_light: Option<fastnbt::ByteArray>,
 	/// Version-specific data
 	#[serde(flatten)]
-	pub section: SectionV0Variants,
+	pub section: SectionV0Variant,
 }
 
 /// Pre-1.18 biome fields found in the [Level](LevelV0) compound
@@ -118,7 +118,7 @@ pub struct LevelV0 {
 /// Version-specific part of a [Chunk] compound
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
-pub enum ChunkVariants {
+pub enum ChunkVariant {
 	/// 1.18+ chunk data
 	V1_18 {
 		/// List of chunk sections
@@ -140,7 +140,7 @@ pub struct Chunk {
 	pub data_version: Option<u32>,
 	/// Version-specific chunk data
 	#[serde(flatten)]
-	pub chunk: ChunkVariants,
+	pub chunk: ChunkVariant,
 }
 
 /// `Data` compound element of level.dat
