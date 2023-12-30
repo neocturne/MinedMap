@@ -34,6 +34,8 @@ with open(sys.argv[2], 'w') as f:
 			flags.append('Spruce')
 		if info['water']:
 			flags.append('Water')
+		if info['wall_sign']:
+			flags.append('WallSign')
 		flags = 'make_bitflags!(BlockFlag::{' + '|'.join(flags) + '})'
 
 		sign_material = 'None'

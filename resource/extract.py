@@ -45,6 +45,7 @@ for name, info in blocks.items():
 		'birch': False,
 		'spruce': False,
 		'water': False,
+		'wall_sign': False,
 		'sign_material': None,
 	}
 
@@ -59,11 +60,13 @@ for name, info in blocks.items():
 	if color:
 		output[id]['color'] = color
 		output[id]['opaque'] = True
-		output[id]['grass'] = info.get('grass', False)
-		output[id]['foliage'] = info.get('foliage', False)
-		output[id]['birch'] = info.get('birch', False)
-		output[id]['spruce'] = info.get('spruce', False)
-		output[id]['water'] = info.get('water', False)
+
+	output[id]['grass'] = info.get('grass', False)
+	output[id]['foliage'] = info.get('foliage', False)
+	output[id]['birch'] = info.get('birch', False)
+	output[id]['spruce'] = info.get('spruce', False)
+	output[id]['water'] = info.get('water', False)
+	output[id]['wall_sign'] = info.get('wall_sign', False)
 
 	output[id]['sign_material'] = info.get('sign_material')
 

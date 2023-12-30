@@ -31,6 +31,11 @@ pub enum BlockFlag {
 	Spruce,
 	/// The block type is colored using biome water colors
 	Water,
+	/// The block type is a wall sign
+	///
+	/// The WallSign flag is used to distinguish wall signs from
+	/// freestanding or -hanging signs.
+	WallSign,
 }
 
 /// An RGB color with u8 components

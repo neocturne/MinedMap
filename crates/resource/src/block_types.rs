@@ -147,7 +147,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"acacia_wall_hanging_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("acacia"),
@@ -157,7 +157,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"acacia_wall_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("acacia"),
@@ -507,7 +507,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"bamboo_wall_hanging_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("bamboo"),
@@ -517,7 +517,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"bamboo_wall_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("bamboo"),
@@ -777,7 +777,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"birch_wall_hanging_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("birch"),
@@ -787,7 +787,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"birch_wall_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("birch"),
@@ -1787,7 +1787,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"cherry_wall_hanging_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("cherry"),
@@ -1797,7 +1797,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"cherry_wall_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("cherry"),
@@ -2387,7 +2387,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"crimson_wall_hanging_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("crimson"),
@@ -2397,7 +2397,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"crimson_wall_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("crimson"),
@@ -2787,7 +2787,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"dark_oak_wall_hanging_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("dark_oak"),
@@ -2797,7 +2797,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"dark_oak_wall_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("dark_oak"),
@@ -4577,7 +4577,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"jungle_wall_hanging_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("jungle"),
@@ -4587,7 +4587,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"jungle_wall_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("jungle"),
@@ -5527,7 +5527,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"mangrove_wall_hanging_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("mangrove"),
@@ -5537,7 +5537,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"mangrove_wall_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("mangrove"),
@@ -6057,7 +6057,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"oak_wall_hanging_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("oak"),
@@ -6067,7 +6067,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"oak_wall_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("oak"),
@@ -8637,7 +8637,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"spruce_wall_hanging_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("spruce"),
@@ -8647,7 +8647,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"spruce_wall_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("spruce"),
@@ -9287,7 +9287,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"wall_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("oak"),
@@ -9467,7 +9467,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"warped_wall_hanging_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("warped"),
@@ -9477,7 +9477,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"warped_wall_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
+				flags: make_bitflags!(BlockFlag::{WallSign}),
 				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("warped"),
