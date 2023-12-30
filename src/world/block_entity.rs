@@ -1,5 +1,6 @@
 //! Processing of block entity data
 
+use minedmap_resource::{BlockFlag, BlockType};
 use serde::{Deserialize, Serialize};
 
 use super::{
@@ -11,10 +12,14 @@ use super::{
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(rename_all = "snake_case")]
 pub enum SignKind {
-	/// Standing or attached sign
+	/// Standing sign
 	Sign,
+	/// Sign attached to wall
+	WallSign,
 	/// Hanging sign
 	HangingSign,
+	/// Hanging sign attached to wall
+	HangingWallSign,
 }
 
 /// Processed sign data
@@ -22,6 +27,9 @@ pub enum SignKind {
 pub struct Sign {
 	/// The kind of the sign
 	pub kind: SignKind,
+	/// The material of the sign
+	#[serde(skip_serializing_if = "Option::is_none", default)]
+	pub material: Option<String>,
 	/// The sign's front text
 	#[serde(skip_serializing_if = "SignText::is_empty", default)]
 	pub front_text: SignText,
@@ -32,12 +40,13 @@ pub struct Sign {
 
 impl Sign {
 	/// Processes a [de::BlockEntitySign] into a [Sign]
-	fn new(sign: &de::BlockEntitySign, kind: SignKind) -> Sign {
+	fn new(sign: &de::BlockEntitySign, kind: SignKind, material: Option<String>) -> Sign {
 		let (front_text, back_text) = sign.text();
 		let front_text = front_text.decode();
 		let back_text = back_text.decode();
 		Sign {
 			kind,
+			material,
 			front_text,
 			back_text,
 		}
@@ -68,16 +77,21 @@ pub struct BlockEntity {
 
 impl BlockEntity {
 	/// Processes a [de::BlockEntity] into a [BlockEntity]
-	pub fn new(entity: &de::BlockEntity) -> Option<Self> {
-		let data = match &entity.data {
-			de::BlockEntityData::Sign(sign) => {
-				BlockEntityData::Sign(Sign::new(sign, SignKind::Sign))
-			}
-			de::BlockEntityData::HangingSign(sign) => {
-				BlockEntityData::Sign(Sign::new(sign, SignKind::HangingSign))
-			}
-			de::BlockEntityData::Other => return None,
+	pub fn new(entity: &de::BlockEntity, block_type: Option<&BlockType>) -> Option<Self> {
+		let wall_sign = block_type
+			.map(|block_type| block_type.block_color.is(BlockFlag::WallSign))
+			.unwrap_or_default();
+		let (kind, sign) = match (&entity.data, wall_sign) {
+			(de::BlockEntityData::Sign(sign), false) => (SignKind::Sign, sign),
+			(de::BlockEntityData::Sign(sign), true) => (SignKind::WallSign, sign),
+			(de::BlockEntityData::HangingSign(sign), false) => (SignKind::HangingSign, sign),
+			(de::BlockEntityData::HangingSign(sign), true) => (SignKind::HangingWallSign, sign),
+			(de::BlockEntityData::Other, _) => return None,
 		};
+		let material = block_type
+			.as_ref()
+			.and_then(|block_type| block_type.sign_material.as_ref());
+		let data = BlockEntityData::Sign(Sign::new(sign, kind, material.cloned()));
 
 		Some(BlockEntity {
 			x: entity.x,

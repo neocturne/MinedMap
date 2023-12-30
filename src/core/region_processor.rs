@@ -243,7 +243,12 @@ impl<'a> SingleRegionProcessor<'a> {
 		}
 
 		if self.entities_needed {
-			let mut block_entities = chunk.block_entities();
+			let mut block_entities = chunk.block_entities().with_context(|| {
+				format!(
+					"Failed to process block entities for chunk {:?}",
+					chunk_coords,
+				)
+			})?;
 			self.entities.block_entities.append(&mut block_entities);
 		}
 

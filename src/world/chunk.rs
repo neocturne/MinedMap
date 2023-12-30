@@ -12,8 +12,9 @@ use anyhow::{bail, Context, Result};
 
 use super::{block_entity::BlockEntity, de, section::*};
 use crate::{
-	resource::{BiomeTypes, BlockTypes},
+	resource::{BiomeTypes, BlockType, BlockTypes},
 	types::*,
+	util::{self, ShiftMask},
 };
 
 /// Version-specific part of [Chunk]
@@ -243,12 +244,58 @@ impl<'a> Chunk<'a> {
 		}
 	}
 
+	/// Returns the section at a [SectionY] coordinate
+	fn section_at(&self, y: SectionY) -> Option<&dyn Section> {
+		match &self.inner {
+			ChunkInner::V1_18 { section_map } => section_map
+				.get(&y)
+				.map(|(section, _, _)| -> &dyn Section { section }),
+			ChunkInner::V1_13 { section_map, .. } => section_map
+				.get(&y)
+				.map(|(section, _)| -> &dyn Section { section }),
+			ChunkInner::V0 { section_map, .. } => section_map
+				.get(&y)
+				.map(|(section, _)| -> &dyn Section { section }),
+			ChunkInner::Empty => None,
+		}
+	}
+
+	/// Returns the [BlockType] at a given coordinate
+	fn block_type_at(&self, y: SectionY, coords: SectionBlockCoords) -> Result<Option<&BlockType>> {
+		let Some(section) = self.section_at(y) else {
+			return Ok(None);
+		};
+		section.block_at(coords)
+	}
+
+	/// Returns the [BlockType] at the coordinates of a [de::BlockEntity]
+	fn block_type_at_block_entity(
+		&self,
+		block_entity: &de::BlockEntity,
+	) -> Result<Option<&BlockType>> {
+		let x: BlockX = util::from_flat_coord(block_entity.x).2;
+		let z: BlockZ = util::from_flat_coord(block_entity.z).2;
+		let (section_y, block_y) = block_entity.y.shift_mask(BLOCK_BITS);
+
+		let coords = SectionBlockCoords {
+			xz: LayerBlockCoords { x, z },
+			y: BlockY::new(block_y),
+		};
+
+		self.block_type_at(SectionY(section_y), coords)
+	}
+
 	/// Processes all of the chunk's block entities
-	pub fn block_entities(&self) -> Vec<BlockEntity> {
-		self.block_entities
+	pub fn block_entities(&self) -> Result<Vec<BlockEntity>> {
+		let entities: Vec<Option<BlockEntity>> = self
+			.block_entities
 			.iter()
-			.filter_map(BlockEntity::new)
-			.collect()
+			.map(|block_entity| {
+				let block_type = self.block_type_at_block_entity(block_entity)?;
+				Ok(BlockEntity::new(block_entity, block_type))
+			})
+			.collect::<Result<_>>()?;
+		Ok(entities.into_iter().flatten().collect())
 	}
 }
 
