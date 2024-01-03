@@ -1,10 +1,10 @@
 // bsearch-based array element check
 function contains(array, elem) {
-	var min = 0, max = array.length, i, cur;
+	let min = 0, max = array.length;
 
 	while (min < max) {
-		i = min + Math.floor((max-min)/2);
-		cur = array[i];
+		const i = min + Math.floor((max-min)/2);
+		const cur = array[i];
 
 		if (cur === elem)
 			return true;
@@ -17,7 +17,7 @@ function contains(array, elem) {
 	return false;
 }
 
-var MinedMapLayer = L.GridLayer.extend({
+const MinedMapLayer = L.GridLayer.extend({
 	initialize: function (mipmaps, layer) {
 		this.mipmaps = mipmaps;
 		this.layer = layer;
@@ -37,7 +37,7 @@ var MinedMapLayer = L.GridLayer.extend({
 	},
 
 	createTile: function (coords, done) {
-		var tile = document.createElement('img');
+		const tile = document.createElement('img');
 
 		tile.onload = L.bind(this._tileOnLoad, this, done, tile);
 		tile.onerror = L.bind(this._tileOnError, this, done, tile);
@@ -54,11 +54,11 @@ var MinedMapLayer = L.GridLayer.extend({
 		*/
 		tile.setAttribute('role', 'presentation');
 
-		var z = -(coords.z + this.zoomOffset);
+		let z = -(coords.z + this.zoomOffset);
 		if (z < 0)
 			z = 0;
 
-		var mipmap = this.mipmaps[z];
+		const mipmap = this.mipmaps[z];
 
 		if (coords.x >= mipmap.bounds.minX && coords.x <= mipmap.bounds.maxX &&
 		    coords.y >= mipmap.bounds.minZ && coords.y <= mipmap.bounds.maxZ &&
@@ -87,10 +87,9 @@ var MinedMapLayer = L.GridLayer.extend({
 	},
 
 	_abortLoading: function () {
-		var i, tile;
-		for (i in this._tiles) {
+		for (const i in this._tiles) {
 			if (this._tiles[i].coords.z !== this._tileZoom) {
-				tile = this._tiles[i].el;
+				const tile = this._tiles[i].el;
 
 				tile.onload = L.Util.falseFn;
 				tile.onerror = L.Util.falseFn;
@@ -104,7 +103,7 @@ var MinedMapLayer = L.GridLayer.extend({
 	},
 
 	_removeTile: function (key) {
-		var tile = this._tiles[key];
+		const tile = this._tiles[key];
 		if (!tile) { return; }
 
 		// Cancels any pending http requests associated with the tile
@@ -119,7 +118,7 @@ var MinedMapLayer = L.GridLayer.extend({
 });
 
 
-var CoordControl = L.Control.extend({
+const CoordControl = L.Control.extend({
 	initialize: function () {
 		this.options.position = 'bottomleft';
 	},
@@ -138,15 +137,15 @@ var CoordControl = L.Control.extend({
 });
 
 
-var parseHash = function () {
-	var args = {};
+const parseHash = function () {
+	const args = {};
 
 	if (window.location.hash) {
-		var parts = window.location.hash.substr(1).split('&');
+		const parts = window.location.hash.substring(1).split('&');
 
-		for (var i = 0; i < parts.length; i++) {
-			var key_value = parts[i].split('=');
-			var key = key_value[0], value = key_value.slice(1).join('=');
+		for (const part of parts) {
+			const key_value = part.split('=');
+			const key = key_value[0], value = key_value.slice(1).join('=');
 
 			args[key] = value;
 		}
@@ -157,16 +156,16 @@ var parseHash = function () {
 
 
 window.createMap = function () {
-	var xhr = new XMLHttpRequest();
+	const xhr = new XMLHttpRequest();
 	xhr.onload = function () {
-		var res = JSON.parse(this.responseText),
+		const res = JSON.parse(this.responseText),
 		    mipmaps = res.mipmaps,
 		    spawn = res.spawn;
 
-		var x, z, zoom, light;
+		let x, z, zoom, light;
 
-		var updateParams = function () {
-			var args = parseHash();
+		const updateParams = function () {
+			const args = parseHash();
 
 			zoom = parseInt(args['zoom']);
 			x = parseFloat(args['x']);
@@ -183,7 +182,7 @@ window.createMap = function () {
 
 		updateParams();
 
-		var map = L.map('map', {
+		const map = L.map('map', {
 			center: [-z, x],
 			zoom: zoom,
 			minZoom: -(mipmaps.length-1),
@@ -195,29 +194,29 @@ window.createMap = function () {
 			],
 		});
 
-		var mapLayer = new MinedMapLayer(mipmaps, 'map');
-		var lightLayer = new MinedMapLayer(mipmaps, 'light');
+		const mapLayer = new MinedMapLayer(mipmaps, 'map');
+		const lightLayer = new MinedMapLayer(mipmaps, 'light');
 
 		mapLayer.addTo(map);
 
 		if (light)
 			map.addLayer(lightLayer);
 
-		var overlayMaps = {
+		const overlayMaps = {
 			"Illumination": lightLayer,
 		};
 
 		L.control.layers({}, overlayMaps).addTo(map);
 
-		var coordControl = new CoordControl();
+		const coordControl = new CoordControl();
 		coordControl.addTo(map);
 
 		map.on('mousemove', function(e) {
 			coordControl.update(Math.round(e.latlng.lng), Math.round(-e.latlng.lat));
 		});
 
-		var makeHash = function () {
-			var ret = '#x='+x+'&z='+z;
+		const makeHash = function () {
+			let ret = '#x='+x+'&z='+z;
 
 			if (zoom != 0)
 				ret += '&zoom='+zoom;
@@ -228,11 +227,11 @@ window.createMap = function () {
 			return ret;
 		};
 
-		var updateHash = function () {
+		const updateHash = function () {
 			window.location.hash = makeHash();
 		};
 
-		var refreshHash = function () {
+		const refreshHash = function () {
 			zoom = map.getZoom();
 			center = map.getCenter();
 			x = Math.round(center.lng);
