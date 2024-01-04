@@ -6,7 +6,9 @@ use std::{
 	path::{Path, PathBuf},
 };
 
+use anyhow::{Context, Result};
 use indexmap::IndexSet;
+use regex::RegexSet;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -147,11 +149,13 @@ pub struct Config {
 	pub viewer_info_path: PathBuf,
 	/// Path of viewer entities file
 	pub viewer_entities_path: PathBuf,
+	/// Sign text filter patterns
+	pub sign_patterns: RegexSet,
 }
 
 impl Config {
 	/// Crates a new [Config] from [command line arguments](super::Args)
-	pub fn new(args: &super::Args) -> Self {
+	pub fn new(args: &super::Args) -> Result<Self> {
 		let num_threads = match args.jobs {
 			Some(0) => num_cpus::get(),
 			Some(threads) => threads,
@@ -168,7 +172,9 @@ impl Config {
 			.iter()
 			.collect();
 
-		Config {
+		let sign_patterns = Self::sign_patterns(args).context("Failed to parse sign patterns")?;
+
+		Ok(Config {
 			num_threads,
 			region_dir,
 			level_dat_path,
@@ -178,7 +184,20 @@ impl Config {
 			entities_path_final,
 			viewer_info_path,
 			viewer_entities_path,
-		}
+			sign_patterns,
+		})
+	}
+
+	/// Parses the sign prefixes and sign filters into a [RegexSet]
+	fn sign_patterns(args: &super::Args) -> Result<RegexSet> {
+		let prefix_patterns: Vec<_> = args
+			.sign_prefix
+			.iter()
+			.map(|prefix| format!("^{}", regex::escape(prefix)))
+			.collect();
+		Ok(RegexSet::new(
+			prefix_patterns.iter().chain(args.sign_filter.iter()),
+		)?)
 	}
 
 	/// Constructs the path to an input region file
