@@ -32,7 +32,11 @@ const VERSION: &str = git_version!(
 
 /// Command line arguments for minedmap CLI
 #[derive(Debug, Parser)]
-#[command(about, version = VERSION.strip_prefix("v").unwrap())]
+#[command(
+	about,
+	version = VERSION.strip_prefix("v").unwrap(),
+	max_term_width = 100,
+)]
 pub struct Args {
 	/// Number of parallel threads to use for processing
 	///
