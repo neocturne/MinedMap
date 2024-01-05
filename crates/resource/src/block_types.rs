@@ -5695,6 +5695,13 @@ pub const BLOCK_TYPES: &[(&str, BlockType)] = &[
 		},
 	),
 	(
+		"short_grass",
+		BlockType {
+			flags: make_bitflags!(BlockFlag::{}),
+			color: Color([0, 0, 0]),
+		},
+	),
+	(
 		"shroomlight",
 		BlockType {
 			flags: make_bitflags!(BlockFlag::{Opaque}),
