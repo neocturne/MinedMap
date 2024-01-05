@@ -6,7 +6,10 @@ use serde::Serialize;
 use crate::{
 	core::common::*,
 	io::{fs, storage},
-	world::{block_entity::BlockEntity, de},
+	world::{
+		block_entity::{self, BlockEntity, BlockEntityData},
+		de,
+	},
 };
 
 /// Minimum and maximum X and Z tile coordinates for a mipmap level
@@ -120,6 +123,19 @@ impl<'a> MetadataWriter<'a> {
 		}
 	}
 
+	/// Filter signs according to the sign pattern configuration
+	fn sign_filter(&self, sign: &block_entity::Sign) -> bool {
+		let front_text = sign.front_text.to_string();
+		if self.config.sign_patterns.is_match(front_text.trim()) {
+			return true;
+		}
+		let back_text = sign.back_text.to_string();
+		if self.config.sign_patterns.is_match(back_text.trim()) {
+			return true;
+		}
+		false
+	}
+
 	/// Generates [Entities] data from collected entity lists
 	fn entities(&self) -> Result<Entities> {
 		let data: ProcessedEntities =
@@ -127,7 +143,13 @@ impl<'a> MetadataWriter<'a> {
 				.context("Failed to read entity data file")?;
 
 		let ret = Entities {
-			signs: data.block_entities,
+			signs: data
+				.block_entities
+				.into_iter()
+				.filter(|entity| match &entity.data {
+					BlockEntityData::Sign(sign) => self.sign_filter(sign),
+				})
+				.collect(),
 		};
 
 		Ok(ret)
