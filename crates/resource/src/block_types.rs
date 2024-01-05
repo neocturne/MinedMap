@@ -107,8 +107,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"acacia_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([168, 90, 50]),
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("acacia"),
 		},
@@ -467,8 +467,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"bamboo_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([193, 173, 80]),
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("bamboo"),
 		},
@@ -737,8 +737,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"birch_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([192, 175, 121]),
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("birch"),
 		},
@@ -1747,8 +1747,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"cherry_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([226, 178, 172]),
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("cherry"),
 		},
@@ -2337,8 +2337,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"crimson_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([101, 48, 70]),
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("crimson"),
 		},
@@ -2747,8 +2747,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"dark_oak_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([66, 43, 20]),
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("dark_oak"),
 		},
@@ -4537,8 +4537,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"jungle_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([160, 115, 80]),
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("jungle"),
 		},
@@ -5487,8 +5487,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"mangrove_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([117, 54, 48]),
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("mangrove"),
 		},
@@ -6017,8 +6017,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"oak_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([162, 130, 78]),
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("oak"),
 		},
@@ -8167,8 +8167,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([162, 130, 78]),
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("oak"),
 		},
@@ -8597,8 +8597,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"spruce_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([114, 84, 48]),
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("spruce"),
 		},
@@ -9417,8 +9417,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"warped_sign",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([43, 104, 99]),
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: Some("warped"),
 		},

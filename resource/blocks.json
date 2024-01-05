@@ -26,7 +26,7 @@
 	"acacia_sapling": {},
 	"acacia_sign": {
 		"sign_material": "acacia",
-		"texture": "acacia_planks"
+		"texture": null
 	},
 	"acacia_slab": {
 		"texture": "acacia_planks"
@@ -114,7 +114,7 @@
 	"bamboo_sapling": null,
 	"bamboo_sign": {
 		"sign_material": "bamboo",
-		"texture": "bamboo_planks"
+		"texture": null
 	},
 	"bamboo_slab": {
 		"texture": "bamboo_planks"
@@ -185,7 +185,7 @@
 	"birch_sapling": {},
 	"birch_sign": {
 		"sign_material": "birch",
-		"texture": "birch_planks"
+		"texture": null
 	},
 	"birch_slab": {
 		"texture": "birch_planks"
@@ -377,7 +377,7 @@
 	"cherry_sapling": null,
 	"cherry_sign": {
 		"sign_material": "cherry",
-		"texture": "cherry_planks"
+		"texture": null
 	},
 	"cherry_slab": {
 		"texture": "cherry_planks"
@@ -496,7 +496,7 @@
 	"crimson_roots": {},
 	"crimson_sign": {
 		"sign_material": "crimson",
-		"texture": "crimson_planks"
+		"texture": null
 	},
 	"crimson_slab": {
 		"texture": "crimson_planks"
@@ -589,7 +589,7 @@
 	"dark_oak_sapling": {},
 	"dark_oak_sign": {
 		"sign_material": "dark_oak",
-		"texture": "dark_oak_planks"
+		"texture": null
 	},
 	"dark_oak_slab": {
 		"texture": "dark_oak_planks"
@@ -921,7 +921,7 @@
 	"jungle_sapling": {},
 	"jungle_sign": {
 		"sign_material": "jungle",
-		"texture": "jungle_planks"
+		"texture": null
 	},
 	"jungle_slab": {
 		"texture": "jungle_planks"
@@ -1095,7 +1095,7 @@
 	},
 	"mangrove_sign": {
 		"sign_material": "mangrove",
-		"texture": "mangrove_planks"
+		"texture": null
 	},
 	"mangrove_slab": {
 		"texture": "mangrove_planks"
@@ -1218,7 +1218,7 @@
 	"oak_sapling": {},
 	"oak_sign": {
 		"sign_material": "oak",
-		"texture": "oak_planks"
+		"texture": null
 	},
 	"oak_slab": {
 		"texture": "oak_planks"
@@ -1671,7 +1671,7 @@
 	"shulker_box": {},
 	"sign": {
 		"sign_material": "oak",
-		"texture": "oak_planks"
+		"texture": null
 	},
 	"skeleton_skull": null,
 	"skeleton_wall_skull": null,
@@ -1764,7 +1764,7 @@
 	"spruce_sapling": {},
 	"spruce_sign": {
 		"sign_material": "spruce",
-		"texture": "spruce_planks"
+		"texture": null
 	},
 	"spruce_slab": {
 		"texture": "spruce_planks"
@@ -1961,7 +1961,7 @@
 	"warped_roots": {},
 	"warped_sign": {
 		"sign_material": "warped",
-		"texture": "warped_planks"
+		"texture": null
 	},
 	"warped_slab": {
 		"texture": "warped_planks"

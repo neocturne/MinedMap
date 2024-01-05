@@ -22,7 +22,7 @@ use crate::{
 ///
 /// Increase when the generation of processed regions from region data changes
 /// (usually because of updated resource data)
-pub const REGION_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
+pub const REGION_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(1);
 
 /// MinedMap map tile data version number
 ///
@@ -34,7 +34,7 @@ pub const MAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 ///
 /// Increase when the generation of lightmap tiles from region data changes
 /// (usually because of updated resource data)
-pub const LIGHTMAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
+pub const LIGHTMAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(1);
 
 /// MinedMap mipmap data version number
 ///
