@@ -1,6 +1,6 @@
 //! Newtype and helper methods for handling Minecraft Raw JSON Text
 
-use std::{collections::VecDeque, sync::Arc};
+use std::{collections::VecDeque, fmt::Display, sync::Arc};
 
 use serde::{Deserialize, Serialize};
 
@@ -51,6 +51,12 @@ impl FormattedText {
 	}
 }
 
+impl Display for FormattedText {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		self.text.fmt(f)
+	}
+}
+
 /// A tree of [FormattedText] nodes
 ///
 /// Each node including the root has a `text` and a list of children (`extra`).
@@ -84,6 +90,16 @@ impl FormattedTextList {
 	/// Returns `true` when [FormattedTextList] does not contain any text
 	pub fn is_empty(&self) -> bool {
 		self.0.iter().all(|text| text.text.is_empty())
+	}
+}
+
+impl Display for FormattedTextList {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		for text in &self.0 {
+			text.fmt(f)?;
+		}
+
+		Ok(())
 	}
 }
 

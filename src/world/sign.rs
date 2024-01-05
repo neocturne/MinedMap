@@ -1,6 +1,6 @@
 //! Processing of sign text
 
-use std::sync::Arc;
+use std::{fmt::Display, sync::Arc};
 
 use serde::{Deserialize, Serialize};
 
@@ -87,5 +87,46 @@ impl SignText {
 	/// Checks if all lines of the sign text are empty
 	pub fn is_empty(&self) -> bool {
 		self.0.iter().all(|line| line.is_empty())
+	}
+}
+
+impl Display for SignText {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		let mut iter = self.0.iter();
+
+		let Some(first) = iter.next() else {
+			return Ok(());
+		};
+		first.fmt(f)?;
+
+		for text in iter {
+			f.write_str("\n")?;
+			text.fmt(f)?;
+		}
+
+		Ok(())
+	}
+}
+
+#[cfg(test)]
+mod test {
+	use super::*;
+
+	fn formatted_text(text: &str) -> FormattedText {
+		FormattedText {
+			text: text.to_string(),
+			..Default::default()
+		}
+	}
+
+	#[test]
+	fn test_sign_text_display() {
+		let sign_text = SignText(vec![
+			FormattedTextList(vec![formatted_text("a"), formatted_text("b")]),
+			FormattedTextList(vec![formatted_text("c")]),
+			FormattedTextList(vec![formatted_text("d")]),
+			FormattedTextList(vec![formatted_text("e")]),
+		]);
+		assert_eq!("ab\nc\nd\ne", sign_text.to_string());
 	}
 }
