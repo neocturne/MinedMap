@@ -17,6 +17,44 @@ function contains(array, elem) {
 	return false;
 }
 
+const signKinds = {
+	sign: {
+		iconSize: [26, 28],
+		popupAnchor: [0, -20],
+	},
+	wall_sign: {
+		iconSize: [26, 18],
+		popupAnchor: [0, -15],
+	},
+	hanging_sign: {
+		iconSize: [28, 24],
+		popupAnchor: [0, -18],
+	},
+	hanging_wall_sign: {
+		iconSize: [28, 28],
+		popupAnchor: [0, -20],
+	},
+}
+
+const signIcons = {};
+
+function signIcon(material, kind) {
+	function createSignIcon(material, kind) {
+		const params = signKinds[kind];
+
+		return L.icon({
+			iconUrl: `images/icon/${material}_${kind}.png`,
+			iconSize: params.iconSize,
+			popupAnchor: params.popupAnchor,
+			className: 'overzoomed',
+		});
+	}
+
+
+	let icons = signIcons[material] ??= {};
+	return icons[kind] ??= createSignIcon(material, kind);
+}
+
 const MinedMapLayer = L.TileLayer.extend({
 	initialize: function (mipmaps, layer) {
 		L.TileLayer.prototype.initialize.call(this, '', {
@@ -167,6 +205,9 @@ function loadSigns(signLayer) {
 			const el = document.createElement('span');
 			const [x, z] = key.split(',').map((i) => +i);
 
+			let material = 'oak'; /* Default material */
+			let kind = 'sign';
+
 			group.forEach((sign) => {
 				if (sign.front_text) {
 					for (const line of sign.front_text) {
@@ -185,13 +226,21 @@ function loadSigns(signLayer) {
 
 					el.appendChild(document.createElement('hr'));
 				}
+
+				if (sign.material)
+					material = sign.material;
+				if (sign.kind)
+					kind = sign.kind;
 			});
 
 			const lastChild = el.lastChild;
 			if (lastChild)
 				lastChild.remove();
 
-			L.marker([-z-0.5, x+0.5]).addTo(signLayer).bindPopup(el);
+			L.marker([-z-0.5, x+0.5], {
+				icon: signIcon(material, kind),
+
+			}).addTo(signLayer).bindPopup(el);
 		}
 	}
 
