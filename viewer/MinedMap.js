@@ -231,7 +231,7 @@ window.createMap = function () {
 			center: [-z, x],
 			zoom: zoom,
 			minZoom: -(mipmaps.length-1),
-			maxZoom: 3,
+			maxZoom: 5,
 			crs: L.CRS.Simple,
 			maxBounds: [
 				[-512*(mipmaps[0].bounds.maxZ+1), 512*mipmaps[0].bounds.minX],
