@@ -44,6 +44,13 @@ struct Spawn {
 	z: i32,
 }
 
+/// Keeps track of enabled MinedMap features
+#[derive(Debug, Serialize)]
+struct Features {
+	/// Sign layer
+	signs: bool,
+}
+
 /// Viewer metadata JSON data structure
 #[derive(Debug, Serialize)]
 struct Metadata<'t> {
@@ -51,6 +58,8 @@ struct Metadata<'t> {
 	mipmaps: Vec<Mipmap<'t>>,
 	/// Initial spawn point for new players
 	spawn: Spawn,
+	/// Enabled MinedMap features
+	features: Features,
 }
 
 /// Viewer entity JSON data structure
@@ -159,9 +168,14 @@ impl<'a> MetadataWriter<'a> {
 	pub fn run(self) -> Result<()> {
 		let level_dat = self.read_level_dat()?;
 
+		let features = Features {
+			signs: !self.config.sign_patterns.is_empty(),
+		};
+
 		let mut metadata = Metadata {
 			mipmaps: Vec::new(),
 			spawn: Self::spawn(&level_dat),
+			features,
 		};
 
 		for tile_map in self.tiles.iter() {
