@@ -284,76 +284,71 @@ function createSign(sign, back) {
 	return wrapper;
 }
 
-function loadSigns(signLayer) {
-	const xhr = new XMLHttpRequest();
-	xhr.onload = function () {
-		const res = JSON.parse(this.responseText);
-		const groups = {};
+async function loadSigns(signLayer) {
+	const response = await fetch('data/entities.json', {cache: 'no-store'});
+	const res = await response.json();
 
-		// Group signs by x,z coordinates
-		for (const sign of res.signs) {
-			const key = coordKey([sign.x, sign.z]);
-			const group = groups[key] ??= [];
-			group.push(sign);
-		}
+	const groups = {};
 
-		for (const [key, group] of Object.entries(groups)) {
-			const el = document.createElement('div');
-
-			let material;
-			let kind;
-
-			// Sort from top to bottom
-			group.sort((a, b) => b.y - a.y);
-
-			for (const sign of group) {
-				el.appendChild(createSign(sign, false));
-
-				if (sign.back_text)
-					el.appendChild(createSign(sign, true));
-
-				material ??= sign.material;
-				kind ??= sign.kind;
-			}
-
-			// Default material
-			material ??= 'oak';
-
-			const [x, z] = key.split(',').map((i) => +i);
-
-			const popup = L.popup().setContent(el);
-
-			popup.on('add', () => {
-				params.marker = [x, z];
-				updateHash();
-			});
-			popup.on('remove', () => {
-				params.marker = null;
-				updateHash();
-			});
-
-			const marker = L.marker([-z-0.5, x+0.5], {
-				icon: signIcon(material, kind),
-			}).addTo(signLayer).bindPopup(popup);
-
-			markers[coordKey([x, z])] = marker;
-
-			if (params.marker && x === params.marker[0] && z === params.marker[1])
-				marker.openPopup();
-		}
+	// Group signs by x,z coordinates
+	for (const sign of res.signs) {
+		const key = coordKey([sign.x, sign.z]);
+		const group = groups[key] ??= [];
+		group.push(sign);
 	}
 
-	xhr.open('GET', 'data/entities.json', true);
-	xhr.send();
+	for (const [key, group] of Object.entries(groups)) {
+		const el = document.createElement('div');
+
+		let material;
+		let kind;
+
+		// Sort from top to bottom
+		group.sort((a, b) => b.y - a.y);
+
+		for (const sign of group) {
+			el.appendChild(createSign(sign, false));
+
+			if (sign.back_text)
+				el.appendChild(createSign(sign, true));
+
+			material ??= sign.material;
+			kind ??= sign.kind;
+		}
+
+		// Default material
+		material ??= 'oak';
+
+		const [x, z] = key.split(',').map((i) => +i);
+
+		const popup = L.popup().setContent(el);
+
+		popup.on('add', () => {
+			params.marker = [x, z];
+			updateHash();
+		});
+		popup.on('remove', () => {
+			params.marker = null;
+			updateHash();
+		});
+
+		const marker = L.marker([-z-0.5, x+0.5], {
+			icon: signIcon(material, kind),
+		}).addTo(signLayer).bindPopup(popup);
+
+		markers[coordKey([x, z])] = marker;
+
+		if (params.marker && x === params.marker[0] && z === params.marker[1])
+			marker.openPopup();
+	}
 }
 
 window.createMap = function () {
-	const xhr = new XMLHttpRequest();
-	xhr.onload = function () {
-		const res = JSON.parse(this.responseText),
-		    mipmaps = res.mipmaps,
-		    spawn = res.spawn,
-		    features = res.features || {};
+	(async function () {
+		const response = await fetch('data/info.json', {cache: 'no-store'});
+		const res = await response.json();
+		const {mipmaps, spawn} = res;
+		const features = res.features || {};
 
 		const updateParams = function () {
 			const args = parseHash();
@@ -489,8 +484,5 @@ window.createMap = function () {
 			updateHash();
 		};
 
-	};
-
-	xhr.open('GET', 'data/info.json', true);
-	xhr.send();
+	})();
 }
