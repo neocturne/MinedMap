@@ -5,7 +5,7 @@ members = ["crates/*"]
 edition = "2021"
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/NeoRaider/MinedMap"
+repository = "https://github.com/neocturne/MinedMap"
 
 [workspace.metadata.release]
 consolidate-commits = false

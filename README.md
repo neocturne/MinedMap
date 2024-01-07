@@ -10,7 +10,7 @@
 * Typically uses less than 100MB of RAM in single-threaded operation (may be higher when `-j` is passed)
 * Cross-platform: runs on Linux, Windows, and likely other systems like MacOS as well
 
-![Screenshot](https://raw.githubusercontent.com/NeoRaider/MinedMap/main/docs/images/MinedMap.png)
+![Screenshot](https://raw.githubusercontent.com/neocturne/MinedMap/main/docs/images/MinedMap.png)
 
 ## How to use
 
@@ -51,7 +51,7 @@ the generated map files to public webspace to make the map available to others.
 Building the MinedMap map generator from source requires a recent Rust toolchain (1.72.0
 or newer). The following command can be used to build the current development version:
 ```shell
-cargo install --git 'https://github.com/NeoRaider/MinedMap.git'
+cargo install --git 'https://github.com/neocturne/MinedMap.git'
 ```
 
 In addition, CMake is needed to build the zlib-ng library. If you do not have
@@ -60,5 +60,5 @@ to cargo. A pure-Rust zlib implementation will be used, which is more portable,
 but slower than zlib-ng.
 
 If you are looking for the older C++ implementation of the MinedMap tile renderer,
-see the [v1.19.1](https://github.com/NeoRaider/MinedMap/tree/v1.19.1) tag.
+see the [v1.19.1](https://github.com/neocturne/MinedMap/tree/v1.19.1) tag.
 
