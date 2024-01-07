@@ -279,26 +279,30 @@ function loadSigns(signLayer) {
 		for (const sign of res.signs) {
 			const key = `${sign.x},${sign.z}`;
 			const group = groups[key] ??= [];
-			group[sign.y] = sign;
+			group.push(sign);
 		}
 
 		for (const [key, group] of Object.entries(groups)) {
 			const popup = document.createElement('div');
 
-			let material = 'oak'; /* Default material */
-			let kind = 'sign';
+			let material;
+			let kind;
 
-			group.forEach((sign) => {
+			// Sort from top to bottom
+			group.sort((a, b) => b.y - a.y);
+
+			for (const sign of group) {
 				popup.appendChild(createSign(sign, false));
 
 				if (sign.back_text)
 					popup.appendChild(createSign(sign, true));
 
-				if (sign.material)
-					material = sign.material;
-				if (sign.kind)
-					kind = sign.kind;
-			});
+				material ??= sign.material;
+				kind ??= sign.kind;
+			}
+
+			// Default material
+			material ??= 'oak';
 
 			const [x, z] = key.split(',').map((i) => +i);
 
