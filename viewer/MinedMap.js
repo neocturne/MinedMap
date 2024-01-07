@@ -38,8 +38,20 @@ const signKinds = {
 
 const params = {};
 const signIcons = {};
+const markers = {};
 
 let updateHash = () => {};
+
+function coordKey(coords) {
+	if (!coords)
+		return null;
+
+	return `${coords[0]},${coords[1]}`;
+}
+
+function getMarker(coords) {
+	return markers[coordKey(coords)];
+}
 
 function signIcon(material, kind) {
 	function createSignIcon(material, kind) {
@@ -280,7 +292,7 @@ function loadSigns(signLayer) {
 
 		// Group signs by x,z coordinates
 		for (const sign of res.signs) {
-			const key = `${sign.x},${sign.z}`;
+			const key = coordKey([sign.x, sign.z]);
 			const group = groups[key] ??= [];
 			group.push(sign);
 		}
@@ -323,6 +335,8 @@ function loadSigns(signLayer) {
 			const marker = L.marker([-z-0.5, x+0.5], {
 				icon: signIcon(material, kind),
 			}).addTo(signLayer).bindPopup(popup);
+
+			markers[coordKey([x, z])] = marker;
 
 			if (params.marker && x === params.marker[0] && z === params.marker[1])
 				marker.openPopup();
@@ -451,20 +465,26 @@ window.createMap = function () {
 			if (window.location.hash === makeHash())
 				return;
 
-			updateParams();
+			const prevMarkerCoords = params.marker;
 
-			map.setView([-params.z, params.x], params.zoom);
+			updateParams();
 
 			if (params.light)
 				map.addLayer(lightLayer);
 			else
 				map.removeLayer(lightLayer);
+
 			if (features.signs) {
 				if (params.signs)
 					map.addLayer(signLayer);
 				else
 					map.removeLayer(signLayer);
+
+				if (coordKey(prevMarkerCoords) !== coordKey(params.marker))
+					getMarker(params.marker)?.openPopup();
 			}
+
+			map.setView([-params.z, params.x], params.zoom);
 
 			updateHash();
 		};
