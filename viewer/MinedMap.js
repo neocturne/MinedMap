@@ -40,12 +40,14 @@ const signIcons = {};
 
 function signIcon(material, kind) {
 	function createSignIcon(material, kind) {
-		const params = signKinds[kind];
+		const {iconSize, popupAnchor} = signKinds[kind];
 
 		return L.icon({
 			iconUrl: `images/icon/${material}_${kind}.png`,
-			iconSize: params.iconSize,
-			popupAnchor: params.popupAnchor,
+			iconSize,
+			popupAnchor,
+			shadowUrl: `images/icon/shadow_${kind}.png`,
+			shadowSize: [iconSize[0]+8, iconSize[1]+8],
 			className: 'overzoomed',
 		});
 	}
