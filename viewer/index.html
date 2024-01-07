@@ -22,13 +22,57 @@
         background: #333;
       }
 
-      img.overzoomed {
+      .leaflet-container a.leaflet-popup-close-button {
+        color: #ccc;
+      }
+
+      .leaflet-container a.leaflet-popup-close-button:hover {
+        color: #fff;
+      }
+
+      .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+        background: rgba(64, 64, 64, 0.5);
+      }
+
+      .overzoomed {
         image-rendering: -moz-crisp-edges;
         image-rendering: -o-crisp-edges;
         image-rendering: -webkit-optimize-contrast;
         image-rendering: crisp-edges;
         image-rendering: pixelated;
         -ms-interpolation-mode: nearest-neighbor;
+      }
+
+      .sign-wrapper {
+        padding: 0;
+        padding-left: 4px;
+        margin-bottom: 2em;
+      }
+
+      .sign-wrapper:last-child {
+        margin-bottom: 0;
+      }
+
+      .sign-title {
+        color: #fff;
+        font-weight: bold;
+        margin-bottom: 0.5em;
+      }
+
+      .sign-container {
+        padding: 0;
+        background-size: cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .sign-content {
+        padding: 0;
+        font-size: 18px;
+        line-height: 1.5;
+        text-align: center;
+        font-family: sans;
       }
 
       span.obfuscated:hover {

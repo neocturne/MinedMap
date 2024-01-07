@@ -160,7 +160,6 @@ const colors = {
 function formatSignLine(line) {
 	const el = document.createElement('span');
 	el.style.whiteSpace = 'pre';
-	el.style.fontFamily = 'sans';
 
 	for (const span of line) {
 		const child = document.createElement('span');
@@ -190,6 +189,86 @@ function formatSignLine(line) {
 	return el;
 }
 
+function createSign(sign, back) {
+	// standing signs
+	function px(base) {
+		const scale = 11;
+		return (base*scale)+'px';
+	}
+	// hanging signs
+	function pxh(base) {
+		const scale = 16;
+		return (base*scale)+'px';
+	}
+
+	const sizes = {
+		sign: {
+			width: px(24),
+			height: px(12),
+			paddingTop: px(0),
+			paddingBottom: px(14),
+		},
+		wall_sign: {
+			width: px(24),
+			height: px(12),
+			paddingTop: px(0),
+			paddingBottom: px(0),
+		},
+		hanging_sign: {
+			width: pxh(16),
+			height: pxh(10),
+			paddingTop: pxh(4),
+			paddingBottom: pxh(0),
+		},
+		hanging_wall_sign: {
+			width: pxh(16),
+			height: pxh(10),
+			paddingTop: pxh(6),
+			paddingBottom: pxh(0),
+		},
+	};
+	const size = sizes[sign.kind];
+
+	const wrapper = document.createElement('div');
+	wrapper.classList = 'sign-wrapper';
+
+	const title = document.createElement('div');
+	title.classList = 'sign-title'
+	title.textContent = `Sign at ${sign.x}/${sign.y}/${sign.z}`;
+	if (back)
+		title.textContent += ' (back)';
+	title.textContent += ':';
+
+	wrapper.appendChild(title);
+
+	const container = document.createElement('div');
+	container.style.width = size.width;
+	container.style.height = size.height;
+	container.style.paddingTop = size.paddingTop;
+	container.style.paddingBottom = size.paddingBottom;
+	container.style.backgroundImage = `url(images/bg/${sign.material}_${sign.kind}.png)`;
+	container.classList = 'sign-container overzoomed';
+
+	const content = document.createElement('div');
+	content.classList = 'sign-content';
+
+	let text = [];
+	if (!back && sign.front_text)
+		text = sign.front_text;
+	else if (back && sign.back_text)
+		text = sign.back_text;
+
+	for (const line of text) {
+		content.appendChild(formatSignLine(line));
+		content.appendChild(document.createElement('br'));
+	}
+
+	container.appendChild(content);
+	wrapper.appendChild(container);
+
+	return wrapper;
+}
+
 function loadSigns(signLayer) {
 	const xhr = new XMLHttpRequest();
 	xhr.onload = function () {
@@ -204,30 +283,16 @@ function loadSigns(signLayer) {
 		}
 
 		for (const [key, group] of Object.entries(groups)) {
-			const el = document.createElement('span');
-			const [x, z] = key.split(',').map((i) => +i);
+			const popup = document.createElement('div');
 
 			let material = 'oak'; /* Default material */
 			let kind = 'sign';
 
 			group.forEach((sign) => {
-				if (sign.front_text) {
-					for (const line of sign.front_text) {
-						el.appendChild(formatSignLine(line));
-						el.appendChild(document.createElement('br'));
-					}
+				popup.appendChild(createSign(sign, false));
 
-					el.appendChild(document.createElement('hr'));
-				}
-
-				if (sign.back_text) {
-					for (let line of sign.back_text) {
-						el.appendChild(formatSignLine(line));
-						el.appendChild(document.createElement('br'));
-					}
-
-					el.appendChild(document.createElement('hr'));
-				}
+				if (sign.back_text)
+					popup.appendChild(createSign(sign, true));
 
 				if (sign.material)
 					material = sign.material;
@@ -235,14 +300,11 @@ function loadSigns(signLayer) {
 					kind = sign.kind;
 			});
 
-			const lastChild = el.lastChild;
-			if (lastChild)
-				lastChild.remove();
+			const [x, z] = key.split(',').map((i) => +i);
 
 			L.marker([-z-0.5, x+0.5], {
 				icon: signIcon(material, kind),
-
-			}).addTo(signLayer).bindPopup(el);
+			}).addTo(signLayer).bindPopup(popup);
 		}
 	}
 
