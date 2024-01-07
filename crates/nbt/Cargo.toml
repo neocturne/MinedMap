@@ -1,6 +1,6 @@
 [package]
 name = "minedmap-nbt"
-version = "0.1.0"
+version = "0.1.1"
 description = "MinedMap's handling of Minecraft NBT data and region files"
 edition.workspace = true
 license.workspace = true
