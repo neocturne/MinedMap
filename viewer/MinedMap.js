@@ -39,6 +39,8 @@ const signKinds = {
 const params = {};
 const signIcons = {};
 
+let updateHash = () => {};
+
 function signIcon(material, kind) {
 	function createSignIcon(material, kind) {
 		const {iconSize, popupAnchor} = signKinds[kind];
@@ -284,7 +286,7 @@ function loadSigns(signLayer) {
 		}
 
 		for (const [key, group] of Object.entries(groups)) {
-			const popup = document.createElement('div');
+			const el = document.createElement('div');
 
 			let material;
 			let kind;
@@ -293,10 +295,10 @@ function loadSigns(signLayer) {
 			group.sort((a, b) => b.y - a.y);
 
 			for (const sign of group) {
-				popup.appendChild(createSign(sign, false));
+				el.appendChild(createSign(sign, false));
 
 				if (sign.back_text)
-					popup.appendChild(createSign(sign, true));
+					el.appendChild(createSign(sign, true));
 
 				material ??= sign.material;
 				kind ??= sign.kind;
@@ -307,9 +309,23 @@ function loadSigns(signLayer) {
 
 			const [x, z] = key.split(',').map((i) => +i);
 
-			L.marker([-z-0.5, x+0.5], {
+			const popup = L.popup().setContent(el);
+
+			popup.on('add', () => {
+				params.marker = [x, z];
+				updateHash();
+			});
+			popup.on('remove', () => {
+				params.marker = null;
+				updateHash();
+			});
+
+			const marker = L.marker([-z-0.5, x+0.5], {
 				icon: signIcon(material, kind),
 			}).addTo(signLayer).bindPopup(popup);
+
+			if (params.marker && x === params.marker[0] && z === params.marker[1])
+				marker.openPopup();
 		}
 	}
 
@@ -332,6 +348,7 @@ window.createMap = function () {
 			params.z = parseFloat(args['z']);
 			params.light = parseInt(args['light']);
 			params.signs = parseInt(args['signs'] ?? '1');
+			params.marker = (args['marker'] ?? '').split(',').map((i) => +i);
 
 			if (isNaN(params.zoom))
 				params.zoom = 0;
@@ -339,6 +356,8 @@ window.createMap = function () {
 				params.x = spawn.x;
 			if (isNaN(params.z))
 				params.z = spawn.z;
+			if (isNaN(params.marker[0]) || isNaN(params.marker[1]))
+				params.marker = null;
 		};
 
 		updateParams();
@@ -392,11 +411,14 @@ window.createMap = function () {
 				ret += '&light=1';
 			if (!map.hasLayer(signLayer))
 				ret += '&signs=0';
+			if (params.marker) {
+				ret += `&marker=${params.marker[0]},${params.marker[1]}`;
+			}
 
 			return ret;
 		};
 
-		const updateHash = function () {
+		updateHash = function () {
 			window.location.hash = makeHash();
 		};
 
