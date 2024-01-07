@@ -2,6 +2,8 @@
 
 ## [Unreleased] - ReleaseDate
 
+## [2.0.2] - 2024-01-07
+
 ### Updated
 
 - Added support for Minecraft 1.20.3+
@@ -55,6 +57,7 @@ intermediate data.
   Full support for custom biomes datapacks might be added in a future release.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/neocturne/MinedMap/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/neocturne/MinedMap/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/neocturne/MinedMap/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/neocturne/MinedMap/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/neocturne/MinedMap/compare/v1.19.1...v2.0.0
