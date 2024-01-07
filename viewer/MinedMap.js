@@ -338,7 +338,8 @@ window.createMap = function () {
 	xhr.onload = function () {
 		const res = JSON.parse(this.responseText),
 		    mipmaps = res.mipmaps,
-		    spawn = res.spawn;
+		    spawn = res.spawn,
+		    features = res.features || {};
 
 		const updateParams = function () {
 			const args = parseHash();
@@ -356,7 +357,7 @@ window.createMap = function () {
 				params.x = spawn.x;
 			if (isNaN(params.z))
 				params.z = spawn.z;
-			if (isNaN(params.marker[0]) || isNaN(params.marker[1]))
+			if (!features.signs || isNaN(params.marker[0]) || isNaN(params.marker[1]))
 				params.marker = null;
 		};
 
@@ -374,23 +375,25 @@ window.createMap = function () {
 			],
 		});
 
+		const overlayMaps = {};
+
 		const mapLayer = new MinedMapLayer(mipmaps, 'map');
-		const lightLayer = new MinedMapLayer(mipmaps, 'light');
-		const signLayer = L.layerGroup();
-
-		loadSigns(signLayer);
-
 		mapLayer.addTo(map);
 
+		const lightLayer = new MinedMapLayer(mipmaps, 'light');
+		overlayMaps['Illumination'] = lightLayer;
 		if (params.light)
 			map.addLayer(lightLayer);
-		if (params.signs)
-			map.addLayer(signLayer);
 
-		const overlayMaps = {
-			"Illumination": lightLayer,
-			"Signs": signLayer,
-		};
+		let signLayer;
+		if (features.signs) {
+			signLayer = L.layerGroup();
+			loadSigns(signLayer);
+			if (params.signs)
+				map.addLayer(signLayer);
+
+			overlayMaps['Signs'] = signLayer;
+		}
 
 		L.control.layers({}, overlayMaps).addTo(map);
 
@@ -409,7 +412,7 @@ window.createMap = function () {
 
 			if (map.hasLayer(lightLayer))
 				ret += '&light=1';
-			if (!map.hasLayer(signLayer))
+			if (features.signs && !map.hasLayer(signLayer))
 				ret += '&signs=0';
 			if (params.marker) {
 				ret += `&marker=${params.marker[0]},${params.marker[1]}`;
@@ -456,10 +459,12 @@ window.createMap = function () {
 				map.addLayer(lightLayer);
 			else
 				map.removeLayer(lightLayer);
-			if (params.signs)
-				map.addLayer(signLayer);
-			else
-				map.removeLayer(signLayer);
+			if (features.signs) {
+				if (params.signs)
+					map.addLayer(signLayer);
+				else
+					map.removeLayer(signLayer);
+			}
 
 			updateHash();
 		};
