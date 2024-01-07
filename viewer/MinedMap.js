@@ -36,6 +36,7 @@ const signKinds = {
 	},
 }
 
+const params = {};
 const signIcons = {};
 
 function signIcon(material, kind) {
@@ -323,30 +324,28 @@ window.createMap = function () {
 		    mipmaps = res.mipmaps,
 		    spawn = res.spawn;
 
-		let x, z, zoom, light, signs;
-
 		const updateParams = function () {
 			const args = parseHash();
 
-			zoom = parseInt(args['zoom']);
-			x = parseFloat(args['x']);
-			z = parseFloat(args['z']);
-			light = parseInt(args['light']);
-			signs = parseInt(args['signs'] ?? '1');
+			params.zoom = parseInt(args['zoom']);
+			params.x = parseFloat(args['x']);
+			params.z = parseFloat(args['z']);
+			params.light = parseInt(args['light']);
+			params.signs = parseInt(args['signs'] ?? '1');
 
-			if (isNaN(zoom))
-				zoom = 0;
-			if (isNaN(x))
-				x = spawn.x;
-			if (isNaN(z))
-				z = spawn.z;
+			if (isNaN(params.zoom))
+				params.zoom = 0;
+			if (isNaN(params.x))
+				params.x = spawn.x;
+			if (isNaN(params.z))
+				params.z = spawn.z;
 		};
 
 		updateParams();
 
 		const map = L.map('map', {
-			center: [-z, x],
-			zoom: zoom,
+			center: [-params.z, params.x],
+			zoom: params.zoom,
 			minZoom: -(mipmaps.length-1),
 			maxZoom: 5,
 			crs: L.CRS.Simple,
@@ -364,9 +363,9 @@ window.createMap = function () {
 
 		mapLayer.addTo(map);
 
-		if (light)
+		if (params.light)
 			map.addLayer(lightLayer);
-		if (signs)
+		if (params.signs)
 			map.addLayer(signLayer);
 
 		const overlayMaps = {
@@ -384,10 +383,10 @@ window.createMap = function () {
 		});
 
 		const makeHash = function () {
-			let ret = '#x='+x+'&z='+z;
+			let ret = '#x='+params.x+'&z='+params.z;
 
-			if (zoom != 0)
-				ret += '&zoom='+zoom;
+			if (params.zoom != 0)
+				ret += '&zoom='+params.zoom;
 
 			if (map.hasLayer(lightLayer))
 				ret += '&light=1';
@@ -407,10 +406,11 @@ window.createMap = function () {
 					return;
 			}
 
-			zoom = map.getZoom();
-			center = map.getCenter();
-			x = Math.round(center.lng);
-			z = Math.round(-center.lat);
+			const center = map.getCenter();
+
+			params.zoom = map.getZoom();
+			params.x = Math.round(center.lng);
+			params.z = Math.round(-center.lat);
 
 			updateHash();
 		}
@@ -428,13 +428,13 @@ window.createMap = function () {
 
 			updateParams();
 
-			map.setView([-z, x], zoom);
+			map.setView([-params.z, params.x], params.zoom);
 
-			if (light)
+			if (params.light)
 				map.addLayer(lightLayer);
 			else
 				map.removeLayer(lightLayer);
-			if (signs)
+			if (params.signs)
 				map.addLayer(signLayer);
 			else
 				map.removeLayer(signLayer);
