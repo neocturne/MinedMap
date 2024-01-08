@@ -31,6 +31,11 @@ pub const MAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 /// (usually because of updated resource data)
 pub const LIGHTMAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 
+/// MinedMap mipmap data version number
+///
+/// Increase when the mipmap generation changes (this should not happen)
+pub const MIPMAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
+
 /// Coordinate pair of a generated tile
 ///
 /// Each tile corresponds to one Minecraft region file
