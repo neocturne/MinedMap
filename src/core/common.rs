@@ -14,12 +14,21 @@ use crate::{io::fs::FileMetaVersion, resource::Biome, types::*, world::layer};
 /// Increase to force regeneration of all output files
 
 /// MinedMap processed region data version number
+///
+/// Increase when the generation of processed regions from region data changes
+/// (usually because of updated resource data)
 pub const REGION_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 
 /// MinedMap map tile data version number
+///
+/// Increase when the generation of map tiles from processed regions changes
+/// (because of code changes in tile generation)
 pub const MAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 
 /// MinedMap lightmap data version number
+///
+/// Increase when the generation of lightmap tiles from region data changes
+/// (usually because of updated resource data)
 pub const LIGHTMAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 
 /// Coordinate pair of a generated tile
