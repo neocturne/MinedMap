@@ -2,6 +2,12 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- Without `--verbose`, only a single warning is printed at the end of
+  processing for unknown block/biome types, rather than once for every
+  section where such a block/biome is encountered.
+
 ## [2.0.2] - 2024-01-07
 
 ### Added

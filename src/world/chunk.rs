@@ -56,7 +56,7 @@ impl<'a> Chunk<'a> {
 		data: &'a de::Chunk,
 		block_types: &'a BlockTypes,
 		biome_types: &'a BiomeTypes,
-	) -> Result<Self> {
+	) -> Result<(Self, bool)> {
 		let data_version = data.data_version.unwrap_or_default();
 
 		match &data.chunk {
@@ -75,8 +75,9 @@ impl<'a> Chunk<'a> {
 		sections: &'a Vec<de::SectionV1_18>,
 		block_types: &'a BlockTypes,
 		biome_types: &'a BiomeTypes,
-	) -> Result<Self> {
+	) -> Result<(Self, bool)> {
 		let mut section_map = BTreeMap::new();
+		let mut has_unknown = false;
 
 		for section in sections {
 			match &section.section {
@@ -85,22 +86,27 @@ impl<'a> Chunk<'a> {
 					biomes,
 					block_light,
 				} => {
+					let (loaded_section, unknown_blocks) = SectionV1_13::new(
+						data_version,
+						block_states.data.as_deref(),
+						&block_states.palette,
+						block_types,
+					)
+					.with_context(|| format!("Failed to load section at Y={}", section.y))?;
+					has_unknown |= unknown_blocks;
+
+					let (loaded_biomes, unknown_biomes) =
+						BiomesV1_18::new(biomes.data.as_deref(), &biomes.palette, biome_types)
+							.with_context(|| {
+								format!("Failed to load section biomes at Y={}", section.y)
+							})?;
+					has_unknown |= unknown_biomes;
+
 					section_map.insert(
 						SectionY(section.y),
 						(
-							SectionV1_13::new(
-								data_version,
-								block_states.data.as_deref(),
-								&block_states.palette,
-								block_types,
-							)
-							.with_context(|| {
-								format!("Failed to load section at Y={}", section.y)
-							})?,
-							BiomesV1_18::new(biomes.data.as_deref(), &biomes.palette, biome_types)
-								.with_context(|| {
-									format!("Failed to load section biomes at Y={}", section.y)
-								})?,
+							loaded_section,
+							loaded_biomes,
 							BlockLight::new(block_light.as_deref()).with_context(|| {
 								format!("Failed to load section block light at Y={}", section.y)
 							})?,
@@ -111,7 +117,8 @@ impl<'a> Chunk<'a> {
 			};
 		}
 
-		Ok(Chunk::V1_18 { section_map })
+		let chunk = Chunk::V1_18 { section_map };
+		Ok((chunk, has_unknown))
 	}
 
 	/// [Chunk::new] implementation for all pre-1.18 chunk variants
@@ -120,9 +127,10 @@ impl<'a> Chunk<'a> {
 		level: &'a de::LevelV0,
 		block_types: &'a BlockTypes,
 		biome_types: &'a BiomeTypes,
-	) -> Result<Self> {
+	) -> Result<(Self, bool)> {
 		let mut section_map_v1_13 = BTreeMap::new();
 		let mut section_map_v0 = BTreeMap::new();
+		let mut has_unknown = false;
 
 		for section in &level.sections {
 			let block_light =
@@ -134,21 +142,13 @@ impl<'a> Chunk<'a> {
 					block_states,
 					palette,
 				} => {
-					section_map_v1_13.insert(
-						SectionY(section.y.into()),
-						(
-							SectionV1_13::new(
-								data_version,
-								Some(block_states),
-								palette,
-								block_types,
-							)
-							.with_context(|| {
-								format!("Failed to load section at Y={}", section.y)
-							})?,
-							block_light,
-						),
-					);
+					let (loaded_section, unknown_blocks) =
+						SectionV1_13::new(data_version, Some(block_states), palette, block_types)
+							.with_context(|| format!("Failed to load section at Y={}", section.y))?;
+					has_unknown |= unknown_blocks;
+
+					section_map_v1_13
+						.insert(SectionY(section.y.into()), (loaded_section, block_light));
 				}
 				de::SectionV0Variant::V0 { blocks, data } => {
 					section_map_v0.insert(
@@ -166,23 +166,22 @@ impl<'a> Chunk<'a> {
 		}
 
 		let biomes = BiomesV0::new(level.biomes.as_ref(), biome_types);
-
-		Ok(
-			match (section_map_v1_13.is_empty(), section_map_v0.is_empty()) {
-				(true, true) => Chunk::Empty,
-				(false, true) => Chunk::V1_13 {
-					section_map: section_map_v1_13,
-					biomes: biomes?,
-				},
-				(true, false) => Chunk::V0 {
-					section_map: section_map_v0,
-					biomes: biomes?,
-				},
-				(false, false) => {
-					bail!("Mixed section versions");
-				}
+		let chunk = match (section_map_v1_13.is_empty(), section_map_v0.is_empty()) {
+			(true, true) => Chunk::Empty,
+			(false, true) => Chunk::V1_13 {
+				section_map: section_map_v1_13,
+				biomes: biomes?,
 			},
-		)
+			(true, false) => Chunk::V0 {
+				section_map: section_map_v0,
+				biomes: biomes?,
+			},
+			(false, false) => {
+				bail!("Mixed section versions");
+			}
+		};
+
+		Ok((chunk, has_unknown))
 	}
 
 	/// Returns true if the chunk does not contain any sections

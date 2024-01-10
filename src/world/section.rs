@@ -7,7 +7,7 @@ use std::fmt::Debug;
 
 use anyhow::{bail, Context, Result};
 use num_integer::div_rem;
-use tracing::warn;
+use tracing::debug;
 
 use super::de;
 use crate::{
@@ -73,7 +73,7 @@ impl<'a> SectionV1_13<'a> {
 		block_states: Option<&'a [i64]>,
 		palette: &'a [de::BlockStatePaletteEntry],
 		block_types: &'a BlockTypes,
-	) -> Result<Self> {
+	) -> Result<(Self, bool)> {
 		let aligned_blocks = data_version >= 2529;
 
 		let bits = palette_bits(palette.len(), 4, 12).context("Unsupported block palette size")?;
@@ -90,23 +90,29 @@ impl<'a> SectionV1_13<'a> {
 			}
 		}
 
+		let mut has_unknown = false;
+
 		let palette_types = palette
 			.iter()
 			.map(|entry| {
 				let block_type = block_types.get(&entry.name);
 				if block_type.is_none() {
-					warn!("Unknown block type: {}", entry.name);
+					debug!("Unknown block type: {}", entry.name);
+					has_unknown = true;
 				}
 				block_type
 			})
 			.collect();
 
-		Ok(Self {
-			block_states,
-			palette: palette_types,
-			bits,
-			aligned_blocks,
-		})
+		Ok((
+			Self {
+				block_states,
+				palette: palette_types,
+				bits,
+				aligned_blocks,
+			},
+			has_unknown,
+		))
 	}
 
 	/// Looks up the block type palette index at the given coordinates
@@ -231,7 +237,7 @@ impl<'a> BiomesV1_18<'a> {
 		biomes: Option<&'a [i64]>,
 		palette: &'a [String],
 		biome_types: &'a BiomeTypes,
-	) -> Result<Self> {
+	) -> Result<(Self, bool)> {
 		let bits = palette_bits(palette.len(), 1, 6).context("Unsupported block palette size")?;
 
 		if let Some(biomes) = biomes {
@@ -242,22 +248,28 @@ impl<'a> BiomesV1_18<'a> {
 			}
 		}
 
+		let mut has_unknown = false;
+
 		let palette_types = palette
 			.iter()
 			.map(|entry| {
 				let biome_type = biome_types.get(entry);
 				if biome_type.is_none() {
-					warn!("Unknown biome type: {}", entry);
+					debug!("Unknown biome type: {}", entry);
+					has_unknown = true;
 				}
 				biome_type
 			})
 			.collect();
 
-		Ok(BiomesV1_18 {
-			biomes,
-			palette: palette_types,
-			bits,
-		})
+		Ok((
+			BiomesV1_18 {
+				biomes,
+				palette: palette_types,
+				bits,
+			},
+			has_unknown,
+		))
 	}
 
 	/// Looks up the block type palette index at the given coordinates
