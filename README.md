@@ -10,7 +10,7 @@
 * Typically uses less than 100MB of RAM in single-threaded operation (may be higher when `-j` is passed)
 * Cross-platform: runs on Linux, Windows, and likely other systems like MacOS as well
 
-![Screenshot](https://raw.githubusercontent.com/neocturne/MinedMap/main/docs/images/MinedMap.png)
+![Screenshot](https://raw.githubusercontent.com/neocturne/MinedMap/997a4fb24e89d2cd3c671d77eafaa47084d14304/docs/images/MinedMap.png)
 
 ## How to use
 
