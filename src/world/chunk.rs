@@ -50,39 +50,6 @@ pub enum Chunk<'a> {
 	Empty,
 }
 
-/// Inner data structure of [SectionIter]
-#[derive(Debug, Clone)]
-enum SectionIterInner<'a> {
-	/// Iterator over sections of [Chunk::V1_18]
-	V1_18 {
-		/// Inner iterator into section map
-		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BiomesV1_18<'a>, BlockLight<'a>)>,
-	},
-	/// Iterator over sections of [Chunk::V1_13]
-	V1_13 {
-		/// Inner iterator into section map
-		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BlockLight<'a>)>,
-		/// Chunk biome data
-		biomes: &'a BiomesV0<'a>,
-	},
-	/// Iterator over sections of [Chunk::V0]
-	V0 {
-		/// Inner iterator into section map
-		iter: btree_map::Iter<'a, SectionY, (SectionV0<'a>, BlockLight<'a>)>,
-		/// Chunk biome data
-		biomes: &'a BiomesV0<'a>,
-	},
-	/// Empty iterator over an unpopulated chunk ([Chunk::Empty])
-	Empty,
-}
-
-/// Iterator over the sections of a [Chunk]
-#[derive(Debug, Clone)]
-pub struct SectionIter<'a> {
-	/// Inner iterator enum
-	inner: SectionIterInner<'a>,
-}
-
 impl<'a> Chunk<'a> {
 	/// Creates a new [Chunk] from a deserialized [de::Chunk]
 	pub fn new(
@@ -281,6 +248,39 @@ impl<'a, T> SectionIterTrait<'a> for T where
 		+ ExactSizeIterator
 		+ FusedIterator
 {
+}
+
+/// Inner data structure of [SectionIter]
+#[derive(Debug, Clone)]
+enum SectionIterInner<'a> {
+	/// Iterator over sections of [Chunk::V1_18]
+	V1_18 {
+		/// Inner iterator into section map
+		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BiomesV1_18<'a>, BlockLight<'a>)>,
+	},
+	/// Iterator over sections of [Chunk::V1_13]
+	V1_13 {
+		/// Inner iterator into section map
+		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BlockLight<'a>)>,
+		/// Chunk biome data
+		biomes: &'a BiomesV0<'a>,
+	},
+	/// Iterator over sections of [Chunk::V0]
+	V0 {
+		/// Inner iterator into section map
+		iter: btree_map::Iter<'a, SectionY, (SectionV0<'a>, BlockLight<'a>)>,
+		/// Chunk biome data
+		biomes: &'a BiomesV0<'a>,
+	},
+	/// Empty iterator over an unpopulated chunk ([Chunk::Empty])
+	Empty,
+}
+
+/// Iterator over the sections of a [Chunk]
+#[derive(Debug, Clone)]
+pub struct SectionIter<'a> {
+	/// Inner iterator enum
+	inner: SectionIterInner<'a>,
 }
 
 impl<'a> SectionIter<'a> {
