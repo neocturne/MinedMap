@@ -4,11 +4,14 @@
 
 ## [2.0.2] - 2024-01-07
 
-### Updated
+### Added
 
 - Added support for Minecraft 1.20.3+
 
   Minecraft 1.20.3 renamed the `grass` block type to `short_grass`.
+
+### Changed
+
 - Updated [Leaflet](https://leafletjs.com/) to 1.9.4
 - Updated attribution URL to https://github.com/neocturne/MinedMap
 
