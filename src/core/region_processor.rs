@@ -1,6 +1,14 @@
 //! The [RegionProcessor] and related functions
 
-use std::{ffi::OsStr, path::PathBuf, sync::mpsc, time::SystemTime};
+use std::{
+	ffi::OsStr,
+	path::PathBuf,
+	sync::{
+		atomic::{AtomicBool, Ordering},
+		mpsc,
+	},
+	time::SystemTime,
+};
 
 use anyhow::{Context, Result};
 use rayon::prelude::*;
@@ -32,6 +40,8 @@ fn parse_region_filename(file_name: &OsStr) -> Option<TileCoords> {
 enum RegionProcessorStatus {
 	/// Region was processed
 	Ok,
+	/// Region was processed, unknown blocks or biomes were encountered
+	OkWithUnknown,
 	/// Region was unchanged and skipped
 	Skipped,
 	/// Reading the region failed, previous processed data is reused
@@ -68,6 +78,8 @@ struct SingleRegionProcessor<'a> {
 	processed_region: ProcessedRegion,
 	/// Lightmap intermediate data
 	lightmap: image::GrayAlphaImage,
+	/// True if any unknown block or biome types were encountered during processing
+	has_unknown: bool,
 }
 
 impl<'a> SingleRegionProcessor<'a> {
@@ -104,6 +116,7 @@ impl<'a> SingleRegionProcessor<'a> {
 			lightmap_needed,
 			processed_region,
 			lightmap,
+			has_unknown: false,
 		})
 	}
 
@@ -162,8 +175,10 @@ impl<'a> SingleRegionProcessor<'a> {
 
 	/// Processes a single chunk
 	fn process_chunk(&mut self, chunk_coords: ChunkCoords, data: world::de::Chunk) -> Result<()> {
-		let chunk = world::chunk::Chunk::new(&data, self.block_types, self.biome_types)
-			.with_context(|| format!("Failed to decode chunk {:?}", chunk_coords))?;
+		let (chunk, has_unknown) =
+			world::chunk::Chunk::new(&data, self.block_types, self.biome_types)
+				.with_context(|| format!("Failed to decode chunk {:?}", chunk_coords))?;
+		self.has_unknown |= has_unknown;
 		let Some(layer::LayerData {
 			blocks,
 			biomes,
@@ -231,7 +246,11 @@ impl<'a> SingleRegionProcessor<'a> {
 		self.save_region()?;
 		self.save_lightmap()?;
 
-		Ok(RegionProcessorStatus::Ok)
+		Ok(if self.has_unknown {
+			RegionProcessorStatus::OkWithUnknown
+		} else {
+			RegionProcessorStatus::Ok
+		})
 	}
 }
 
@@ -300,6 +319,8 @@ impl<'a> RegionProcessor<'a> {
 		let (processed_send, processed_recv) = mpsc::channel();
 		let (error_send, error_recv) = mpsc::channel();
 
+		let has_unknown = AtomicBool::new(false);
+
 		self.collect_regions()?.par_iter().try_for_each(|&coords| {
 			let ret = self
 				.process_region(coords)
@@ -311,6 +332,10 @@ impl<'a> RegionProcessor<'a> {
 
 			match ret {
 				RegionProcessorStatus::Ok => processed_send.send(()).unwrap(),
+				RegionProcessorStatus::OkWithUnknown => {
+					has_unknown.store(true, Ordering::Relaxed);
+					processed_send.send(()).unwrap();
+				}
 				RegionProcessorStatus::Skipped => {}
 				RegionProcessorStatus::ErrorOk | RegionProcessorStatus::ErrorMissing => {
 					error_send.send(()).unwrap()
@@ -334,6 +359,16 @@ impl<'a> RegionProcessor<'a> {
 			regions.len() - processed - errors,
 			errors,
 		);
+
+		if has_unknown.into_inner() {
+			warn!("Unknown block or biome types found during processing");
+			eprint!(concat!(
+				"\n",
+				"  If you're encountering this issue with an unmodified Minecraft version supported by MinedMap,\n",
+				"  please file a bug report including the output with the --verbose flag.\n",
+				"\n",
+			));
+		}
 
 		// Sort regions in a zig-zag pattern to optimize cache usage
 		regions.sort_unstable_by_key(|&TileCoords { x, z }| (x, if x % 2 == 0 { z } else { -z }));
