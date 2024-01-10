@@ -12,7 +12,7 @@
 
 ![Screenshot](https://raw.githubusercontent.com/neocturne/MinedMap/997a4fb24e89d2cd3c671d77eafaa47084d14304/docs/images/MinedMap.png)
 
-## How to use
+## About
 
 MinedMap consists of two components: a map renderer generating map tiles from
 Minecraft save games, and a viewer for displaying and navigating maps in a browser
@@ -20,16 +20,16 @@ based on [Leaflet](https://leafletjs.com/). The map renderer is heavily inspired
 [MapRend](https://github.com/YSelfTool/MapRend), but has been reimplemented from scratch
 (first in C++, now in Rust) for highest performance.
 
-The viewer expects the the map data in a directory named `data`. To generate a new
-map, create this empty directory inside the viewer directory. Next, to generate the
-map files run MinedMap passing the source and the destination paths on the command
-line:
+## How to use
+
+Minecraft stores its save data in a directory `~/.minecraft/saves` on Linux,
+and `C:\Users\<username>\AppData\Roaming\.minecraft\saves`. To generate minedmap
+tile data from a save game called "World", use the a command like the following
+(replacing the first argument with the path to your save data; `viewer` refers
+to the directory where you unpacked the MinedMap viewer):
 ```shell
-minedmap /path/to/save/game /path/to/viewer/data
+minedmap ~/.minecraft/saves/World viewer/data
 ```
-The save game is stored in `saves` inside your Minecraft main directory
-(`~/.minecraft` on Linux, `C:\Users\<username>\AppData\Roaming\.minecraft` on Windows)
-in a subdirectory with the name of your world.
 
 The first map generation might take a while for big worlds, but subsequent calls will
 only rebuild tiles for region files that have changed, rarely taking more than a second
@@ -38,7 +38,8 @@ MinedMap as a Cron job every minute.
 
 Note that it is not possible to open the viewer *index.html* without a webserver, as
 it cannot load the generated map information from `file://` URIs. For testing purposes,
-you can use a minimal HTTP server, e.g. (if you have Python installed):
+you can use a minimal HTTP server, e.g. if you have Python installed just run the
+following in the viewer directory:
 ```shell
 python3 -m http.server
 ```
@@ -48,7 +49,10 @@ the generated map files to public webspace to make the map available to others.
 
 ## Installation
 
-Building the MinedMap map generator from source requires a recent Rust toolchain (1.72.0
+Binary builds of the map generator for Linux and Windows, as well as an archive
+containing the viewer can be found on the GitHub release page.
+
+Building the generator from source requires a recent Rust toolchain (1.72.0
 or newer). The following command can be used to build the current development version:
 ```shell
 cargo install --git 'https://github.com/neocturne/MinedMap.git'
