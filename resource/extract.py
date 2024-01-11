@@ -11,7 +11,7 @@ if len(sys.argv) != 4:
 	sys.exit('Usage: extract.py <blocks.json> <asset directory> <colors.json>')
 
 def mean_color(texture):
-	path = os.path.join(sys.argv[2], texture + '.png')
+	path = os.path.join(sys.argv[2], 'assets/minecraft/textures/block', texture + '.png')
 	im = Image.open(path)
 
 	data = im.convert('RGBA').getdata()

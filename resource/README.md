@@ -43,7 +43,7 @@ with MinedMap's resource metadata.
 5. Edit `blocks.json` until the following command passes without errors:
 
      ```sh
-     ./extract.py blocks.json data/new/assets/minecraft/textures/block colors.json
+     ./extract.py blocks.json data/new colors.json
      ```
 
    If possible, the top texture of blocks should be used where different sides
