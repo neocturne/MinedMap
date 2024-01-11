@@ -1,9 +1,12 @@
 //! Core functions of the MinedMap CLI
 
 mod common;
+mod entity_collector;
 mod metadata_writer;
 mod region_group;
 mod region_processor;
+mod tile_collector;
+mod tile_merger;
 mod tile_mipmapper;
 mod tile_renderer;
 
@@ -19,6 +22,8 @@ use region_processor::RegionProcessor;
 use tile_mipmapper::TileMipmapper;
 use tile_renderer::TileRenderer;
 
+use self::entity_collector::EntityCollector;
+
 /// MinedMap version number
 const VERSION: &str = git_version!(
 	args = ["--abbrev=7", "--match=v*", "--dirty=-modified"],
@@ -27,7 +32,11 @@ const VERSION: &str = git_version!(
 
 /// Command line arguments for minedmap CLI
 #[derive(Debug, Parser)]
-#[command(about, version = VERSION.strip_prefix("v").unwrap())]
+#[command(
+	about,
+	version = VERSION.strip_prefix("v").unwrap(),
+	max_term_width = 100,
+)]
 pub struct Args {
 	/// Number of parallel threads to use for processing
 	///
@@ -38,6 +47,18 @@ pub struct Args {
 	/// Enable verbose messages
 	#[arg(short, long)]
 	pub verbose: bool,
+	/// Prefix for text of signs to show on the map
+	#[arg(long)]
+	pub sign_prefix: Vec<String>,
+	/// Regular expression for text of signs to show on the map
+	///
+	/// --sign-prefix and --sign-filter allow to filter for signs to display;
+	/// by default, none are visible. The options may be passed multiple times,
+	/// and a sign will be visible if it matches any pattern.
+	///
+	/// To make all signs visible, pass an empty string to either option.
+	#[arg(long)]
+	pub sign_filter: Vec<String>,
 	/// Minecraft save directory
 	pub input_dir: PathBuf,
 	/// MinedMap data directory
@@ -55,7 +76,7 @@ fn setup_threads(num_threads: usize) -> Result<()> {
 /// MinedMap CLI main function
 pub fn cli() -> Result<()> {
 	let args = Args::parse();
-	let config = Config::new(&args);
+	let config = Config::new(&args)?;
 
 	tracing_subscriber::fmt()
 		.with_max_level(if args.verbose {
@@ -75,6 +96,7 @@ pub fn cli() -> Result<()> {
 	let regions = RegionProcessor::new(&config).run()?;
 	TileRenderer::new(&config, &rt, &regions).run()?;
 	let tiles = TileMipmapper::new(&config, &regions).run()?;
+	EntityCollector::new(&config, &regions).run()?;
 	MetadataWriter::new(&config, &tiles).run()?;
 
 	Ok(())

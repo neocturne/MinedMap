@@ -9,7 +9,10 @@
 	"acacia_fence_gate": {
 		"texture": "acacia_planks"
 	},
-	"acacia_hanging_sign": null,
+	"acacia_hanging_sign": {
+		"sign_material": "acacia",
+		"texture": null
+	},
 	"acacia_leaves": {
 		"foliage": true
 	},
@@ -22,7 +25,8 @@
 	},
 	"acacia_sapling": {},
 	"acacia_sign": {
-		"texture": "acacia_planks"
+		"sign_material": "acacia",
+		"texture": null
 	},
 	"acacia_slab": {
 		"texture": "acacia_planks"
@@ -31,8 +35,16 @@
 		"texture": "acacia_planks"
 	},
 	"acacia_trapdoor": {},
-	"acacia_wall_hanging_sign": null,
-	"acacia_wall_sign": null,
+	"acacia_wall_hanging_sign": {
+		"sign_material": "acacia",
+		"texture": null,
+		"wall_sign": true
+	},
+	"acacia_wall_sign": {
+		"sign_material": "acacia",
+		"texture": null,
+		"wall_sign": true
+	},
 	"acacia_wood": {
 		"texture": "acacia_log"
 	},
@@ -84,7 +96,10 @@
 	"bamboo_fence_gate": {
 		"texture": "bamboo_planks"
 	},
-	"bamboo_hanging_sign": null,
+	"bamboo_hanging_sign": {
+		"sign_material": "bamboo",
+		"texture": null
+	},
 	"bamboo_mosaic": {},
 	"bamboo_mosaic_slab": {
 		"texture": "bamboo_mosaic"
@@ -98,7 +113,8 @@
 	},
 	"bamboo_sapling": null,
 	"bamboo_sign": {
-		"texture": "bamboo_planks"
+		"sign_material": "bamboo",
+		"texture": null
 	},
 	"bamboo_slab": {
 		"texture": "bamboo_planks"
@@ -107,8 +123,16 @@
 		"texture": "bamboo_planks"
 	},
 	"bamboo_trapdoor": {},
-	"bamboo_wall_hanging_sign": null,
-	"bamboo_wall_sign": null,
+	"bamboo_wall_hanging_sign": {
+		"sign_material": "bamboo",
+		"texture": null,
+		"wall_sign": true
+	},
+	"bamboo_wall_sign": {
+		"sign_material": "bamboo",
+		"texture": null,
+		"wall_sign": true
+	},
 	"barrel": {
 		"texture": "barrel_top"
 	},
@@ -144,7 +168,10 @@
 	"birch_fence_gate": {
 		"texture": "birch_planks"
 	},
-	"birch_hanging_sign": null,
+	"birch_hanging_sign": {
+		"sign_material": "birch",
+		"texture": null
+	},
 	"birch_leaves": {
 		"birch": true
 	},
@@ -157,7 +184,8 @@
 	},
 	"birch_sapling": {},
 	"birch_sign": {
-		"texture": "birch_planks"
+		"sign_material": "birch",
+		"texture": null
 	},
 	"birch_slab": {
 		"texture": "birch_planks"
@@ -166,8 +194,16 @@
 		"texture": "birch_planks"
 	},
 	"birch_trapdoor": {},
-	"birch_wall_hanging_sign": null,
-	"birch_wall_sign": null,
+	"birch_wall_hanging_sign": {
+		"sign_material": "birch",
+		"texture": null,
+		"wall_sign": true
+	},
+	"birch_wall_sign": {
+		"sign_material": "birch",
+		"texture": null,
+		"wall_sign": true
+	},
 	"birch_wood": {
 		"texture": "birch_log"
 	},
@@ -326,7 +362,10 @@
 	"cherry_fence_gate": {
 		"texture": "cherry_planks"
 	},
-	"cherry_hanging_sign": null,
+	"cherry_hanging_sign": {
+		"sign_material": "cherry",
+		"texture": null
+	},
 	"cherry_leaves": {},
 	"cherry_log": {
 		"texture": "cherry_log_top"
@@ -337,7 +376,8 @@
 	},
 	"cherry_sapling": null,
 	"cherry_sign": {
-		"texture": "cherry_planks"
+		"sign_material": "cherry",
+		"texture": null
 	},
 	"cherry_slab": {
 		"texture": "cherry_planks"
@@ -346,8 +386,16 @@
 		"texture": "cherry_planks"
 	},
 	"cherry_trapdoor": {},
-	"cherry_wall_hanging_sign": null,
-	"cherry_wall_sign": null,
+	"cherry_wall_hanging_sign": {
+		"sign_material": "cherry",
+		"texture": null,
+		"wall_sign": true
+	},
+	"cherry_wall_sign": {
+		"sign_material": "cherry",
+		"texture": null,
+		"wall_sign": true
+	},
 	"cherry_wood": {
 		"texture": "cherry_log"
 	},
@@ -433,7 +481,10 @@
 		"texture": "crimson_planks"
 	},
 	"crimson_fungus": null,
-	"crimson_hanging_sign": null,
+	"crimson_hanging_sign": {
+		"sign_material": "crimson",
+		"texture": null
+	},
 	"crimson_hyphae": {
 		"texture": "crimson_stem"
 	},
@@ -444,7 +495,8 @@
 	},
 	"crimson_roots": {},
 	"crimson_sign": {
-		"texture": "crimson_planks"
+		"sign_material": "crimson",
+		"texture": null
 	},
 	"crimson_slab": {
 		"texture": "crimson_planks"
@@ -456,8 +508,16 @@
 		"texture": "crimson_stem_top"
 	},
 	"crimson_trapdoor": {},
-	"crimson_wall_hanging_sign": null,
-	"crimson_wall_sign": null,
+	"crimson_wall_hanging_sign": {
+		"sign_material": "crimson",
+		"texture": null,
+		"wall_sign": true
+	},
+	"crimson_wall_sign": {
+		"sign_material": "crimson",
+		"texture": null,
+		"wall_sign": true
+	},
 	"crying_obsidian": {},
 	"cut_copper": {},
 	"cut_copper_slab": {
@@ -512,7 +572,10 @@
 	"dark_oak_fence_gate": {
 		"texture": "dark_oak_planks"
 	},
-	"dark_oak_hanging_sign": null,
+	"dark_oak_hanging_sign": {
+		"sign_material": "dark_oak",
+		"texture": null
+	},
 	"dark_oak_leaves": {
 		"foliage": true
 	},
@@ -525,7 +588,8 @@
 	},
 	"dark_oak_sapling": {},
 	"dark_oak_sign": {
-		"texture": "dark_oak_planks"
+		"sign_material": "dark_oak",
+		"texture": null
 	},
 	"dark_oak_slab": {
 		"texture": "dark_oak_planks"
@@ -534,8 +598,16 @@
 		"texture": "dark_oak_planks"
 	},
 	"dark_oak_trapdoor": {},
-	"dark_oak_wall_hanging_sign": null,
-	"dark_oak_wall_sign": null,
+	"dark_oak_wall_hanging_sign": {
+		"sign_material": "dark_oak",
+		"texture": null,
+		"wall_sign": true
+	},
+	"dark_oak_wall_sign": {
+		"sign_material": "dark_oak",
+		"texture": null,
+		"wall_sign": true
+	},
 	"dark_oak_wood": {
 		"texture": "dark_oak_log"
 	},
@@ -832,7 +904,10 @@
 	"jungle_fence_gate": {
 		"texture": "jungle_planks"
 	},
-	"jungle_hanging_sign": null,
+	"jungle_hanging_sign": {
+		"sign_material": "jungle",
+		"texture": null
+	},
 	"jungle_leaves": {
 		"foliage": true
 	},
@@ -845,7 +920,8 @@
 	},
 	"jungle_sapling": {},
 	"jungle_sign": {
-		"texture": "jungle_planks"
+		"sign_material": "jungle",
+		"texture": null
 	},
 	"jungle_slab": {
 		"texture": "jungle_planks"
@@ -854,8 +930,16 @@
 		"texture": "jungle_planks"
 	},
 	"jungle_trapdoor": {},
-	"jungle_wall_hanging_sign": null,
-	"jungle_wall_sign": null,
+	"jungle_wall_hanging_sign": {
+		"sign_material": "jungle",
+		"texture": null,
+		"wall_sign": true
+	},
+	"jungle_wall_sign": {
+		"sign_material": "jungle",
+		"texture": null,
+		"wall_sign": true
+	},
 	"jungle_wood": {
 		"texture": "jungle_log"
 	},
@@ -991,7 +1075,10 @@
 	"mangrove_fence_gate": {
 		"texture": "mangrove_planks"
 	},
-	"mangrove_hanging_sign": null,
+	"mangrove_hanging_sign": {
+		"sign_material": "mangrove",
+		"texture": null
+	},
 	"mangrove_leaves": {
 		"foliage": true
 	},
@@ -1007,7 +1094,8 @@
 		"texture": "mangrove_roots_top"
 	},
 	"mangrove_sign": {
-		"texture": "mangrove_planks"
+		"sign_material": "mangrove",
+		"texture": null
 	},
 	"mangrove_slab": {
 		"texture": "mangrove_planks"
@@ -1016,8 +1104,16 @@
 		"texture": "mangrove_planks"
 	},
 	"mangrove_trapdoor": {},
-	"mangrove_wall_hanging_sign": null,
-	"mangrove_wall_sign": null,
+	"mangrove_wall_hanging_sign": {
+		"sign_material": "mangrove",
+		"texture": null,
+		"wall_sign": true
+	},
+	"mangrove_wall_sign": {
+		"sign_material": "mangrove",
+		"texture": null,
+		"wall_sign": true
+	},
 	"mangrove_wood": {
 		"texture": "mangrove_log"
 	},
@@ -1105,7 +1201,10 @@
 	"oak_fence_gate": {
 		"texture": "oak_planks"
 	},
-	"oak_hanging_sign": null,
+	"oak_hanging_sign": {
+		"sign_material": "oak",
+		"texture": null
+	},
 	"oak_leaves": {
 		"foliage": true
 	},
@@ -1118,7 +1217,8 @@
 	},
 	"oak_sapling": {},
 	"oak_sign": {
-		"texture": "oak_planks"
+		"sign_material": "oak",
+		"texture": null
 	},
 	"oak_slab": {
 		"texture": "oak_planks"
@@ -1127,8 +1227,16 @@
 		"texture": "oak_planks"
 	},
 	"oak_trapdoor": {},
-	"oak_wall_hanging_sign": null,
-	"oak_wall_sign": null,
+	"oak_wall_hanging_sign": {
+		"sign_material": "oak",
+		"texture": null,
+		"wall_sign": true
+	},
+	"oak_wall_sign": {
+		"sign_material": "oak",
+		"texture": null,
+		"wall_sign": true
+	},
 	"oak_wood": {
 		"texture": "oak_log"
 	},
@@ -1562,7 +1670,8 @@
 	"shroomlight": {},
 	"shulker_box": {},
 	"sign": {
-		"texture": "oak_planks"
+		"sign_material": "oak",
+		"texture": null
 	},
 	"skeleton_skull": null,
 	"skeleton_wall_skull": null,
@@ -1638,7 +1747,10 @@
 	"spruce_fence_gate": {
 		"texture": "spruce_planks"
 	},
-	"spruce_hanging_sign": null,
+	"spruce_hanging_sign": {
+		"sign_material": "spruce",
+		"texture": null
+	},
 	"spruce_leaves": {
 		"spruce": true
 	},
@@ -1651,7 +1763,8 @@
 	},
 	"spruce_sapling": {},
 	"spruce_sign": {
-		"texture": "spruce_planks"
+		"sign_material": "spruce",
+		"texture": null
 	},
 	"spruce_slab": {
 		"texture": "spruce_planks"
@@ -1660,8 +1773,16 @@
 		"texture": "spruce_planks"
 	},
 	"spruce_trapdoor": {},
-	"spruce_wall_hanging_sign": null,
-	"spruce_wall_sign": null,
+	"spruce_wall_hanging_sign": {
+		"sign_material": "spruce",
+		"texture": null,
+		"wall_sign": true
+	},
+	"spruce_wall_sign": {
+		"sign_material": "spruce",
+		"texture": null,
+		"wall_sign": true
+	},
 	"spruce_wood": {
 		"texture": "spruce_log"
 	},
@@ -1808,7 +1929,11 @@
 		"grass": true
 	},
 	"void_air": null,
-	"wall_sign": null,
+	"wall_sign": {
+		"sign_material": "oak",
+		"texture": null,
+		"wall_sign": true
+	},
 	"wall_torch": null,
 	"warped_button": null,
 	"warped_door": {
@@ -1821,7 +1946,10 @@
 		"texture": "warped_planks"
 	},
 	"warped_fungus": null,
-	"warped_hanging_sign": null,
+	"warped_hanging_sign": {
+		"sign_material": "warped",
+		"texture": null
+	},
 	"warped_hyphae": {
 		"texture": "warped_stem"
 	},
@@ -1832,7 +1960,8 @@
 	},
 	"warped_roots": {},
 	"warped_sign": {
-		"texture": "warped_planks"
+		"sign_material": "warped",
+		"texture": null
 	},
 	"warped_slab": {
 		"texture": "warped_planks"
@@ -1844,8 +1973,16 @@
 		"texture": "warped_stem_top"
 	},
 	"warped_trapdoor": {},
-	"warped_wall_hanging_sign": null,
-	"warped_wall_sign": null,
+	"warped_wall_hanging_sign": {
+		"sign_material": "warped",
+		"texture": null,
+		"wall_sign": true
+	},
+	"warped_wall_sign": {
+		"sign_material": "warped",
+		"texture": null,
+		"wall_sign": true
+	},
 	"warped_wart_block": {},
 	"water": {
 		"texture": "water_still",

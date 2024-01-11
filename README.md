@@ -23,7 +23,7 @@ based on [Leaflet](https://leafletjs.com/). The map renderer is heavily inspired
 ## How to use
 
 Minecraft stores its save data in a directory `~/.minecraft/saves` on Linux,
-and `C:\Users\<username>\AppData\Roaming\.minecraft\saves`. To generate minedmap
+and `C:\Users\<username>\AppData\Roaming\.minecraft\saves`. To generate MinedMap
 tile data from a save game called "World", use the a command like the following
 (replacing the first argument with the path to your save data; `viewer` refers
 to the directory where you unpacked the MinedMap viewer):
@@ -46,6 +46,34 @@ python3 -m http.server
 This test server is very slow and cannot handle multiple requests concurrently, so use
 a proper webserver like [nginx](https://nginx.org/) or upload the viewer together with
 the generated map files to public webspace to make the map available to others.
+
+### Signs
+
+![Sign screenshot](https://raw.githubusercontent.com/neocturne/MinedMap/e5d9c813ba3118d04dc7e52e3dc6f48808a69120/docs/images/signs.png)
+
+MinedMap can display sign markers on the map, which will open a popup showing
+the sign text when clicked.
+
+Generation of the sign layer is disabled by default. It can be enabled by passing
+the `--sign-prefix` or `--sign-filter` options to MinedMap. The options allow
+to configure which signs should be displayed, and they can be passed multiple
+times to show every sign that matches at least one prefix or filter.
+
+`--sign-prefix` will make all signs visible the text of which starts with the
+given prefix, so something like `--sign-prefix '[Map]'` would allow to put up
+signs that start with "\[Map\]" in Minecraft to add markers to the map. An
+empty prefix (`--sign-prefix ''`) can be used to make *all* signs visible on
+the map.
+
+`--sign-filter` can be used for more advanced filters based on regular expressions.
+`--sign-filter '\[Map\]'` would show all signs that contain "\[Map\]"
+anywhere in their text, and `--sign-filter '.'` makes all non-empty signs (signs
+containing at least one character) visible. See the documentation of the
+[regex crate](https://docs.rs/regex) for more information on the supported syntax.
+
+All prefixes and filters are applied to the front and back text separately, but
+both the front and the back text will be shown in the popup when one of them
+matches.
 
 ## Installation
 

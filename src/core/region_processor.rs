@@ -64,20 +64,28 @@ struct SingleRegionProcessor<'a> {
 	output_path: PathBuf,
 	/// Lightmap output filename
 	lightmap_path: PathBuf,
+	/// Processed entity output filename
+	entities_path: PathBuf,
 	/// Timestamp of last modification of input file
 	input_timestamp: SystemTime,
 	/// Timestamp of last modification of processed region output file (if valid)
 	output_timestamp: Option<SystemTime>,
 	/// Timestamp of last modification of lightmap output file (if valid)
 	lightmap_timestamp: Option<SystemTime>,
+	/// Timestamp of last modification of entity list output file (if valid)
+	entities_timestamp: Option<SystemTime>,
 	/// True if processed region output file needs to be updated
 	output_needed: bool,
 	/// True if lightmap output file needs to be updated
 	lightmap_needed: bool,
+	/// True if entity output file needs to be updated
+	entities_needed: bool,
 	/// Processed region intermediate data
 	processed_region: ProcessedRegion,
 	/// Lightmap intermediate data
 	lightmap: image::GrayAlphaImage,
+	/// Processed entity intermediate data
+	entities: ProcessedEntities,
 	/// True if any unknown block or biome types were encountered during processing
 	has_unknown: bool,
 }
@@ -93,14 +101,20 @@ impl<'a> SingleRegionProcessor<'a> {
 
 		let output_path = processor.config.processed_path(coords);
 		let output_timestamp = fs::read_timestamp(&output_path, REGION_FILE_META_VERSION);
+
 		let lightmap_path = processor.config.tile_path(TileKind::Lightmap, 0, coords);
 		let lightmap_timestamp = fs::read_timestamp(&lightmap_path, LIGHTMAP_FILE_META_VERSION);
 
+		let entities_path = processor.config.entities_path(0, coords);
+		let entities_timestamp = fs::read_timestamp(&entities_path, ENTITIES_FILE_META_VERSION);
+
 		let output_needed = Some(input_timestamp) > output_timestamp;
 		let lightmap_needed = Some(input_timestamp) > lightmap_timestamp;
+		let entities_needed = Some(input_timestamp) > entities_timestamp;
 
 		let processed_region = ProcessedRegion::default();
 		let lightmap = image::GrayAlphaImage::new(N, N);
+		let entities = ProcessedEntities::default();
 
 		Ok(SingleRegionProcessor {
 			block_types: &processor.block_types,
@@ -109,13 +123,17 @@ impl<'a> SingleRegionProcessor<'a> {
 			input_path,
 			output_path,
 			lightmap_path,
+			entities_path,
 			input_timestamp,
 			output_timestamp,
 			lightmap_timestamp,
+			entities_timestamp,
 			output_needed,
 			lightmap_needed,
+			entities_needed,
 			processed_region,
 			lightmap,
+			entities,
 			has_unknown: false,
 		})
 	}
@@ -145,9 +163,10 @@ impl<'a> SingleRegionProcessor<'a> {
 			return Ok(());
 		}
 
-		storage::write(
+		storage::write_file(
 			&self.output_path,
 			&self.processed_region,
+			storage::Format::Bincode,
 			REGION_FILE_META_VERSION,
 			self.input_timestamp,
 		)
@@ -173,34 +192,64 @@ impl<'a> SingleRegionProcessor<'a> {
 		)
 	}
 
+	/// Saves processed entity data
+	///
+	/// The timestamp is the time of the last modification of the input region data.
+	fn save_entities(&mut self) -> Result<()> {
+		if !self.entities_needed {
+			return Ok(());
+		}
+
+		self.entities.block_entities.sort_unstable();
+
+		storage::write_file(
+			&self.entities_path,
+			&self.entities,
+			storage::Format::Json,
+			ENTITIES_FILE_META_VERSION,
+			self.input_timestamp,
+		)
+	}
+
 	/// Processes a single chunk
 	fn process_chunk(&mut self, chunk_coords: ChunkCoords, data: world::de::Chunk) -> Result<()> {
 		let (chunk, has_unknown) =
 			world::chunk::Chunk::new(&data, self.block_types, self.biome_types)
 				.with_context(|| format!("Failed to decode chunk {:?}", chunk_coords))?;
 		self.has_unknown |= has_unknown;
-		let Some(layer::LayerData {
-			blocks,
-			biomes,
-			block_light,
-			depths,
-		}) = world::layer::top_layer(&mut self.processed_region.biome_list, &chunk)
-			.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
-		else {
-			return Ok(());
-		};
 
-		if self.output_needed {
-			self.processed_region.chunks[chunk_coords] = Some(Box::new(ProcessedChunk {
+		if self.output_needed || self.lightmap_needed {
+			if let Some(layer::LayerData {
 				blocks,
 				biomes,
+				block_light,
 				depths,
-			}));
+			}) = world::layer::top_layer(&mut self.processed_region.biome_list, &chunk)
+				.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
+			{
+				if self.output_needed {
+					self.processed_region.chunks[chunk_coords] = Some(Box::new(ProcessedChunk {
+						blocks,
+						biomes,
+						depths,
+					}));
+				}
+
+				if self.lightmap_needed {
+					let chunk_lightmap = Self::render_chunk_lightmap(block_light);
+					overlay_chunk(&mut self.lightmap, &chunk_lightmap, chunk_coords);
+				}
+			}
 		}
 
-		if self.lightmap_needed {
-			let chunk_lightmap = Self::render_chunk_lightmap(block_light);
-			overlay_chunk(&mut self.lightmap, &chunk_lightmap, chunk_coords);
+		if self.entities_needed {
+			let mut block_entities = chunk.block_entities().with_context(|| {
+				format!(
+					"Failed to process block entities for chunk {:?}",
+					chunk_coords,
+				)
+			})?;
+			self.entities.block_entities.append(&mut block_entities);
 		}
 
 		Ok(())
@@ -214,7 +263,7 @@ impl<'a> SingleRegionProcessor<'a> {
 
 	/// Processes the region
 	fn run(mut self) -> Result<RegionProcessorStatus> {
-		if !self.output_needed && !self.lightmap_needed {
+		if !self.output_needed && !self.lightmap_needed && !self.entities_needed {
 			debug!(
 				"Skipping unchanged region r.{}.{}.mca",
 				self.coords.x, self.coords.z
@@ -228,7 +277,10 @@ impl<'a> SingleRegionProcessor<'a> {
 		);
 
 		if let Err(err) = self.process_chunks() {
-			if self.output_timestamp.is_some() && self.lightmap_timestamp.is_some() {
+			if self.output_timestamp.is_some()
+				&& self.lightmap_timestamp.is_some()
+				&& self.entities_timestamp.is_some()
+			{
 				warn!(
 					"Failed to process region {:?}, using old data: {:?}",
 					self.coords, err
@@ -245,6 +297,7 @@ impl<'a> SingleRegionProcessor<'a> {
 
 		self.save_region()?;
 		self.save_lightmap()?;
+		self.save_entities()?;
 
 		Ok(if self.has_unknown {
 			RegionProcessorStatus::OkWithUnknown
@@ -312,6 +365,7 @@ impl<'a> RegionProcessor<'a> {
 	pub fn run(self) -> Result<Vec<TileCoords>> {
 		fs::create_dir_all(&self.config.processed_dir)?;
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Lightmap, 0))?;
+		fs::create_dir_all(&self.config.entities_dir(0))?;
 
 		info!("Processing region files...");
 

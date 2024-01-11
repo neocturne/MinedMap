@@ -1,6 +1,6 @@
 //! Functions for computations of block colors
 
-use super::{Biome, BlockType, Color, Colorf};
+use super::{Biome, BlockColor, Color, Colorf};
 
 /// Converts an u8 RGB color to a float vector
 fn color_vec_unscaled(color: Color) -> Colorf {
@@ -91,18 +91,18 @@ const BIRCH_COLOR: Colorf = Colorf::new(0.502, 0.655, 0.333); // == color_vec(Co
 /// Color multiplier for spruce leaves
 const EVERGREEN_COLOR: Colorf = Colorf::new(0.380, 0.600, 0.380); // == color_vec(Color([97, 153, 97]))
 
-/// Determined if calling [block_color] for a given [BlockType] needs biome information
-pub fn needs_biome(block: BlockType) -> bool {
+/// Determined if calling [block_color] for a given [BlockColor] needs biome information
+pub fn needs_biome(block: BlockColor) -> bool {
 	use super::BlockFlag::*;
 
 	block.is(Grass) || block.is(Foliage) || block.is(Water)
 }
 
-/// Determined the block color to display for a given [BlockType]
+/// Determined the block color to display for a given [BlockColor]
 ///
 /// [needs_biome] must be used to determine whether passing a [Biome] is necessary.
 /// Will panic if a [Biome] is necessary, but none is passed.
-pub fn block_color(block: BlockType, biome: Option<&Biome>, depth: f32) -> Colorf {
+pub fn block_color(block: BlockColor, biome: Option<&Biome>, depth: f32) -> Colorf {
 	use super::BlockFlag::*;
 
 	let get_biome = || biome.expect("needs biome to determine block color");

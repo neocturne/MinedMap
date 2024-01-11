@@ -27,10 +27,15 @@ pub enum BlockFlag {
 	Foliage,
 	/// The block type is birch foliage
 	Birch,
-	/// The block type is spurce foliage
+	/// The block type is spruce foliage
 	Spruce,
 	/// The block type is colored using biome water colors
 	Water,
+	/// The block type is a wall sign
+	///
+	/// The WallSign flag is used to distinguish wall signs from
+	/// freestanding or -hanging signs.
+	WallSign,
 }
 
 /// An RGB color with u8 components
@@ -42,18 +47,45 @@ pub type Colorf = glam::Vec3;
 
 /// A block type specification
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct BlockType {
+pub struct BlockColor {
 	/// Bit set of [BlockFlag]s describing special properties of the block type
 	pub flags: BitFlags<BlockFlag>,
 	/// Base color of the block type
 	pub color: Color,
 }
 
-impl BlockType {
-	/// Checks whether a block type has a given [BlockFlag] set
+impl BlockColor {
+	/// Checks whether a block color has a given [BlockFlag] set
 	#[inline]
 	pub fn is(&self, flag: BlockFlag) -> bool {
 		self.flags.contains(flag)
+	}
+}
+
+/// A block type specification (for use in constants)
+#[derive(Debug, Clone)]
+struct ConstBlockType {
+	/// Determines the rendered color of the block type
+	pub block_color: BlockColor,
+	/// Material of a sign block
+	pub sign_material: Option<&'static str>,
+}
+
+/// A block type specification
+#[derive(Debug, Clone)]
+pub struct BlockType {
+	/// Determines the rendered color of the block type
+	pub block_color: BlockColor,
+	/// Material of a sign block
+	pub sign_material: Option<String>,
+}
+
+impl From<&ConstBlockType> for BlockType {
+	fn from(value: &ConstBlockType) -> Self {
+		BlockType {
+			block_color: value.block_color,
+			sign_material: value.sign_material.map(String::from),
+		}
 	}
 }
 
@@ -70,10 +102,15 @@ impl Default for BlockTypes {
 	fn default() -> Self {
 		let block_type_map: HashMap<_, _> = block_types::BLOCK_TYPES
 			.iter()
-			.map(|(k, v)| (String::from(*k), *v))
+			.map(|(k, v)| (String::from(*k), BlockType::from(v)))
 			.collect();
 		let legacy_block_types = Box::new(legacy_block_types::LEGACY_BLOCK_TYPES.map(|inner| {
-			inner.map(|id| *block_type_map.get(id).expect("Unknown legacy block type"))
+			inner.map(|id| {
+				block_type_map
+					.get(id)
+					.expect("Unknown legacy block type")
+					.clone()
+			})
 		}));
 
 		BlockTypes {
@@ -86,15 +123,15 @@ impl Default for BlockTypes {
 impl BlockTypes {
 	/// Resolves a Minecraft 1.13+ string block type ID
 	#[inline]
-	pub fn get(&self, id: &str) -> Option<BlockType> {
+	pub fn get(&self, id: &str) -> Option<&BlockType> {
 		let suffix = id.strip_prefix("minecraft:")?;
-		self.block_type_map.get(suffix).copied()
+		self.block_type_map.get(suffix)
 	}
 
 	/// Resolves a Minecraft pre-1.13 numeric block type ID
 	#[inline]
-	pub fn get_legacy(&self, id: u8, data: u8) -> Option<BlockType> {
-		Some(self.legacy_block_types[id as usize][data as usize])
+	pub fn get_legacy(&self, id: u8, data: u8) -> Option<&BlockType> {
+		Some(&self.legacy_block_types[id as usize][data as usize])
 	}
 }
 

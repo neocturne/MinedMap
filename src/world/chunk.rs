@@ -10,16 +10,16 @@ use std::{
 
 use anyhow::{bail, Context, Result};
 
-use super::{de, section::*};
+use super::{block_entity::BlockEntity, de, section::*};
 use crate::{
-	resource::{BiomeTypes, BlockTypes},
+	resource::{BiomeTypes, BlockType, BlockTypes},
 	types::*,
+	util::{self, ShiftMask},
 };
 
-/// Chunk data structure wrapping a [de::Chunk] for convenient access to
-/// block and biome data
+/// Version-specific part of [Chunk]
 #[derive(Debug)]
-pub enum Chunk<'a> {
+pub enum ChunkInner<'a> {
 	/// Minecraft v1.18+ chunk with biome data moved into sections
 	V1_18 {
 		/// Section data
@@ -50,6 +50,16 @@ pub enum Chunk<'a> {
 	Empty,
 }
 
+/// Chunk data structure wrapping a [de::Chunk] for convenient access to
+/// block and biome data
+#[derive(Debug)]
+pub struct Chunk<'a> {
+	/// Version-specific data
+	inner: ChunkInner<'a>,
+	/// Unprocessed block entities
+	block_entities: &'a Vec<de::BlockEntity>,
+}
+
 impl<'a> Chunk<'a> {
 	/// Creates a new [Chunk] from a deserialized [de::Chunk]
 	pub fn new(
@@ -59,14 +69,27 @@ impl<'a> Chunk<'a> {
 	) -> Result<(Self, bool)> {
 		let data_version = data.data_version.unwrap_or_default();
 
-		match &data.chunk {
-			de::ChunkVariant::V1_18 { sections } => {
-				Self::new_v1_18(data_version, sections, block_types, biome_types)
-			}
-			de::ChunkVariant::V0 { level } => {
-				Self::new_v0(data_version, level, block_types, biome_types)
-			}
-		}
+		let ((inner, has_unknown), block_entities) = match &data.chunk {
+			de::ChunkVariant::V1_18 {
+				sections,
+				block_entities,
+			} => (
+				Self::new_v1_18(data_version, sections, block_types, biome_types)?,
+				block_entities,
+			),
+			de::ChunkVariant::V0 { level } => (
+				Self::new_v0(data_version, level, block_types, biome_types)?,
+				&level.tile_entities,
+			),
+		};
+
+		Ok((
+			Chunk {
+				inner,
+				block_entities,
+			},
+			has_unknown,
+		))
 	}
 
 	/// [Chunk::new] implementation for Minecraft v1.18+ chunks
@@ -75,7 +98,7 @@ impl<'a> Chunk<'a> {
 		sections: &'a Vec<de::SectionV1_18>,
 		block_types: &'a BlockTypes,
 		biome_types: &'a BiomeTypes,
-	) -> Result<(Self, bool)> {
+	) -> Result<(ChunkInner<'a>, bool)> {
 		let mut section_map = BTreeMap::new();
 		let mut has_unknown = false;
 
@@ -117,7 +140,7 @@ impl<'a> Chunk<'a> {
 			};
 		}
 
-		let chunk = Chunk::V1_18 { section_map };
+		let chunk = ChunkInner::V1_18 { section_map };
 		Ok((chunk, has_unknown))
 	}
 
@@ -127,7 +150,7 @@ impl<'a> Chunk<'a> {
 		level: &'a de::LevelV0,
 		block_types: &'a BlockTypes,
 		biome_types: &'a BiomeTypes,
-	) -> Result<(Self, bool)> {
+	) -> Result<(ChunkInner<'a>, bool)> {
 		let mut section_map_v1_13 = BTreeMap::new();
 		let mut section_map_v0 = BTreeMap::new();
 		let mut has_unknown = false;
@@ -167,12 +190,12 @@ impl<'a> Chunk<'a> {
 
 		let biomes = BiomesV0::new(level.biomes.as_ref(), biome_types);
 		let chunk = match (section_map_v1_13.is_empty(), section_map_v0.is_empty()) {
-			(true, true) => Chunk::Empty,
-			(false, true) => Chunk::V1_13 {
+			(true, true) => ChunkInner::Empty,
+			(false, true) => ChunkInner::V1_13 {
 				section_map: section_map_v1_13,
 				biomes: biomes?,
 			},
-			(true, false) => Chunk::V0 {
+			(true, false) => ChunkInner::V0 {
 				section_map: section_map_v0,
 				biomes: biomes?,
 			},
@@ -186,11 +209,11 @@ impl<'a> Chunk<'a> {
 
 	/// Returns true if the chunk does not contain any sections
 	pub fn is_empty(&self) -> bool {
-		match self {
-			Chunk::V1_18 { section_map } => section_map.is_empty(),
-			Chunk::V1_13 { section_map, .. } => section_map.is_empty(),
-			Chunk::V0 { section_map, .. } => section_map.is_empty(),
-			Chunk::Empty => true,
+		match &self.inner {
+			ChunkInner::V1_18 { section_map } => section_map.is_empty(),
+			ChunkInner::V1_13 { section_map, .. } => section_map.is_empty(),
+			ChunkInner::V0 { section_map, .. } => section_map.is_empty(),
+			ChunkInner::Empty => true,
 		}
 	}
 
@@ -198,27 +221,81 @@ impl<'a> Chunk<'a> {
 	pub fn sections(&self) -> SectionIter {
 		use SectionIterInner::*;
 		SectionIter {
-			inner: match self {
-				Chunk::V1_18 { section_map } => V1_18 {
+			inner: match &self.inner {
+				ChunkInner::V1_18 { section_map } => V1_18 {
 					iter: section_map.iter(),
 				},
-				Chunk::V1_13 {
+				ChunkInner::V1_13 {
 					section_map,
 					biomes,
 				} => V1_13 {
 					iter: section_map.iter(),
 					biomes,
 				},
-				Chunk::V0 {
+				ChunkInner::V0 {
 					section_map,
 					biomes,
 				} => V0 {
 					iter: section_map.iter(),
 					biomes,
 				},
-				Chunk::Empty => Empty,
+				ChunkInner::Empty => Empty,
 			},
 		}
+	}
+
+	/// Returns the section at a [SectionY] coordinate
+	fn section_at(&self, y: SectionY) -> Option<&dyn Section> {
+		match &self.inner {
+			ChunkInner::V1_18 { section_map } => section_map
+				.get(&y)
+				.map(|(section, _, _)| -> &dyn Section { section }),
+			ChunkInner::V1_13 { section_map, .. } => section_map
+				.get(&y)
+				.map(|(section, _)| -> &dyn Section { section }),
+			ChunkInner::V0 { section_map, .. } => section_map
+				.get(&y)
+				.map(|(section, _)| -> &dyn Section { section }),
+			ChunkInner::Empty => None,
+		}
+	}
+
+	/// Returns the [BlockType] at a given coordinate
+	fn block_type_at(&self, y: SectionY, coords: SectionBlockCoords) -> Result<Option<&BlockType>> {
+		let Some(section) = self.section_at(y) else {
+			return Ok(None);
+		};
+		section.block_at(coords)
+	}
+
+	/// Returns the [BlockType] at the coordinates of a [de::BlockEntity]
+	fn block_type_at_block_entity(
+		&self,
+		block_entity: &de::BlockEntity,
+	) -> Result<Option<&BlockType>> {
+		let x: BlockX = util::from_flat_coord(block_entity.x).2;
+		let z: BlockZ = util::from_flat_coord(block_entity.z).2;
+		let (section_y, block_y) = block_entity.y.shift_mask(BLOCK_BITS);
+
+		let coords = SectionBlockCoords {
+			xz: LayerBlockCoords { x, z },
+			y: BlockY::new(block_y),
+		};
+
+		self.block_type_at(SectionY(section_y), coords)
+	}
+
+	/// Processes all of the chunk's block entities
+	pub fn block_entities(&self) -> Result<Vec<BlockEntity>> {
+		let entities: Vec<Option<BlockEntity>> = self
+			.block_entities
+			.iter()
+			.map(|block_entity| {
+				let block_type = self.block_type_at_block_entity(block_entity)?;
+				Ok(BlockEntity::new(block_entity, block_type))
+			})
+			.collect::<Result<_>>()?;
+		Ok(entities.into_iter().flatten().collect())
 	}
 }
 
@@ -252,26 +329,26 @@ impl<'a, T> SectionIterTrait<'a> for T where
 /// Inner data structure of [SectionIter]
 #[derive(Debug, Clone)]
 enum SectionIterInner<'a> {
-	/// Iterator over sections of [Chunk::V1_18]
+	/// Iterator over sections of [ChunkInner::V1_18]
 	V1_18 {
 		/// Inner iterator into section map
 		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BiomesV1_18<'a>, BlockLight<'a>)>,
 	},
-	/// Iterator over sections of [Chunk::V1_13]
+	/// Iterator over sections of [ChunkInner::V1_13]
 	V1_13 {
 		/// Inner iterator into section map
 		iter: btree_map::Iter<'a, SectionY, (SectionV1_13<'a>, BlockLight<'a>)>,
 		/// Chunk biome data
 		biomes: &'a BiomesV0<'a>,
 	},
-	/// Iterator over sections of [Chunk::V0]
+	/// Iterator over sections of [ChunkInner::V0]
 	V0 {
 		/// Inner iterator into section map
 		iter: btree_map::Iter<'a, SectionY, (SectionV0<'a>, BlockLight<'a>)>,
 		/// Chunk biome data
 		biomes: &'a BiomesV0<'a>,
 	},
-	/// Empty iterator over an unpopulated chunk ([Chunk::Empty])
+	/// Empty iterator over an unpopulated chunk ([ChunkInner::Empty])
 	Empty,
 }
 

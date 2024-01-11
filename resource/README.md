@@ -11,6 +11,7 @@ work.
 - `extract.py`: Takes the block type information from `blocks.json` and texture data
   from an unpacked Minecraft JAR, storing the result in `colors.json`
 - `generate.py`: Generates `block_types.rs` from `colors.json`
+- `sign_textures.py`: Generates all needed sign graphics from Minecraft assets
 
 In addition to these scripts, the JSON processor *jq* is a useful tool to work
 with MinedMap's resource metadata.
@@ -42,12 +43,13 @@ with MinedMap's resource metadata.
 5. Edit `blocks.json` until the following command passes without errors:
 
      ```sh
-     ./extract.py blocks.json data/new/assets/minecraft/textures/block colors.json
+     ./extract.py blocks.json data/new colors.json
      ```
 
    If possible, the top texture of blocks should be used where different sides
    exist. Block types that should not be visible on the map are just set to
-   `null` in the JSON.
+   `null` in the JSON (or have a `null` `texture` field when other flags need
+   to be set, like for sign blocks).
 
    The `water`, `grass` and `foliage` flags control biome-dependent texture color modifiers.
 

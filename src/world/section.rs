@@ -44,7 +44,7 @@ fn palette_bits(len: usize, min: u8, max: u8) -> Option<u8> {
 /// Trait for common functions of [SectionV1_13] and [SectionV0]
 pub trait Section: Debug {
 	/// Returns the [BlockType] at a coordinate tuple inside the section
-	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<BlockType>>;
+	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<&BlockType>>;
 }
 
 /// Minecraft v1.13+ section block data
@@ -53,7 +53,7 @@ pub struct SectionV1_13<'a> {
 	/// Packed block type data
 	block_states: Option<&'a [i64]>,
 	/// List of block types indexed by entries encoded in *block_states*
-	palette: Vec<Option<BlockType>>,
+	palette: Vec<Option<&'a BlockType>>,
 	/// Number of bits per block in *block_states*
 	bits: u8,
 	/// Set to true if packed block entries in *block_states* are aligned to i64
@@ -146,7 +146,7 @@ impl<'a> SectionV1_13<'a> {
 }
 
 impl<'a> Section for SectionV1_13<'a> {
-	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<BlockType>> {
+	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<&BlockType>> {
 		let index = self.palette_index_at(coords);
 		Ok(*self
 			.palette
@@ -189,7 +189,7 @@ impl<'a> SectionV0<'a> {
 }
 
 impl<'a> Section for SectionV0<'a> {
-	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<BlockType>> {
+	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<&BlockType>> {
 		let offset = coords.offset();
 		let block = self.blocks[offset] as u8;
 

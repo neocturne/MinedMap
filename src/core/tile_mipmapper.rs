@@ -1,13 +1,153 @@
 //! The [TileMipmapper]
 
-use std::sync::mpsc;
+use std::{marker::PhantomData, ops::Add};
 
 use anyhow::{Context, Result};
-use rayon::prelude::*;
 use tracing::{debug, info, warn};
 
-use super::common::*;
+use super::{
+	common::*,
+	tile_collector::TileCollector,
+	tile_merger::{self, TileMerger},
+};
 use crate::{io::fs, types::*};
+
+/// Counters for the number of processed and total tiles
+///
+/// Used as return of [TileMipmapper::collect_one]
+#[derive(Debug, Clone, Copy)]
+pub struct MipmapStat {
+	/// Total number of tiles
+	total: usize,
+	/// Processed number of tiles
+	processed: usize,
+}
+
+impl From<tile_merger::Stat> for MipmapStat {
+	fn from(value: tile_merger::Stat) -> Self {
+		match value {
+			tile_merger::Stat::NotFound => MipmapStat {
+				total: 0,
+				processed: 0,
+			},
+			tile_merger::Stat::Skipped => MipmapStat {
+				total: 1,
+				processed: 0,
+			},
+			tile_merger::Stat::Regenerate => MipmapStat {
+				total: 1,
+				processed: 1,
+			},
+		}
+	}
+}
+
+impl Add for MipmapStat {
+	type Output = MipmapStat;
+
+	fn add(self, rhs: Self) -> Self::Output {
+		MipmapStat {
+			total: self.total + rhs.total,
+			processed: self.processed + rhs.processed,
+		}
+	}
+}
+
+/// [TileMerger] for map tile images
+struct MapMerger<'a, P> {
+	/// Common MinedMap configuration from command line
+	config: &'a Config,
+	/// Tile kind (map or lightmap)
+	kind: TileKind,
+	/// Pixel format type
+	_pixel: PhantomData<P>,
+}
+
+impl<'a, P> MapMerger<'a, P> {
+	/// Creates a new [MapMerger]
+	fn new(config: &'a Config, kind: TileKind) -> Self {
+		MapMerger {
+			config,
+			kind,
+			_pixel: PhantomData,
+		}
+	}
+}
+
+impl<'a, P: image::PixelWithColorType> TileMerger for MapMerger<'a, P>
+where
+	[P::Subpixel]: image::EncodableLayout,
+	image::ImageBuffer<P, Vec<P::Subpixel>>: Into<image::DynamicImage>,
+{
+	fn file_meta_version(&self) -> fs::FileMetaVersion {
+		MIPMAP_FILE_META_VERSION
+	}
+
+	fn tile_path(&self, level: usize, coords: TileCoords) -> std::path::PathBuf {
+		self.config.tile_path(self.kind, level, coords)
+	}
+
+	fn log(&self, output_path: &std::path::Path, stat: super::tile_merger::Stat) {
+		match stat {
+			super::tile_merger::Stat::NotFound => {}
+			super::tile_merger::Stat::Skipped => {
+				debug!(
+					"Skipping unchanged mipmap tile {}",
+					output_path
+						.strip_prefix(&self.config.output_dir)
+						.expect("tile path must be in output directory")
+						.display(),
+				);
+			}
+			super::tile_merger::Stat::Regenerate => {
+				debug!(
+					"Rendering mipmap tile {}",
+					output_path
+						.strip_prefix(&self.config.output_dir)
+						.expect("tile path must be in output directory")
+						.display(),
+				);
+			}
+		};
+	}
+
+	fn write_tile(
+		&self,
+		file: &mut std::io::BufWriter<std::fs::File>,
+		sources: &[super::tile_merger::Source],
+	) -> Result<()> {
+		/// Tile width/height
+		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
+
+		let mut image: image::DynamicImage =
+			image::ImageBuffer::<P, Vec<P::Subpixel>>::new(N, N).into();
+
+		for ((dx, dz), source_path, _) in sources {
+			let source = match image::open(source_path) {
+				Ok(source) => source,
+				Err(err) => {
+					warn!(
+						"Failed to read source image {}: {:?}",
+						source_path.display(),
+						err,
+					);
+					continue;
+				}
+			};
+			let resized = source.resize(N / 2, N / 2, image::imageops::FilterType::Triangle);
+			image::imageops::overlay(
+				&mut image,
+				&resized,
+				*dx as i64 * (N / 2) as i64,
+				*dz as i64 * (N / 2) as i64,
+			);
+		}
+
+		image
+			.write_to(file, image::ImageFormat::Png)
+			.context("Failed to save image")
+	}
+}
 
 /// Generates mipmap tiles from full-resolution tile images
 pub struct TileMipmapper<'a> {
@@ -17,37 +157,61 @@ pub struct TileMipmapper<'a> {
 	regions: &'a [TileCoords],
 }
 
+impl<'a> TileCollector for TileMipmapper<'a> {
+	type CollectOutput = MipmapStat;
+
+	fn tiles(&self) -> &[TileCoords] {
+		self.regions
+	}
+
+	fn prepare(&self, level: usize) -> Result<()> {
+		info!("Generating level {} mipmaps...", level);
+
+		fs::create_dir_all(&self.config.tile_dir(TileKind::Map, level))?;
+		fs::create_dir_all(&self.config.tile_dir(TileKind::Lightmap, level))?;
+
+		Ok(())
+	}
+
+	fn finish(
+		&self,
+		level: usize,
+		outputs: impl Iterator<Item = Self::CollectOutput>,
+	) -> Result<()> {
+		let stat = outputs.fold(
+			MipmapStat {
+				total: 0,
+				processed: 0,
+			},
+			MipmapStat::add,
+		);
+		info!(
+			"Generated level {} mipmaps ({} processed, {} unchanged)",
+			level,
+			stat.processed,
+			stat.total - stat.processed,
+		);
+
+		Ok(())
+	}
+
+	fn collect_one(
+		&self,
+		level: usize,
+		coords: TileCoords,
+		prev: &TileCoordMap,
+	) -> Result<Self::CollectOutput> {
+		let map_stat = self.render_mipmap::<image::Rgba<u8>>(TileKind::Map, level, coords, prev)?;
+		let lightmap_stat =
+			self.render_mipmap::<image::LumaA<u8>>(TileKind::Lightmap, level, coords, prev)?;
+		Ok(map_stat + lightmap_stat)
+	}
+}
+
 impl<'a> TileMipmapper<'a> {
 	/// Constructs a new TileMipmapper
 	pub fn new(config: &'a Config, regions: &'a [TileCoords]) -> Self {
 		TileMipmapper { config, regions }
-	}
-
-	/// Helper to determine if no further mipmap levels are needed
-	///
-	/// If all tile coordinates are -1 or 0, further mipmap levels will not
-	/// decrease the number of tiles and mipmap generated is considered finished.
-	fn done(tiles: &TileCoordMap) -> bool {
-		tiles
-			.0
-			.iter()
-			.all(|(z, xs)| (-1..=0).contains(z) && xs.iter().all(|x| (-1..=0).contains(x)))
-	}
-
-	/// Derives the map of populated tile coordinates for the next mipmap level
-	fn map_coords(tiles: &TileCoordMap) -> TileCoordMap {
-		let mut ret = TileCoordMap::default();
-
-		for (&z, xs) in &tiles.0 {
-			for &x in xs {
-				let xt = x >> 1;
-				let zt = z >> 1;
-
-				ret.0.entry(zt).or_default().insert(xt);
-			}
-		}
-
-		ret
 	}
 
 	/// Renders and saves a single mipmap tile image
@@ -60,174 +224,18 @@ impl<'a> TileMipmapper<'a> {
 		level: usize,
 		coords: TileCoords,
 		prev: &TileCoordMap,
-		count_total: &mpsc::Sender<()>,
-		count_processed: &mpsc::Sender<()>,
-	) -> Result<()>
+	) -> Result<MipmapStat>
 	where
 		[P::Subpixel]: image::EncodableLayout,
 		image::ImageBuffer<P, Vec<P::Subpixel>>: Into<image::DynamicImage>,
 	{
-		/// Tile width/height
-		const N: u32 = (BLOCKS_PER_CHUNK * CHUNKS_PER_REGION) as u32;
-
-		let version = match kind {
-			TileKind::Map => REGION_FILE_META_VERSION,
-			TileKind::Lightmap => LIGHTMAP_FILE_META_VERSION,
-		};
-		let output_path = self.config.tile_path(kind, level, coords);
-		let output_timestamp = fs::read_timestamp(&output_path, version);
-
-		let sources: Vec<_> = [(0, 0), (0, 1), (1, 0), (1, 1)]
-			.into_iter()
-			.filter_map(|(dx, dz)| {
-				let source_coords = TileCoords {
-					x: 2 * coords.x + dx,
-					z: 2 * coords.z + dz,
-				};
-				if !prev.contains(source_coords) {
-					return None;
-				}
-
-				let source_path = self.config.tile_path(kind, level - 1, source_coords);
-				let timestamp = match fs::modified_timestamp(&source_path) {
-					Ok(timestamp) => timestamp,
-					Err(err) => {
-						warn!("{}", err);
-						return None;
-					}
-				};
-				Some(((dx, dz), source_path, timestamp))
-			})
-			.collect();
-
-		let Some(input_timestamp) = sources.iter().map(|(_, _, ts)| *ts).max() else {
-			return Ok(());
-		};
-
-		count_total.send(()).unwrap();
-
-		if Some(input_timestamp) <= output_timestamp {
-			debug!(
-				"Skipping unchanged mipmap tile {}",
-				output_path
-					.strip_prefix(&self.config.output_dir)
-					.expect("tile path must be in output directory")
-					.display(),
-			);
-			return Ok(());
-		}
-
-		debug!(
-			"Rendering mipmap tile {}",
-			output_path
-				.strip_prefix(&self.config.output_dir)
-				.expect("tile path must be in output directory")
-				.display(),
-		);
-
-		let mut image: image::DynamicImage =
-			image::ImageBuffer::<P, Vec<P::Subpixel>>::new(N, N).into();
-
-		for ((dx, dz), source_path, _) in sources {
-			let source = match image::open(&source_path) {
-				Ok(source) => source,
-				Err(err) => {
-					warn!(
-						"Failed to read source image {}: {}",
-						source_path.display(),
-						err,
-					);
-					continue;
-				}
-			};
-			let resized = source.resize(N / 2, N / 2, image::imageops::FilterType::Triangle);
-			image::imageops::overlay(
-				&mut image,
-				&resized,
-				dx as i64 * (N / 2) as i64,
-				dz as i64 * (N / 2) as i64,
-			);
-		}
-
-		fs::create_with_timestamp(&output_path, version, input_timestamp, |file| {
-			image
-				.write_to(file, image::ImageFormat::Png)
-				.context("Failed to save image")
-		})?;
-
-		count_processed.send(()).unwrap();
-		Ok(())
+		let merger = MapMerger::<P>::new(self.config, kind);
+		let ret = merger.merge_tiles(level, coords, prev)?;
+		Ok(ret.into())
 	}
 
 	/// Runs the mipmap generation
 	pub fn run(self) -> Result<Vec<TileCoordMap>> {
-		let mut tile_stack = {
-			let mut tile_map = TileCoordMap::default();
-
-			for &TileCoords { x, z } in self.regions {
-				tile_map.0.entry(z).or_default().insert(x);
-			}
-
-			vec![tile_map]
-		};
-
-		loop {
-			let level = tile_stack.len();
-			let prev = &tile_stack[level - 1];
-			if Self::done(prev) {
-				break;
-			}
-
-			info!("Generating level {} mipmaps...", level);
-
-			fs::create_dir_all(&self.config.tile_dir(TileKind::Map, level))?;
-			fs::create_dir_all(&self.config.tile_dir(TileKind::Lightmap, level))?;
-
-			let next = Self::map_coords(prev);
-
-			let (total_send, total_recv) = mpsc::channel();
-			let (processed_send, processed_recv) = mpsc::channel();
-
-			next.0
-				.par_iter()
-				.flat_map(|(&z, xs)| xs.par_iter().map(move |&x| TileCoords { x, z }))
-				.try_for_each(|coords| {
-					self.render_mipmap::<image::Rgba<u8>>(
-						TileKind::Map,
-						level,
-						coords,
-						prev,
-						&total_send,
-						&processed_send,
-					)?;
-					self.render_mipmap::<image::LumaA<u8>>(
-						TileKind::Lightmap,
-						level,
-						coords,
-						prev,
-						&total_send,
-						&processed_send,
-					)?;
-
-					anyhow::Ok(())
-				})?;
-
-			drop(total_send);
-			let total = total_recv.into_iter().count();
-
-			drop(processed_send);
-			let processed = processed_recv.into_iter().count();
-
-			info!(
-				"Generated level {} mipmaps ({} processed, {} unchanged)",
-				level,
-				processed,
-				total - processed,
-			);
-
-			tile_stack.push(next);
-		}
-
-		Ok(tile_stack)
+		self.collect_tiles()
 	}
 }

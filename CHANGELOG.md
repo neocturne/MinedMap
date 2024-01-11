@@ -2,6 +2,13 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Added sign layer
+
+  This feature is disabled by default. Use the `--sign-prefix` and `--sign-filter` options to
+  configure which signs to show on the map.
+
 ### Changed
 
 - Without `--verbose`, only a single warning is printed at the end of

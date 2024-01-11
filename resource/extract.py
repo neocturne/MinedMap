@@ -11,7 +11,7 @@ if len(sys.argv) != 4:
 	sys.exit('Usage: extract.py <blocks.json> <asset directory> <colors.json>')
 
 def mean_color(texture):
-	path = os.path.join(sys.argv[2], texture + '.png')
+	path = os.path.join(sys.argv[2], 'assets/minecraft/textures/block', texture + '.png')
 	im = Image.open(path)
 
 	data = im.convert('RGBA').getdata()
@@ -45,20 +45,30 @@ for name, info in blocks.items():
 		'birch': False,
 		'spruce': False,
 		'water': False,
+		'wall_sign': False,
+		'sign_material': None,
 	}
 
 	if info is None:
 		continue
 
-	color = mean_color(info.get('texture', name))
+	texture = info.get('texture', name)
+
+	color = None
+	if texture:
+		color = mean_color(texture)
 	if color:
 		output[id]['color'] = color
 		output[id]['opaque'] = True
-		output[id]['grass'] = info.get('grass', False)
-		output[id]['foliage'] = info.get('foliage', False)
-		output[id]['birch'] = info.get('birch', False)
-		output[id]['spruce'] = info.get('spruce', False)
-		output[id]['water'] = info.get('water', False)
+
+	output[id]['grass'] = info.get('grass', False)
+	output[id]['foliage'] = info.get('foliage', False)
+	output[id]['birch'] = info.get('birch', False)
+	output[id]['spruce'] = info.get('spruce', False)
+	output[id]['water'] = info.get('water', False)
+	output[id]['wall_sign'] = info.get('wall_sign', False)
+
+	output[id]['sign_material'] = info.get('sign_material')
 
 with open(sys.argv[3], 'w') as f:
 	json.dump(output, f)

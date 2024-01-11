@@ -17,6 +17,61 @@ function contains(array, elem) {
 	return false;
 }
 
+const signKinds = {
+	sign: {
+		iconSize: [26, 28],
+		popupAnchor: [0, -20],
+	},
+	wall_sign: {
+		iconSize: [26, 18],
+		popupAnchor: [0, -15],
+	},
+	hanging_sign: {
+		iconSize: [28, 24],
+		popupAnchor: [0, -18],
+	},
+	hanging_wall_sign: {
+		iconSize: [28, 28],
+		popupAnchor: [0, -20],
+	},
+}
+
+const params = {};
+const signIcons = {};
+const markers = {};
+
+let updateHash = () => {};
+
+function coordKey(coords) {
+	if (!coords)
+		return null;
+
+	return `${coords[0]},${coords[1]}`;
+}
+
+function getMarker(coords) {
+	return markers[coordKey(coords)];
+}
+
+function signIcon(material, kind) {
+	function createSignIcon(material, kind) {
+		const {iconSize, popupAnchor} = signKinds[kind];
+
+		return L.icon({
+			iconUrl: `images/icon/${material}_${kind}.png`,
+			iconSize,
+			popupAnchor,
+			shadowUrl: `images/icon/shadow_${kind}.png`,
+			shadowSize: [iconSize[0]+8, iconSize[1]+8],
+			className: 'overzoomed',
+		});
+	}
+
+
+	let icons = signIcons[material] ??= {};
+	return icons[kind] ??= createSignIcon(material, kind);
+}
+
 const MinedMapLayer = L.TileLayer.extend({
 	initialize: function (mipmaps, layer) {
 		L.TileLayer.prototype.initialize.call(this, '', {
@@ -98,39 +153,230 @@ const parseHash = function () {
 	return args;
 }
 
+const colors = {
+	black: '#000000',
+	dark_blue: '#0000AA',
+	dark_green: '#00AA00',
+	dark_aqua: '#00AAAA',
+	dark_red: '#AA0000',
+	dark_purple: '#AA00AA',
+	gold: '#FFAA00',
+	gray: '#AAAAAA',
+	dark_gray: '#555555',
+	blue: '#5555FF',
+	green: '#55FF55',
+	aqua: '#55FFFF',
+	red: '#FF5555',
+	light_purple: '#FF55FF',
+	yellow: '#FFFF55',
+	white: '#FFFFFF',
+};
+
+function formatSignLine(line) {
+	const el = document.createElement('span');
+	el.style.whiteSpace = 'pre';
+
+	for (const span of line) {
+		const child = document.createElement('span');
+		child.textContent = span.text;
+
+		const color = colors[span.color ?? 'black'] || colors['black'];
+
+		if (span.bold)
+			child.style.fontWeight = 'bold';
+		if (span.italic)
+			child.style.fontStyle = 'italic';
+
+		child.style.textDecoration = '';
+		if (span.underlined)
+			child.style.textDecoration += ' underline';
+		if (span.strikethrough)
+			child.style.textDecoration += ' line-through';
+
+		child.style.color = color;
+		if (span.obfuscated) {
+			child.style.backgroundColor = color;
+			child.className = 'obfuscated';
+		}
+
+		el.appendChild(child);
+	}
+	return el;
+}
+
+function createSign(sign, back) {
+	// standing signs
+	function px(base) {
+		const scale = 11;
+		return (base*scale)+'px';
+	}
+	// hanging signs
+	function pxh(base) {
+		const scale = 16;
+		return (base*scale)+'px';
+	}
+
+	const sizes = {
+		sign: {
+			width: px(24),
+			height: px(12),
+			paddingTop: px(0),
+			paddingBottom: px(14),
+		},
+		wall_sign: {
+			width: px(24),
+			height: px(12),
+			paddingTop: px(0),
+			paddingBottom: px(0),
+		},
+		hanging_sign: {
+			width: pxh(16),
+			height: pxh(10),
+			paddingTop: pxh(4),
+			paddingBottom: pxh(0),
+		},
+		hanging_wall_sign: {
+			width: pxh(16),
+			height: pxh(10),
+			paddingTop: pxh(6),
+			paddingBottom: pxh(0),
+		},
+	};
+	const size = sizes[sign.kind];
+
+	const wrapper = document.createElement('div');
+	wrapper.classList = 'sign-wrapper';
+
+	const title = document.createElement('div');
+	title.classList = 'sign-title'
+	title.textContent = `Sign at ${sign.x}/${sign.y}/${sign.z}`;
+	if (back)
+		title.textContent += ' (back)';
+	title.textContent += ':';
+
+	wrapper.appendChild(title);
+
+	const container = document.createElement('div');
+	container.style.width = size.width;
+	container.style.height = size.height;
+	container.style.paddingTop = size.paddingTop;
+	container.style.paddingBottom = size.paddingBottom;
+	container.style.backgroundImage = `url(images/bg/${sign.material}_${sign.kind}.png)`;
+	container.classList = 'sign-container overzoomed';
+
+	const content = document.createElement('div');
+	content.classList = 'sign-content';
+
+	let text = [];
+	if (!back && sign.front_text)
+		text = sign.front_text;
+	else if (back && sign.back_text)
+		text = sign.back_text;
+
+	for (const line of text) {
+		content.appendChild(formatSignLine(line));
+		content.appendChild(document.createElement('br'));
+	}
+
+	container.appendChild(content);
+	wrapper.appendChild(container);
+
+	return wrapper;
+}
+
+async function loadSigns(signLayer) {
+	const response = await fetch('data/entities.json', {cache: 'no-store'});
+	const res = await response.json();
+
+	const groups = {};
+
+	// Group signs by x,z coordinates
+	for (const sign of res.signs) {
+		const key = coordKey([sign.x, sign.z]);
+		const group = groups[key] ??= [];
+		group.push(sign);
+	}
+
+	for (const [key, group] of Object.entries(groups)) {
+		const el = document.createElement('div');
+
+		let material;
+		let kind;
+
+		// Sort from top to bottom
+		group.sort((a, b) => b.y - a.y);
+
+		for (const sign of group) {
+			el.appendChild(createSign(sign, false));
+
+			if (sign.back_text)
+				el.appendChild(createSign(sign, true));
+
+			material ??= sign.material;
+			kind ??= sign.kind;
+		}
+
+		// Default material
+		material ??= 'oak';
+
+		const [x, z] = key.split(',').map((i) => +i);
+
+		const popup = L.popup().setContent(el);
+
+		popup.on('add', () => {
+			params.marker = [x, z];
+			updateHash();
+		});
+		popup.on('remove', () => {
+			params.marker = null;
+			updateHash();
+		});
+
+		const marker = L.marker([-z-0.5, x+0.5], {
+			icon: signIcon(material, kind),
+		}).addTo(signLayer).bindPopup(popup);
+
+		markers[coordKey([x, z])] = marker;
+
+		if (params.marker && x === params.marker[0] && z === params.marker[1])
+			marker.openPopup();
+	}
+}
 
 window.createMap = function () {
-	const xhr = new XMLHttpRequest();
-	xhr.onload = function () {
-		const res = JSON.parse(this.responseText),
-		    mipmaps = res.mipmaps,
-		    spawn = res.spawn;
-
-		let x, z, zoom, light;
+	(async function () {
+		const response = await fetch('data/info.json', {cache: 'no-store'});
+		const res = await response.json();
+		const {mipmaps, spawn} = res;
+		const features = res.features || {};
 
 		const updateParams = function () {
 			const args = parseHash();
 
-			zoom = parseInt(args['zoom']);
-			x = parseFloat(args['x']);
-			z = parseFloat(args['z']);
-			light = parseInt(args['light']);
+			params.zoom = parseInt(args['zoom']);
+			params.x = parseFloat(args['x']);
+			params.z = parseFloat(args['z']);
+			params.light = parseInt(args['light']);
+			params.signs = parseInt(args['signs'] ?? '1');
+			params.marker = (args['marker'] ?? '').split(',').map((i) => +i);
 
-			if (isNaN(zoom))
-				zoom = 0;
-			if (isNaN(x))
-				x = spawn.x;
-			if (isNaN(z))
-				z = spawn.z;
+			if (isNaN(params.zoom))
+				params.zoom = 0;
+			if (isNaN(params.x))
+				params.x = spawn.x;
+			if (isNaN(params.z))
+				params.z = spawn.z;
+			if (!features.signs || isNaN(params.marker[0]) || isNaN(params.marker[1]))
+				params.marker = null;
 		};
 
 		updateParams();
 
 		const map = L.map('map', {
-			center: [-z, x],
-			zoom: zoom,
+			center: [-params.z, params.x],
+			zoom: params.zoom,
 			minZoom: -(mipmaps.length-1),
-			maxZoom: 3,
+			maxZoom: 5,
 			crs: L.CRS.Simple,
 			maxBounds: [
 				[-512*(mipmaps[0].bounds.maxZ+1), 512*mipmaps[0].bounds.minX],
@@ -138,17 +384,25 @@ window.createMap = function () {
 			],
 		});
 
-		const mapLayer = new MinedMapLayer(mipmaps, 'map');
-		const lightLayer = new MinedMapLayer(mipmaps, 'light');
+		const overlayMaps = {};
 
+		const mapLayer = new MinedMapLayer(mipmaps, 'map');
 		mapLayer.addTo(map);
 
-		if (light)
+		const lightLayer = new MinedMapLayer(mipmaps, 'light');
+		overlayMaps['Illumination'] = lightLayer;
+		if (params.light)
 			map.addLayer(lightLayer);
 
-		const overlayMaps = {
-			"Illumination": lightLayer,
-		};
+		let signLayer;
+		if (features.signs) {
+			signLayer = L.layerGroup();
+			loadSigns(signLayer);
+			if (params.signs)
+				map.addLayer(signLayer);
+
+			overlayMaps['Signs'] = signLayer;
+		}
 
 		L.control.layers({}, overlayMaps).addTo(map);
 
@@ -160,26 +414,37 @@ window.createMap = function () {
 		});
 
 		const makeHash = function () {
-			let ret = '#x='+x+'&z='+z;
+			let ret = '#x='+params.x+'&z='+params.z;
 
-			if (zoom != 0)
-				ret += '&zoom='+zoom;
+			if (params.zoom != 0)
+				ret += '&zoom='+params.zoom;
 
 			if (map.hasLayer(lightLayer))
 				ret += '&light=1';
+			if (features.signs && !map.hasLayer(signLayer))
+				ret += '&signs=0';
+			if (params.marker) {
+				ret += `&marker=${params.marker[0]},${params.marker[1]}`;
+			}
 
 			return ret;
 		};
 
-		const updateHash = function () {
+		updateHash = function () {
 			window.location.hash = makeHash();
 		};
 
-		const refreshHash = function () {
-			zoom = map.getZoom();
-			center = map.getCenter();
-			x = Math.round(center.lng);
-			z = Math.round(-center.lat);
+		const refreshHash = function (ev) {
+			if (ev.type === 'layeradd' || ev.type === 'layerremove') {
+				if (ev.layer !== lightLayer && ev.layer !== signLayer)
+					return;
+			}
+
+			const center = map.getCenter();
+
+			params.zoom = map.getZoom();
+			params.x = Math.round(center.lng);
+			params.z = Math.round(-center.lat);
 
 			updateHash();
 		}
@@ -195,20 +460,29 @@ window.createMap = function () {
 			if (window.location.hash === makeHash())
 				return;
 
+			const prevMarkerCoords = params.marker;
+
 			updateParams();
 
-			map.setView([-z, x], zoom);
-
-			if (light)
+			if (params.light)
 				map.addLayer(lightLayer);
 			else
 				map.removeLayer(lightLayer);
 
+			if (features.signs) {
+				if (params.signs)
+					map.addLayer(signLayer);
+				else
+					map.removeLayer(signLayer);
+
+				if (coordKey(prevMarkerCoords) !== coordKey(params.marker))
+					getMarker(params.marker)?.openPopup();
+			}
+
+			map.setView([-params.z, params.x], params.zoom);
+
 			updateHash();
 		};
 
-	};
-
-	xhr.open('GET', 'data/info.json', true);
-	xhr.send();
+	})();
 }
