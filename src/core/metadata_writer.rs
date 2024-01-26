@@ -1,6 +1,7 @@
 //! The [MetadataWriter] and related types
 
 use anyhow::{Context, Result};
+use regex::Regex;
 use serde::Serialize;
 
 use crate::{
@@ -8,7 +9,7 @@ use crate::{
 	io::{fs, storage},
 	world::{
 		block_entity::{self, BlockEntity, BlockEntityData},
-		de,
+		de, sign,
 	},
 };
 
@@ -145,6 +146,28 @@ impl<'a> MetadataWriter<'a> {
 		false
 	}
 
+	/// Applies a single transform to a [sign::SignText]
+	///
+	/// The regular expression is applied for each line of the sign text
+	/// separately (actually for each element when JSON text is used)
+	fn sign_text_transform(sign_text: &mut sign::SignText, transform: &(Regex, String)) {
+		let (regexp, replacement) = transform;
+
+		for line in &mut sign_text.0 {
+			for text in &mut line.0 {
+				text.text = regexp.replace_all(&text.text, replacement).into_owned()
+			}
+		}
+	}
+
+	/// Applies the configured transforms to the text of a sign
+	fn sign_transform(&self, sign: &mut block_entity::Sign) {
+		for transform in &self.config.sign_transforms {
+			Self::sign_text_transform(&mut sign.front_text, transform);
+			Self::sign_text_transform(&mut sign.back_text, transform);
+		}
+	}
+
 	/// Generates [Entities] data from collected entity lists
 	fn entities(&self) -> Result<Entities> {
 		let data: ProcessedEntities =
@@ -157,6 +180,12 @@ impl<'a> MetadataWriter<'a> {
 				.into_iter()
 				.filter(|entity| match &entity.data {
 					BlockEntityData::Sign(sign) => self.sign_filter(sign),
+				})
+				.map(|mut entity| {
+					match &mut entity.data {
+						BlockEntityData::Sign(sign) => self.sign_transform(sign),
+					};
+					entity
 				})
 				.collect(),
 		};

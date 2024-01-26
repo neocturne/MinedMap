@@ -75,6 +75,12 @@ All prefixes and filters are applied to the front and back text separately, but
 both the front and the back text will be shown in the popup when one of them
 matches.
 
+Finally, `--sign-transform` allows to specify sed-style replacement patterns to
+modify the text displayed on the map. This can be used if the text matched by
+`--sign-prefix` or `--sign-filter` should not be displayed:
+`--sign-filter 's/\[Map\]//'` would replace each occurence of "\[Map\]" with
+the empty string.
+
 ## Installation
 
 Binary builds of the map generator for Linux and Windows, as well as an archive

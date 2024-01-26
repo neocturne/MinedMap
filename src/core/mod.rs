@@ -59,6 +59,12 @@ pub struct Args {
 	/// To make all signs visible, pass an empty string to either option.
 	#[arg(long)]
 	pub sign_filter: Vec<String>,
+	/// Regular expression replacement pattern for sign texts
+	///
+	/// Accepts patterns of the form 's/regexp/replacement/'. Transforms
+	/// are applied to each line of sign texts separately.
+	#[arg(long)]
+	pub sign_transform: Vec<String>,
 	/// Minecraft save directory
 	pub input_dir: PathBuf,
 	/// MinedMap data directory
