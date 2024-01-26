@@ -8,7 +8,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use indexmap::IndexSet;
-use regex::RegexSet;
+use regex::{Regex, RegexSet};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -130,6 +130,7 @@ pub enum TileKind {
 }
 
 /// Common configuration based on command line arguments
+#[derive(Debug)]
 pub struct Config {
 	/// Number of threads for parallel processing
 	pub num_threads: usize,
@@ -151,6 +152,8 @@ pub struct Config {
 	pub viewer_entities_path: PathBuf,
 	/// Sign text filter patterns
 	pub sign_patterns: RegexSet,
+	/// Sign text transformation pattern
+	pub sign_transforms: Vec<(Regex, String)>,
 }
 
 impl Config {
@@ -173,6 +176,8 @@ impl Config {
 			.collect();
 
 		let sign_patterns = Self::sign_patterns(args).context("Failed to parse sign patterns")?;
+		let sign_transforms =
+			Self::sign_transforms(args).context("Failed to parse sign transforms")?;
 
 		Ok(Config {
 			num_threads,
@@ -185,6 +190,7 @@ impl Config {
 			viewer_info_path,
 			viewer_entities_path,
 			sign_patterns,
+			sign_transforms,
 		})
 	}
 
@@ -198,6 +204,28 @@ impl Config {
 		Ok(RegexSet::new(
 			prefix_patterns.iter().chain(args.sign_filter.iter()),
 		)?)
+	}
+
+	/// Parses the sign transform argument into a vector of [Regex] and
+	/// corresponding replacement strings
+	fn sign_transforms(args: &super::Args) -> Result<Vec<(Regex, String)>> {
+		let splitter = Regex::new(r"^s/((?:[^\\/]|\\.)*)/((?:[^\\/]|\\.)*)/$").unwrap();
+
+		args.sign_transform
+			.iter()
+			.map(|t| Self::sign_transform(&splitter, t))
+			.collect()
+	}
+
+	/// Parses the sign transform argument into a [Regex] and its corresponding
+	/// replacement string
+	fn sign_transform(splitter: &Regex, transform: &str) -> Result<(Regex, String)> {
+		let captures = splitter
+			.captures(transform)
+			.with_context(|| format!("Invalid transform pattern '{}'", transform))?;
+		let regexp = Regex::new(&captures[1])?;
+		let replacement = captures[2].to_string();
+		Ok((regexp, replacement))
 	}
 
 	/// Constructs the path to an input region file
