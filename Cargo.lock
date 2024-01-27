@@ -587,7 +587,7 @@ dependencies = [
 
 [[package]]
 name = "minedmap-resource"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "enumflags2",
  "glam",

@@ -47,7 +47,7 @@ image = { version = "0.24.5", default-features = false, features = ["png"] }
 indexmap = { version = "2.0.0", features = ["serde"] }
 lru = "0.12.0"
 minedmap-nbt = { version = "0.1.1", path = "crates/nbt", default-features = false }
-minedmap-resource = { version = "0.2.0", path = "crates/resource" }
+minedmap-resource = { version = "0.3.0", path = "crates/resource" }
 minedmap-types = { version = "0.1.2", path = "crates/types" }
 num-integer = "0.1.45"
 num_cpus = "1.16.0"
