@@ -9,6 +9,7 @@ repository = "https://github.com/neocturne/MinedMap"
 
 [workspace.metadata.release]
 consolidate-commits = false
+pre-release-commit-message = "{{crate_name}} {{version}}"
 
 [package]
 name = "minedmap"
@@ -26,7 +27,6 @@ exclude = [
 ]
 
 [package.metadata.release]
-pre-release-commit-message = "{{crate_name}} {{version}}"
 tag-message = "{{crate_name}} {{version}}"
 pre-release-replacements = [
   {file="CHANGELOG.md", search="Unreleased", replace="{{version}}"},
