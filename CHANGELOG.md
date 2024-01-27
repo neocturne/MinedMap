@@ -2,6 +2,8 @@
 
 ## [Unreleased] - ReleaseDate
 
+## [2.1.0] - 2024-01-27
+
 ### Added
 
 - Added sign layer
@@ -74,7 +76,8 @@ intermediate data.
   Full support for custom biomes datapacks might be added in a future release.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/neocturne/MinedMap/compare/v2.0.2...HEAD
+[Unreleased]: https://github.com/neocturne/MinedMap/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/neocturne/MinedMap/compare/v2.0.2...v2.1.0
 [2.0.2]: https://github.com/neocturne/MinedMap/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/neocturne/MinedMap/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/neocturne/MinedMap/compare/v1.19.1...v2.0.0
