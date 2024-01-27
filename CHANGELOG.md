@@ -7,7 +7,8 @@
 - Added sign layer
 
   This feature is disabled by default. Use the `--sign-prefix` and `--sign-filter` options to
-  configure which signs to show on the map.
+  configure which signs to show on the map. `--sign-transform` allows to modify the displayed
+  sign text.
 
 ### Changed
 
