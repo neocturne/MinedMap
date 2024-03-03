@@ -47,8 +47,7 @@ macro_rules! coord_type {
 
 			/// Returns an iterator over all possible values of the type
 			#[inline]
-			pub fn iter() -> impl Iterator<Item = $t<AXIS>>
-			       + DoubleEndedIterator
+			pub fn iter() -> impl DoubleEndedIterator<Item = $t<AXIS>>
 			       + ExactSizeIterator
 			       + FusedIterator
 			       + Clone
