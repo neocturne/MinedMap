@@ -1,16 +1,9 @@
 //! The [RegionProcessor] and related functions
 
-use std::{
-	ffi::OsStr,
-	path::PathBuf,
-	sync::{
-		atomic::{AtomicBool, Ordering},
-		mpsc,
-	},
-	time::SystemTime,
-};
+use std::{ffi::OsStr, path::PathBuf, sync::mpsc, time::SystemTime};
 
 use anyhow::{Context, Result};
+use enum_map::{Enum, EnumMap};
 use rayon::prelude::*;
 use tracing::{debug, info, warn};
 
@@ -36,7 +29,7 @@ fn parse_region_filename(file_name: &OsStr) -> Option<TileCoords> {
 }
 
 /// [RegionProcessor::process_region] return values
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Enum)]
 enum RegionProcessorStatus {
 	/// Region was processed
 	Ok,
@@ -363,6 +356,8 @@ impl<'a> RegionProcessor<'a> {
 	///
 	/// Returns a list of the coordinates of all processed regions
 	pub fn run(self) -> Result<Vec<TileCoords>> {
+		use RegionProcessorStatus as Status;
+
 		fs::create_dir_all(&self.config.processed_dir)?;
 		fs::create_dir_all(&self.config.tile_dir(TileKind::Lightmap, 0))?;
 		fs::create_dir_all(&self.config.entities_dir(0))?;
@@ -370,31 +365,18 @@ impl<'a> RegionProcessor<'a> {
 		info!("Processing region files...");
 
 		let (region_send, region_recv) = mpsc::channel();
-		let (processed_send, processed_recv) = mpsc::channel();
-		let (error_send, error_recv) = mpsc::channel();
-
-		let has_unknown = AtomicBool::new(false);
+		let (status_send, status_recv) = mpsc::channel();
 
 		self.collect_regions()?.par_iter().try_for_each(|&coords| {
 			let ret = self
 				.process_region(coords)
 				.with_context(|| format!("Failed to process region {:?}", coords))?;
 
-			if ret != RegionProcessorStatus::ErrorMissing {
+			if ret != Status::ErrorMissing {
 				region_send.send(coords).unwrap();
 			}
 
-			match ret {
-				RegionProcessorStatus::Ok => processed_send.send(()).unwrap(),
-				RegionProcessorStatus::OkWithUnknown => {
-					has_unknown.store(true, Ordering::Relaxed);
-					processed_send.send(()).unwrap();
-				}
-				RegionProcessorStatus::Skipped => {}
-				RegionProcessorStatus::ErrorOk | RegionProcessorStatus::ErrorMissing => {
-					error_send.send(()).unwrap()
-				}
-			}
+			status_send.send(ret).unwrap();
 
 			anyhow::Ok(())
 		})?;
@@ -402,19 +384,21 @@ impl<'a> RegionProcessor<'a> {
 		drop(region_send);
 		let mut regions: Vec<_> = region_recv.into_iter().collect();
 
-		drop(processed_send);
-		let processed = processed_recv.into_iter().count();
-		drop(error_send);
-		let errors = error_recv.into_iter().count();
+		drop(status_send);
+
+		let mut status = EnumMap::<_, usize>::default();
+		for ret in status_recv {
+			status[ret] += 1;
+		}
 
 		info!(
 			"Processed region files ({} processed, {} unchanged, {} errors)",
-			processed,
-			regions.len() - processed - errors,
-			errors,
+			status[Status::Ok] + status[Status::OkWithUnknown],
+			status[Status::Skipped],
+			status[Status::ErrorOk] + status[Status::ErrorMissing],
 		);
 
-		if has_unknown.into_inner() {
+		if status[Status::OkWithUnknown] > 0 {
 			warn!("Unknown block or biome types found during processing");
 			eprint!(concat!(
 				"\n",

@@ -2,6 +2,13 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Fixed
+
+- Fix crash due to incorrect counting in info message
+
+  The calculation of the number of skipped regions could underflow when more invalid than valid
+  regions were encountered.
+
 ## [2.1.0] - 2024-01-27
 
 ### Added
