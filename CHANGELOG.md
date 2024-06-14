@@ -2,6 +2,17 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Fixed
+
+- Fix crash due to incorrect counting in info message
+
+  The calculation of the number of skipped regions could underflow when more invalid than valid
+  regions were encountered.
+- Ignore empty region files instead of treating them as invalid
+
+  Minecraft generates empty region files in some cases. Just ignore them instead of printing an
+  error message every time.
+
 ## [2.1.0] - 2024-01-27
 
 ### Added
