@@ -337,11 +337,20 @@ impl<'a> RegionProcessor<'a> {
 			})?
 			.filter_map(|entry| entry.ok())
 			.filter(|entry| {
-				// We are only interested in regular files
-				matches!(
-					entry.file_type().map(|file_type| file_type.is_file()),
-					Ok(true)
-				)
+				(|| {
+					// We are only interested in regular files
+					let file_type = entry.file_type().ok()?;
+					if !file_type.is_file() {
+						return None;
+					}
+
+					let metadata = entry.metadata().ok()?;
+					if metadata.len() == 0 {
+						return None;
+					}
+					Some(())
+				})()
+				.is_some()
 			})
 			.filter_map(|entry| parse_region_filename(&entry.file_name()))
 			.collect())
