@@ -2,6 +2,10 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Added support for Minecraft 1.21 block types
+
 ## [2.1.1] - 2024-06-14
 
 ### Fixed
