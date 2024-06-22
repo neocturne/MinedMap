@@ -92,6 +92,11 @@ modify the text displayed on the map. This can be used if the text matched by
 `--sign-filter 's/\[Map\]//'` would replace each occurence of "\[Map\]" with
 the empty string.
 
+**Note:** On Windows, double quotes (`"`) must be used for arguments instead
+of single quotes (`'`), and all backslashes in the arguments must be escaped
+by doubling them. This can make regular expressions somewhat difficult to
+write and to read.
+
 ## Installation
 
 Binary builds of the map generator for Linux and Windows, as well as an archive
