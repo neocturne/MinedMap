@@ -2,7 +2,7 @@
 
 * Render beautiful maps of your [Minecraft](https://minecraft.net/) worlds!
 * Put them on a webserver and view them in your browser!
-* Compatible with unmodified Minecraft Java Edition 1.8 up to 1.20 (no mod installation necessary!)
+* Compatible with unmodified Minecraft Java Edition 1.8 up to 1.21 (no mod installation necessary!)
 * Illumination layer: the world at night
 * Fast: create a full map for a huge 3GB savegame in less than 5 minutes in single-threaded operation
 * Multi-threading support: pass `-j N` to the renderer to use `N` parallel threads for generation
@@ -91,6 +91,11 @@ modify the text displayed on the map. This can be used if the text matched by
 `--sign-prefix` or `--sign-filter` should not be displayed:
 `--sign-filter 's/\[Map\]//'` would replace each occurence of "\[Map\]" with
 the empty string.
+
+**Note:** On Windows, double quotes (`"`) must be used for arguments instead
+of single quotes (`'`), and all backslashes in the arguments must be escaped
+by doubling them. This can make regular expressions somewhat difficult to
+write and to read.
 
 ## Installation
 

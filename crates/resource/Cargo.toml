@@ -9,5 +9,5 @@ repository.workspace = true
 
 [dependencies]
 enumflags2 = { version = "0.7.7", features = ["serde"] }
-glam = "0.25.0"
+glam = "0.28.0"
 serde = { version = "1.0.183", features = ["derive"] }

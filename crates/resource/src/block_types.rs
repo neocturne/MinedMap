@@ -1844,6 +1844,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"chiseled_copper",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([184, 100, 73]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"chiseled_deepslate",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -1909,6 +1919,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([119, 118, 119]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"chiseled_tuff",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([89, 94, 86]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"chiseled_tuff_bricks",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([110, 113, 106]),
 			},
 			sign_material: None,
 		},
@@ -2124,11 +2154,51 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"copper_bulb",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([156, 86, 57]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"copper_door",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([192, 109, 82]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"copper_grate",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([191, 107, 79]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"copper_ore",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([124, 125, 120]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"copper_trapdoor",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([190, 106, 79]),
 			},
 			sign_material: None,
 		},
@@ -2189,6 +2259,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([118, 117, 118]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"crafter",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([112, 98, 99]),
 			},
 			sign_material: None,
 		},
@@ -3534,11 +3614,61 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"exposed_chiseled_copper",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([154, 119, 100]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"exposed_copper",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([161, 125, 103]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"exposed_copper_bulb",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([135, 107, 89]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"exposed_copper_door",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([164, 123, 106]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"exposed_copper_grate",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([161, 125, 104]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"exposed_copper_trapdoor",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([161, 125, 104]),
 			},
 			sign_material: None,
 		},
@@ -4179,6 +4309,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([165, 139, 12]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"heavy_core",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([82, 86, 94]),
 			},
 			sign_material: None,
 		},
@@ -6274,11 +6414,61 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"oxidized_chiseled_copper",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([83, 161, 132]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"oxidized_copper",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([82, 162, 132]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"oxidized_copper_bulb",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([70, 132, 109]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"oxidized_copper_door",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([82, 160, 132]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"oxidized_copper_grate",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([82, 161, 131]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"oxidized_copper_trapdoor",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([83, 161, 132]),
 			},
 			sign_material: None,
 		},
@@ -6859,6 +7049,46 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([154, 106, 89]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"polished_tuff",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([97, 104, 99]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"polished_tuff_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([97, 104, 99]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"polished_tuff_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([97, 104, 99]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"polished_tuff_wall",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([97, 104, 99]),
 			},
 			sign_material: None,
 		},
@@ -9154,6 +9384,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"trial_spawner",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([56, 82, 98]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"tripwire",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -9224,6 +9464,76 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"tuff_brick_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([98, 102, 95]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"tuff_brick_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([98, 102, 95]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"tuff_brick_wall",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([98, 102, 95]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"tuff_bricks",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([98, 102, 95]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"tuff_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([108, 109, 102]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"tuff_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([108, 109, 102]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"tuff_wall",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([108, 109, 102]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"turtle_egg",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -9249,6 +9559,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([20, 135, 122]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"vault",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([54, 69, 79]),
 			},
 			sign_material: None,
 		},
@@ -9514,11 +9834,61 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"waxed_chiseled_copper",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([184, 100, 73]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"waxed_copper_block",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([192, 107, 79]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_copper_bulb",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([156, 86, 57]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_copper_door",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([192, 109, 82]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_copper_grate",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([191, 107, 79]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_copper_trapdoor",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([190, 106, 79]),
 			},
 			sign_material: None,
 		},
@@ -9554,11 +9924,61 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"waxed_exposed_chiseled_copper",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([154, 119, 100]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"waxed_exposed_copper",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([161, 125, 103]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_exposed_copper_bulb",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([135, 107, 89]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_exposed_copper_door",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([164, 123, 106]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_exposed_copper_grate",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([161, 125, 104]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_exposed_copper_trapdoor",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([161, 125, 104]),
 			},
 			sign_material: None,
 		},
@@ -9594,11 +10014,61 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"waxed_oxidized_chiseled_copper",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([83, 161, 132]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"waxed_oxidized_copper",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([82, 162, 132]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_oxidized_copper_bulb",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([70, 132, 109]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_oxidized_copper_door",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([82, 160, 132]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_oxidized_copper_grate",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([82, 161, 131]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_oxidized_copper_trapdoor",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([83, 161, 132]),
 			},
 			sign_material: None,
 		},
@@ -9634,7 +10104,57 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"waxed_weathered_chiseled_copper",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([104, 150, 111]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"waxed_weathered_copper",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([108, 153, 110]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_weathered_copper_bulb",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([92, 126, 99]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_weathered_copper_door",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([110, 150, 109]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_weathered_copper_grate",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([106, 152, 110]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"waxed_weathered_copper_trapdoor",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -9674,7 +10194,57 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"weathered_chiseled_copper",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([104, 150, 111]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"weathered_copper",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([108, 153, 110]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"weathered_copper_bulb",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([92, 126, 99]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"weathered_copper_door",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([110, 150, 109]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"weathered_copper_grate",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([106, 152, 110]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"weathered_copper_trapdoor",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
