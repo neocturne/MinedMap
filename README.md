@@ -89,7 +89,7 @@ matches.
 Finally, `--sign-transform` allows to specify sed-style replacement patterns to
 modify the text displayed on the map. This can be used if the text matched by
 `--sign-prefix` or `--sign-filter` should not be displayed:
-`--sign-filter 's/\[Map\]//'` would replace each occurence of "\[Map\]" with
+`--sign-transform 's/\[Map\]//'` would replace each occurence of "\[Map\]" with
 the empty string.
 
 **Note:** On Windows, double quotes (`"`) must be used for arguments instead
