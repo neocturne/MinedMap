@@ -58,7 +58,7 @@ struct LayerEntry<'a> {
 	depth: &'a mut Option<BlockHeight>,
 }
 
-impl<'a> LayerEntry<'a> {
+impl LayerEntry<'_> {
 	/// Returns true if the entry has not been filled yet (no opaque block has been encountered)
 	///
 	/// The depth value is filled separately when a non-water block is encountered after the block type

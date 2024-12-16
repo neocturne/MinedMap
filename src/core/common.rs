@@ -18,7 +18,7 @@ use crate::{
 	world::{block_entity::BlockEntity, layer},
 };
 
-/// Increase to force regeneration of all output files
+// Increase to force regeneration of all output files
 
 /// MinedMap processed region data version number
 ///

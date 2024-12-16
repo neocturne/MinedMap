@@ -81,7 +81,7 @@ impl<'a> SectionV1_13<'a> {
 		if let Some(block_states) = block_states {
 			let expected_length = if aligned_blocks {
 				let blocks_per_word = 64 / bits as usize;
-				(4096 + blocks_per_word - 1) / blocks_per_word
+				4096usize.div_ceil(blocks_per_word)
 			} else {
 				64 * bits as usize
 			};
@@ -145,7 +145,7 @@ impl<'a> SectionV1_13<'a> {
 	}
 }
 
-impl<'a> Section for SectionV1_13<'a> {
+impl Section for SectionV1_13<'_> {
 	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<&BlockType>> {
 		let index = self.palette_index_at(coords);
 		Ok(*self
@@ -188,7 +188,7 @@ impl<'a> SectionV0<'a> {
 	}
 }
 
-impl<'a> Section for SectionV0<'a> {
+impl Section for SectionV0<'_> {
 	fn block_at(&self, coords: SectionBlockCoords) -> Result<Option<&BlockType>> {
 		let offset = coords.offset();
 		let block = self.blocks[offset] as u8;
@@ -242,7 +242,7 @@ impl<'a> BiomesV1_18<'a> {
 
 		if let Some(biomes) = biomes {
 			let biomes_per_word = 64 / bits as usize;
-			let expected_length = (64 + biomes_per_word - 1) / biomes_per_word;
+			let expected_length = 64usize.div_ceil(biomes_per_word);
 			if biomes.len() != expected_length {
 				bail!("Invalid section biome data");
 			}
@@ -294,7 +294,7 @@ impl<'a> BiomesV1_18<'a> {
 	}
 }
 
-impl<'a> Biomes for BiomesV1_18<'a> {
+impl Biomes for BiomesV1_18<'_> {
 	fn biome_at(&self, _section: SectionY, coords: SectionBlockCoords) -> Result<Option<&Biome>> {
 		let index = self.palette_index_at(coords);
 		Ok(*self
@@ -349,7 +349,7 @@ impl<'a> BiomesV0<'a> {
 	}
 }
 
-impl<'a> Biomes for BiomesV0<'a> {
+impl Biomes for BiomesV0<'_> {
 	fn biome_at(&self, section: SectionY, coords: SectionBlockCoords) -> Result<Option<&Biome>> {
 		let id = match self.data {
 			BiomesV0Data::IntArrayV15(data) => {

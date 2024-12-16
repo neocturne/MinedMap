@@ -16,7 +16,7 @@ pub struct EntityCollector<'a> {
 	regions: &'a [TileCoords],
 }
 
-impl<'a> TileMerger for EntityCollector<'a> {
+impl TileMerger for EntityCollector<'_> {
 	fn file_meta_version(&self) -> fs::FileMetaVersion {
 		ENTITIES_FILE_META_VERSION
 	}
@@ -34,7 +34,7 @@ impl<'a> TileMerger for EntityCollector<'a> {
 	}
 }
 
-impl<'a> TileCollector for EntityCollector<'a> {
+impl TileCollector for EntityCollector<'_> {
 	type CollectOutput = ();
 
 	fn tiles(&self) -> &[TileCoords] {
