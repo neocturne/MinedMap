@@ -74,7 +74,7 @@ impl<'a, P> MapMerger<'a, P> {
 	}
 }
 
-impl<'a, P: image::PixelWithColorType> TileMerger for MapMerger<'a, P>
+impl<P: image::PixelWithColorType> TileMerger for MapMerger<'_, P>
 where
 	[P::Subpixel]: image::EncodableLayout,
 	image::ImageBuffer<P, Vec<P::Subpixel>>: Into<image::DynamicImage>,
@@ -157,7 +157,7 @@ pub struct TileMipmapper<'a> {
 	regions: &'a [TileCoords],
 }
 
-impl<'a> TileCollector for TileMipmapper<'a> {
+impl TileCollector for TileMipmapper<'_> {
 	type CollectOutput = MipmapStat;
 
 	fn tiles(&self) -> &[TileCoords] {

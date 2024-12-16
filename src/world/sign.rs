@@ -23,7 +23,7 @@ pub struct RawSignText<'a> {
 	pub color: Option<&'a str>,
 }
 
-impl<'a> RawSignText<'a> {
+impl RawSignText<'_> {
 	/// Decodes the [RawSignText] into a [SignText]
 	pub fn decode(&self) -> SignText {
 		let color = self.color.map(|c| Arc::new(c.to_owned()));

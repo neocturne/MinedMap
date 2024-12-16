@@ -416,13 +416,13 @@ impl<'a> Iterator for SectionIter<'a> {
 	}
 }
 
-impl<'a> DoubleEndedIterator for SectionIter<'a> {
+impl DoubleEndedIterator for SectionIter<'_> {
 	fn next_back(&mut self) -> Option<Self::Item> {
 		self.with_iter(|iter| iter.next_back())
 	}
 }
 
-impl<'a> ExactSizeIterator for SectionIter<'a> {
+impl ExactSizeIterator for SectionIter<'_> {
 	fn len(&self) -> usize {
 		match &self.inner {
 			SectionIterInner::V1_18 { iter } => iter.len(),
@@ -433,4 +433,4 @@ impl<'a> ExactSizeIterator for SectionIter<'a> {
 	}
 }
 
-impl<'a> FusedIterator for SectionIter<'a> {}
+impl FusedIterator for SectionIter<'_> {}
