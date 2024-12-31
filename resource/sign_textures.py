@@ -15,6 +15,7 @@ MATERIALS = [
 	'jungle',
 	'mangrove',
 	'oak',
+	'pale_oak',
 	'spruce',
 	'warped',
 ]
