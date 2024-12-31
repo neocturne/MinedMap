@@ -188,6 +188,13 @@ pub const BIOMES: &[(&str, Biome)] = {
 		("old_growth_birch_forest", Biome::new(0_60, 0_60)),
 		("old_growth_pine_taiga", Biome::new(0_30, 0_80)),
 		("old_growth_spruce_taiga", Biome::new(0_25, 0_80)),
+		(
+			"pale_garden",
+			Biome::new(0_70, 0_80)
+				.water([118, 136, 157])
+				.foliage([135, 141, 118])
+				.grass([119, 130, 114]),
+		),
 		("plains", Biome::new(0_80, 0_40)),
 		("river", Biome::new(0_50, 0_50)),
 		("savanna", Biome::new(2_00, 0_00)),
