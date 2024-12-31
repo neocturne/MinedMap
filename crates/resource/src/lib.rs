@@ -4,11 +4,9 @@
 
 mod biomes;
 mod block_color;
+mod block_types;
 mod legacy_biomes;
 mod legacy_block_types;
-
-#[allow(clippy::missing_docs_in_private_items)] // Generated module
-mod block_types;
 
 use std::collections::HashMap;
 

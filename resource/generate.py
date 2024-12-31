@@ -14,10 +14,15 @@ with open(sys.argv[1]) as f:
 output = {}
 
 with open(sys.argv[2], 'w') as f:
+	print('//! Block type information', file=f);
+	print('//!', file=f);
+	print('//! This file is generated using resource/generate.py, do not edit', file=f);
+	print('', file=f)
 	print('use enumflags2::make_bitflags;', file=f);
 	print('', file=f)
 	print('use super::*;', file=f)
 	print('', file=f)
+	print('/// List if known block types and their properties', file=f);
 	print('pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[', file=f)
 
 	for name, info in colors.items():

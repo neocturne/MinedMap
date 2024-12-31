@@ -1,7 +1,12 @@
+//! Block type information
+//!
+//! This file is generated using resource/generate.py, do not edit
+
 use enumflags2::make_bitflags;
 
 use super::*;
 
+/// List if known block types and their properties
 pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	(
 		"acacia_button",
