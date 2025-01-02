@@ -13,7 +13,7 @@ pre-release-commit-message = "{{crate_name}} {{version}}"
 
 [package]
 name = "minedmap"
-version = "2.2.0"
+version = "2.3.0"
 description = "Generate browsable maps from Minecraft save data"
 edition.workspace = true
 license.workspace = true

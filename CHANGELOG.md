@@ -2,6 +2,8 @@
 
 ## [Unreleased] - ReleaseDate
 
+## [2.3.0] - 2025-01-02
+
 - Added support for Minecraft 1.21.4 block types
 - Added support for Minecraft 1.21.4 Pale Garden biome
 - viewer: added images for pale oak signs
@@ -99,7 +101,8 @@ intermediate data.
   Full support for custom biomes datapacks might be added in a future release.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/neocturne/MinedMap/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/neocturne/MinedMap/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/neocturne/MinedMap/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/neocturne/MinedMap/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/neocturne/MinedMap/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/neocturne/MinedMap/compare/v2.0.2...v2.1.0
