@@ -4,10 +4,9 @@
 
 mod biomes;
 mod block_color;
-mod legacy_block_types;
-
-#[allow(clippy::missing_docs_in_private_items)] // Generated module
 mod block_types;
+mod legacy_biomes;
+mod legacy_block_types;
 
 use std::collections::HashMap;
 
@@ -135,8 +134,111 @@ impl BlockTypes {
 	}
 }
 
-pub use biomes::{Biome, BiomeGrassColorModifier};
 pub use block_color::{block_color, needs_biome};
+
+/// Grass color modifier used by a biome
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum BiomeGrassColorModifier {
+	/// Grass color modifier used by the dark forest biome
+	DarkForest,
+	/// Grass color modifier used by swamp biomes
+	Swamp,
+}
+
+/// A biome specification
+///
+/// A Biome contains all information about a biome necessary to compute a block
+/// color given a block type and depth
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct Biome {
+	/// Temperature value
+	///
+	/// For more efficient storage, the temperature is stored as an integer
+	/// after mutiplying the raw value by 20
+	pub temp: i8,
+	/// Downfall value
+	///
+	/// For more efficient storage, the downfall is stored as an integer
+	/// after mutiplying the raw value by 20
+	pub downfall: i8,
+	/// Water color override
+	pub water_color: Option<Color>,
+	/// Foliage color override
+	pub foliage_color: Option<Color>,
+	/// Grass color override
+	pub grass_color: Option<Color>,
+	/// Grass color modifier
+	pub grass_color_modifier: Option<BiomeGrassColorModifier>,
+}
+
+impl Biome {
+	/// Constructs a new Biome
+	const fn new(temp: i16, downfall: i16) -> Biome {
+		/// Helper to encode temperature and downfall values
+		///
+		/// Converts temperatue and downfall from the input format
+		/// (mutiplied by 100) to i8 range for more efficient storage.
+		const fn encode(v: i16) -> i8 {
+			(v / 5) as i8
+		}
+		Biome {
+			temp: encode(temp),
+			downfall: encode(downfall),
+			grass_color_modifier: None,
+			water_color: None,
+			foliage_color: None,
+			grass_color: None,
+		}
+	}
+
+	/// Builder function to override the biome water color
+	const fn water(self, water_color: [u8; 3]) -> Biome {
+		Biome {
+			water_color: Some(Color(water_color)),
+			..self
+		}
+	}
+
+	/// Builder function to override the biome foliage color
+	const fn foliage(self, foliage_color: [u8; 3]) -> Biome {
+		Biome {
+			foliage_color: Some(Color(foliage_color)),
+			..self
+		}
+	}
+
+	/// Builder function to override the biome grass color
+	const fn grass(self, grass_color: [u8; 3]) -> Biome {
+		Biome {
+			grass_color: Some(Color(grass_color)),
+			..self
+		}
+	}
+
+	/// Builder function to set a grass color modifier
+	const fn modify(self, grass_color_modifier: BiomeGrassColorModifier) -> Biome {
+		Biome {
+			grass_color_modifier: Some(grass_color_modifier),
+			..self
+		}
+	}
+
+	/// Decodes a temperature or downfall value from the storage format to
+	/// f32 for further calculation
+	fn decode(val: i8) -> f32 {
+		f32::from(val) / 20.0
+	}
+
+	/// Returns the biome's temperature decoded to its original float value
+	pub fn temp(&self) -> f32 {
+		Self::decode(self.temp)
+	}
+
+	/// Returns the biome's downfall decoded to its original float value
+	pub fn downfall(&self) -> f32 {
+		Self::decode(self.downfall)
+	}
+}
 
 /// Used to look up standard Minecraft biome types
 #[derive(Debug)]
@@ -154,7 +256,7 @@ impl Default for BiomeTypes {
 			.map(|(k, v)| (String::from(*k), v))
 			.collect();
 
-		for &(old, new) in biomes::BIOME_ALIASES.iter().rev() {
+		for &(old, new) in legacy_biomes::BIOME_ALIASES.iter().rev() {
 			let biome = biome_map
 				.get(new)
 				.copied()
@@ -164,7 +266,7 @@ impl Default for BiomeTypes {
 
 		let legacy_biomes = (0..=255)
 			.map(|index| {
-				let id = biomes::legacy_biome(index);
+				let id = legacy_biomes::legacy_biome(index);
 				*biome_map.get(id).expect("Unknown legacy biome")
 			})
 			.collect::<Box<[_]>>()

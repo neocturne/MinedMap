@@ -11,13 +11,15 @@ work.
 - `extract.py`: Takes the block type information from `blocks.json` and texture data
   from an unpacked Minecraft JAR, storing the result in `colors.json`
 - `generate.py`: Generates `block_types.rs` from `colors.json`
+- `biomes.py`: Generates `biomes.rs` from biome JSON files of an unpacked
+  Minecraft JAR
 - `sign_textures.py`: Generates all needed sign graphics from Minecraft assets
 
 In addition to these scripts, the JSON processor *jq* is a useful tool to work
 with MinedMap's resource metadata.
 
 
-## How to add support for block IDs of a new Minecraft version
+## How to add support for block IDs and biomes of a new Minecraft version
 
 1. Download the Minecraft version you want to support as well as the previous
    version currently supported by MinedMap. You can use the Minecraft launcher
@@ -68,6 +70,17 @@ with MinedMap's resource metadata.
      ./generate.py colors.json ../crates/resource/src/block_types.rs
      cargo fmt --all
      ```
+
+8. Update the source code for new biome data:
+
+     ```sh
+     ./biomes.py data/new ../crates/resource/src/biomes.rs
+     cargo fmt --all
+     ```
+
+    After regenerating, check if only new biomes were added. If entries
+    got removed, biomes may have been renamed or merged, requiring updates
+    to the alias list in `crates/resource/src/legacy_biomes.rs`.
 
 After the update, the new version should be tested with old savegames (both
 before and after migration by the new version) as well as newly generated

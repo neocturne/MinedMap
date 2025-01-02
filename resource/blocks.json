@@ -416,6 +416,7 @@
 	"chiseled_red_sandstone": {
 		"texture": "red_sandstone_top"
 	},
+	"chiseled_resin_bricks": {},
 	"chiseled_sandstone": {
 		"texture": "sandstone_top"
 	},
@@ -427,6 +428,7 @@
 	"chorus_flower": {},
 	"chorus_plant": {},
 	"clay": {},
+	"closed_eyeblossom": null,
 	"coal_block": {},
 	"coal_ore": {},
 	"coarse_dirt": {},
@@ -481,6 +483,9 @@
 	},
 	"crafting_table": {
 		"texture": "crafting_table_top"
+	},
+	"creaking_heart": {
+		"texture": "creaking_heart_top"
 	},
 	"creeper_head": null,
 	"creeper_wall_head": null,
@@ -1269,6 +1274,7 @@
 	"ochre_froglight": {
 		"texture": "ochre_froglight_top"
 	},
+	"open_eyeblossom": null,
 	"orange_banner": null,
 	"orange_bed": null,
 	"orange_candle": null,
@@ -1308,6 +1314,56 @@
 	},
 	"packed_ice": {},
 	"packed_mud": {},
+	"pale_hanging_moss": null,
+	"pale_moss_block": {},
+	"pale_moss_carpet": {},
+	"pale_oak_button": null,
+	"pale_oak_door": {
+		"texture": "pale_oak_door_top"
+	},
+	"pale_oak_fence": {
+		"texture": "pale_oak_planks"
+	},
+	"pale_oak_fence_gate": {
+		"texture": "pale_oak_planks"
+	},
+	"pale_oak_hanging_sign": {
+		"sign_material": "pale_oak",
+		"texture": null
+	},
+	"pale_oak_leaves": {},
+	"pale_oak_log": {
+		"texture": "pale_oak_log_top"
+	},
+	"pale_oak_planks": {},
+	"pale_oak_pressure_plate": {
+		"texture": "pale_oak_planks"
+	},
+	"pale_oak_sapling": {},
+	"pale_oak_sign": {
+		"sign_material": "pale_oak",
+		"texture": null
+	},
+	"pale_oak_slab": {
+		"texture": "pale_oak_planks"
+	},
+	"pale_oak_stairs": {
+		"texture": "pale_oak_planks"
+	},
+	"pale_oak_trapdoor": {},
+	"pale_oak_wall_hanging_sign": {
+		"sign_material": "pale_oak",
+		"texture": null,
+		"wall_sign": true
+	},
+	"pale_oak_wall_sign": {
+		"sign_material": "pale_oak",
+		"texture": null,
+		"wall_sign": true
+	},
+	"pale_oak_wood": {
+		"texture": "pale_oak_log"
+	},
 	"pearlescent_froglight": {
 		"texture": "pearlescent_froglight_top"
 	},
@@ -1463,6 +1519,9 @@
 	"potted_cherry_sapling": {
 		"texture": "cherry_sapling"
 	},
+	"potted_closed_eyeblossom": {
+		"texture": "closed_eyeblossom"
+	},
 	"potted_cornflower": {
 		"texture": "cornflower"
 	},
@@ -1500,11 +1559,17 @@
 	"potted_oak_sapling": {
 		"texture": "oak_sapling"
 	},
+	"potted_open_eyeblossom": {
+		"texture": "open_eyeblossom"
+	},
 	"potted_orange_tulip": {
 		"texture": "orange_tulip"
 	},
 	"potted_oxeye_daisy": {
 		"texture": "oxeye_daisy"
+	},
+	"potted_pale_oak_sapling": {
+		"texture": "pale_oak_sapling"
 	},
 	"potted_pink_tulip": {
 		"texture": "pink_tulip"
@@ -1668,6 +1733,18 @@
 	"repeating_command_block": {
 		"texture": "repeating_command_block_front"
 	},
+	"resin_block": {},
+	"resin_brick_slab": {
+		"texture": "resin_bricks"
+	},
+	"resin_brick_stairs": {
+		"texture": "resin_bricks"
+	},
+	"resin_brick_wall": {
+		"texture": "resin_bricks"
+	},
+	"resin_bricks": {},
+	"resin_clump": null,
 	"respawn_anchor": {
 		"texture": "respawn_anchor_top"
 	},
@@ -1902,6 +1979,12 @@
 	},
 	"stripped_oak_wood": {
 		"texture": "stripped_oak_log"
+	},
+	"stripped_pale_oak_log": {
+		"texture": "stripped_pale_oak_log_top"
+	},
+	"stripped_pale_oak_wood": {
+		"texture": "stripped_pale_oak_log"
 	},
 	"stripped_spruce_log": {
 		"texture": "stripped_spruce_log_top"

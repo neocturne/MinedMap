@@ -2,6 +2,10 @@
 
 ## [Unreleased] - ReleaseDate
 
+- Added support for Minecraft 1.21.4 block types
+- Added support for Minecraft 1.21.4 Pale Garden biome
+- viewer: added images for pale oak signs
+
 ## [2.2.0] - 2024-06-23
 
 ### Added

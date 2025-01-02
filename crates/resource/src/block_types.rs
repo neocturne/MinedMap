@@ -1,7 +1,12 @@
+//! Block type information
+//!
+//! This file is generated using resource/generate.py, do not edit
+
 use enumflags2::make_bitflags;
 
 use super::*;
 
+/// List if known block types and their properties
 pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	(
 		"acacia_button",
@@ -1868,7 +1873,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([47, 23, 28]),
+				color: Color([45, 22, 27]),
 			},
 			sign_material: None,
 		},
@@ -1899,6 +1904,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([181, 97, 31]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"chiseled_resin_bricks",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([200, 84, 24]),
 			},
 			sign_material: None,
 		},
@@ -1969,6 +1984,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([160, 166, 179]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"closed_eyeblossom",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: None,
 		},
@@ -2279,6 +2304,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([119, 73, 42]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"creaking_heart",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([73, 59, 54]),
 			},
 			sign_material: None,
 		},
@@ -6254,6 +6289,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"open_eyeblossom",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"orange_banner",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -6519,6 +6564,206 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([142, 106, 79]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_hanging_moss",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_moss_block",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([106, 112, 104]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_moss_carpet",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([106, 112, 104]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_button",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_door",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([216, 208, 206]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_fence",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([227, 217, 216]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_fence_gate",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([227, 217, 216]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_hanging_sign",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: Some("pale_oak"),
+		},
+	),
+	(
+		"pale_oak_leaves",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([116, 121, 114]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_log",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([198, 189, 187]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_planks",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([227, 217, 216]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_pressure_plate",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([227, 217, 216]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_sapling",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([109, 105, 99]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_sign",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: Some("pale_oak"),
+		},
+	),
+	(
+		"pale_oak_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([227, 217, 216]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([227, 217, 216]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_trapdoor",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([229, 220, 218]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pale_oak_wall_hanging_sign",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{WallSign}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: Some("pale_oak"),
+		},
+	),
+	(
+		"pale_oak_wall_sign",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{WallSign}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: Some("pale_oak"),
+		},
+	),
+	(
+		"pale_oak_wood",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([87, 77, 75]),
 			},
 			sign_material: None,
 		},
@@ -7214,6 +7459,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"potted_closed_eyeblossom",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([108, 98, 101]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"potted_cornflower",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -7334,6 +7589,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"potted_open_eyeblossom",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([133, 124, 127]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"potted_orange_tulip",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -7349,6 +7614,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([179, 202, 143]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"potted_pale_oak_sapling",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([109, 105, 99]),
 			},
 			sign_material: None,
 		},
@@ -8189,6 +8464,66 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([129, 111, 176]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"resin_block",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([217, 99, 25]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"resin_brick_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([205, 88, 24]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"resin_brick_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([205, 88, 24]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"resin_brick_wall",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([205, 88, 24]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"resin_bricks",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([205, 88, 24]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"resin_clump",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: None,
 		},
@@ -9169,6 +9504,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([177, 144, 86]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"stripped_pale_oak_log",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([235, 226, 225]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"stripped_pale_oak_wood",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([245, 238, 236]),
 			},
 			sign_material: None,
 		},
