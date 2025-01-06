@@ -2,7 +2,20 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Fixed
+
+- Fix text colors for signs modified using dye
+- Fix text colors specified using `#rrggbb` CSS syntax in JSON text
+
+Only named colors specified via JSON text were working as intended. Dyed signs use different
+color names.
+
+The mapping of color names to values is now handled by the generator. Both the generator and the
+viewer must be updated for sign text colors to work.
+
 ## [2.3.0] - 2025-01-02
+
+### Added
 
 - Added support for Minecraft 1.21.4 block types
 - Added support for Minecraft 1.21.4 Pale Garden biome
