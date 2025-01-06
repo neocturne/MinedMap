@@ -9,8 +9,7 @@
 - Fix text colors for signs modified using dye
 - Fix text colors specified using `#rrggbb` CSS syntax in JSON text
 
-Only named colors specified via JSON text were working as intended. Dyed signs use different
-color names.
+Only named colors specified via JSON text were working as intended.
 
 The mapping of color names to values is now handled by the generator. Both the generator and the
 viewer must be updated for sign text colors to work.
