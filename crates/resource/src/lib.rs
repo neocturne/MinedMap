@@ -38,7 +38,7 @@ pub enum BlockFlag {
 }
 
 /// An RGB color with u8 components
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct Color(pub [u8; 3]);
 
 /// An RGB color with f32 components
