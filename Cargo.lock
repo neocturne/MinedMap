@@ -567,7 +567,7 @@ checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
 
 [[package]]
 name = "minedmap"
-version = "2.3.0"
+version = "2.3.1"
 dependencies = [
  "anyhow",
  "bincode",
