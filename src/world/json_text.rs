@@ -1,7 +1,8 @@
 //! Newtype and helper methods for handling Minecraft Raw JSON Text
 
-use std::{collections::VecDeque, fmt::Display, sync::Arc};
+use std::{collections::VecDeque, fmt::Display};
 
+use minedmap_resource::Color;
 use serde::{Deserialize, Serialize};
 
 /// A span of formatted text
@@ -17,8 +18,8 @@ pub struct FormattedText {
 	/// Text content
 	pub text: String,
 	/// Text color
-	#[serde(skip_serializing_if = "Option::is_none")]
-	pub color: Option<Arc<String>>,
+	#[serde(skip_serializing_if = "Option::is_none", with = "json_color")]
+	pub color: Option<Color>,
 	/// Bold formatting
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub bold: Option<bool>,
@@ -41,7 +42,7 @@ impl FormattedText {
 	pub fn inherit(self, parent: &Self) -> Self {
 		FormattedText {
 			text: self.text,
-			color: self.color.or_else(|| parent.color.clone()),
+			color: self.color.or(parent.color),
 			bold: self.bold.or(parent.bold),
 			italic: self.italic.or(parent.italic),
 			underlined: self.underlined.or(parent.underlined),
@@ -173,5 +174,85 @@ impl JSONText {
 	/// Deserializes a [JSONText] into a [DeserializedText]
 	pub fn deserialize(&self) -> DeserializedText {
 		serde_json::from_str(&self.0).unwrap_or_default()
+	}
+}
+
+mod json_color {
+	//! Helpers for serializing and deserializing [FormattedText](super::FormattedText) colors
+
+	use minedmap_resource::Color;
+	use serde::{
+		de::{self, Visitor},
+		ser::Error as _,
+		Deserializer, Serializer,
+	};
+
+	/// Named JSON text colors
+	static COLORS: phf::Map<&'static str, Color> = phf::phf_map! {
+		"black" => Color([0x00, 0x00, 0x00]),
+		"dark_blue" => Color([0x00, 0x00, 0xAA]),
+		"dark_green" => Color([0x00, 0xAA, 0x00]),
+		"dark_aqua" => Color([0x00, 0xAA, 0xAA]),
+		"dark_red" => Color([0xAA, 0x00, 0x00]),
+		"dark_purple" => Color([0xAA, 0x00, 0xAA]),
+		"gold" => Color([0xFF, 0xAA, 0x00]),
+		"gray" => Color([0xAA, 0xAA, 0xAA]),
+		"dark_gray" => Color([0x55, 0x55, 0x55]),
+		"blue" => Color([0x55, 0x55, 0xFF]),
+		"green" => Color([0x55, 0xFF, 0x55]),
+		"aqua" => Color([0x55, 0xFF, 0xFF]),
+		"red" => Color([0xFF, 0x55, 0x55]),
+		"light_purple" => Color([0xFF, 0x55, 0xFF]),
+		"yellow" => Color([0xFF, 0xFF, 0x55]),
+		"white" => Color([0xFF, 0xFF, 0xFF]),
+	};
+
+	/// serde serialize function for [FormattedText::color](super::FormattedText::color)
+	pub fn serialize<S>(color: &Option<Color>, serializer: S) -> Result<S::Ok, S::Error>
+	where
+		S: Serializer,
+	{
+		let &Some(color) = color else {
+			return Err(S::Error::custom("serialize called for None sign color"));
+		};
+
+		let text = format!("#{:02x}{:02x}{:02x}", color.0[0], color.0[1], color.0[2]);
+		serializer.serialize_str(&text)
+	}
+
+	/// serde [Visitor] for use by [deserialize]
+	struct ColorVisitor;
+
+	impl Visitor<'_> for ColorVisitor {
+		type Value = Option<Color>;
+
+		fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+			formatter.write_str("a string representing a color")
+		}
+
+		fn visit_str<E>(self, color: &str) -> Result<Self::Value, E>
+		where
+			E: de::Error,
+		{
+			if let Some(hex) = color.strip_prefix("#") {
+				if let Ok(value) = u32::from_str_radix(hex, 16) {
+					return Ok(Some(Color([
+						(value >> 16) as u8,
+						(value >> 8) as u8,
+						value as u8,
+					])));
+				}
+			}
+
+			Ok(COLORS.get(color).copied())
+		}
+	}
+
+	/// serde deserialize function for [FormattedText::color](super::FormattedText::color)
+	pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<Color>, D::Error>
+	where
+		D: Deserializer<'de>,
+	{
+		deserializer.deserialize_str(ColorVisitor)
 	}
 }

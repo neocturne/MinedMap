@@ -1,7 +1,8 @@
 //! Processing of sign text
 
-use std::{fmt::Display, sync::Arc};
+use std::fmt::Display;
 
+use minedmap_resource::Color;
 use serde::{Deserialize, Serialize};
 
 use super::{
@@ -23,10 +24,34 @@ pub struct RawSignText<'a> {
 	pub color: Option<&'a str>,
 }
 
+/// The color to use for signs without a color attribute ("black")
+const DEFAULT_COLOR: Color = Color([0, 0, 0]);
+
+/// Map of text colors associated with dyes (except for black)
+static DYE_COLORS: phf::Map<&'static str, Color> = phf::phf_map! {
+	"white" => Color([255, 255, 255]),
+	"orange" => Color([255, 104, 31]),
+	"magenta" => Color([255, 0, 255]),
+	"light_blue" => Color([154, 192, 205]),
+	"yellow" => Color([255, 255, 0]),
+	"lime" => Color([191, 255, 0]),
+	"pink" => Color([255, 105, 180]),
+	"gray" => Color([128, 128, 128]),
+	"light_gray" => Color([211, 211, 211]),
+	"cyan" => Color([0, 255, 255]),
+	"purple" => Color([160, 32, 240]),
+	"blue" => Color([0, 0, 255]),
+	"brown" => Color([139, 69, 19]),
+	"green" => Color([0, 255, 0]),
+	"red" => Color([255, 0, 0]),
+};
+
 impl RawSignText<'_> {
 	/// Decodes the [RawSignText] into a [SignText]
 	pub fn decode(&self) -> SignText {
-		let color = self.color.map(|c| Arc::new(c.to_owned()));
+		let color = self
+			.color
+			.map(|c| DYE_COLORS.get(c).copied().unwrap_or(DEFAULT_COLOR));
 		let parent = FormattedText {
 			color,
 			..Default::default()
