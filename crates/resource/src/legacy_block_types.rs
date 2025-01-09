@@ -13,6 +13,7 @@ const DEF: &str = "air";
 const EMPTY: [&str; 16] = simple(DEF);
 
 /// Mapping from each numeric block type and damage/subtype ID to new string ID
+#[allow(clippy::large_const_arrays)]
 pub const LEGACY_BLOCK_TYPES: [[&str; 16]; 256] = [
 	/* 0 */
 	simple("air"),
