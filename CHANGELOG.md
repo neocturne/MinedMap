@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added support for rendering tiles WebP format using the `--image-format` option
+- Added support for rendering tiles in WebP format using the `--image-format` option
 
 ## [2.3.1] - 2025-01-06
 
