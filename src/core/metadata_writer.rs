@@ -61,6 +61,8 @@ struct Metadata<'t> {
 	spawn: Spawn,
 	/// Enabled MinedMap features
 	features: Features,
+	/// Format of generated map tiles
+	tile_extension: &'static str,
 }
 
 /// Viewer entity JSON data structure
@@ -205,6 +207,7 @@ impl<'a> MetadataWriter<'a> {
 			mipmaps: Vec::new(),
 			spawn: Self::spawn(&level_dat),
 			features,
+			tile_extension: self.config.tile_extension(),
 		};
 
 		for tile_map in self.tiles.iter() {

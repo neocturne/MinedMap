@@ -73,7 +73,7 @@ function signIcon(material, kind) {
 }
 
 const MinedMapLayer = L.TileLayer.extend({
-	initialize: function (mipmaps, layer) {
+	initialize: function (mipmaps, layer, tile_extension) {
 		L.TileLayer.prototype.initialize.call(this, '', {
 			detectRetina: true,
 			tileSize: 512,
@@ -88,6 +88,7 @@ const MinedMapLayer = L.TileLayer.extend({
 
 		this.mipmaps = mipmaps;
 		this.layer = layer;
+		this.ext = tile_extension;
 	},
 
 	createTile: function (coords, done) {
@@ -112,7 +113,7 @@ const MinedMapLayer = L.TileLayer.extend({
 			return L.Util.emptyImageUrl;
 
 
-		return 'data/'+this.layer+'/'+z+'/r.'+coords.x+'.'+coords.y+'.png';
+		return `data/${this.layer}/${z}/r.${coords.x}.${coords.y}.${this.ext}`;
 	},
 });
 
@@ -332,6 +333,7 @@ window.createMap = function () {
 		const res = await response.json();
 		const {mipmaps, spawn} = res;
 		const features = res.features || {};
+		const tile_extension = res.tile_extension || 'png';
 
 		const updateParams = function () {
 			const args = parseHash();
@@ -369,10 +371,10 @@ window.createMap = function () {
 
 		const overlayMaps = {};
 
-		const mapLayer = new MinedMapLayer(mipmaps, 'map');
+		const mapLayer = new MinedMapLayer(mipmaps, 'map', tile_extension);
 		mapLayer.addTo(map);
 
-		const lightLayer = new MinedMapLayer(mipmaps, 'light');
+		const lightLayer = new MinedMapLayer(mipmaps, 'light', tile_extension);
 		overlayMaps['Illumination'] = lightLayer;
 		if (params.light)
 			map.addLayer(lightLayer);
