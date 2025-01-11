@@ -7,6 +7,7 @@ use std::{
 };
 
 use anyhow::{Context, Result};
+use clap::ValueEnum;
 use indexmap::IndexSet;
 use regex::{Regex, RegexSet};
 use serde::{Deserialize, Serialize};
@@ -150,6 +151,8 @@ pub struct Config {
 	pub viewer_info_path: PathBuf,
 	/// Path of viewer entities file
 	pub viewer_entities_path: PathBuf,
+	/// Format of generated map tiles
+	pub image_format: ImageFormat,
 	/// Sign text filter patterns
 	pub sign_patterns: RegexSet,
 	/// Sign text transformation pattern
@@ -189,6 +192,7 @@ impl Config {
 			entities_path_final,
 			viewer_info_path,
 			viewer_entities_path,
+			image_format: args.image_format,
 			sign_patterns,
 			sign_transforms,
 		})
@@ -264,12 +268,37 @@ impl Config {
 		[&self.output_dir, Path::new(&dir)].iter().collect()
 	}
 
+	/// Returns the file extension for the configured image format
+	pub fn tile_extension(&self) -> &'static str {
+		match self.image_format {
+			ImageFormat::Png => "png",
+			ImageFormat::Webp => "webp",
+		}
+	}
+	/// Returns the configurured image format for the image library
+	pub fn tile_image_format(&self) -> image::ImageFormat {
+		match self.image_format {
+			ImageFormat::Png => image::ImageFormat::Png,
+			ImageFormat::Webp => image::ImageFormat::WebP,
+		}
+	}
+
 	/// Constructs the path of an output tile image
 	pub fn tile_path(&self, kind: TileKind, level: usize, coords: TileCoords) -> PathBuf {
-		let filename = coord_filename(coords, "png");
+		let filename = coord_filename(coords, self.tile_extension());
 		let dir = self.tile_dir(kind, level);
 		[Path::new(&dir), Path::new(&filename)].iter().collect()
 	}
+}
+
+/// Format of generated map tiles
+#[derive(Debug, Clone, Copy, Default, ValueEnum)]
+pub enum ImageFormat {
+	/// Generate PNG images
+	#[default]
+	Png,
+	/// Generate WebP images
+	Webp,
 }
 
 /// Copies a chunk image into a region tile

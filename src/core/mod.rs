@@ -16,7 +16,7 @@ use anyhow::{Context, Result};
 use clap::Parser;
 use git_version::git_version;
 
-use common::Config;
+use common::{Config, ImageFormat};
 use metadata_writer::MetadataWriter;
 use region_processor::RegionProcessor;
 use tile_mipmapper::TileMipmapper;
@@ -47,6 +47,9 @@ pub struct Args {
 	/// Enable verbose messages
 	#[arg(short, long)]
 	pub verbose: bool,
+	/// Format of generated map tiles
+	#[arg(long, value_enum, default_value_t)]
+	pub image_format: ImageFormat,
 	/// Prefix for text of signs to show on the map
 	#[arg(long)]
 	pub sign_prefix: Vec<String>,

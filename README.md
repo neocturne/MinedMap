@@ -55,8 +55,17 @@ a proper webserver like [nginx](https://nginx.org/) or upload the viewer togethe
 the generated map files to public webspace to make the map available to others.
 
 If you are uploading the directory to a remote webserver, you do not need to upload the
-`<viewer>/data/processed` directory, as that is only used locally to allow processing
+`<viewer>/data/processed` directory, as it is only used locally to allow processing
 updates more quickly.
+
+### Image formats
+
+MinedMap renders map tiles as PNG by default. Pass `--image-format webp` to select
+WebP instead. For typical Minecraft worlds, using WebP reduces file sizes by 10-15%
+without increasing processing time.
+
+MinedMap always uses lossless compression for tile images, regardless of the
+image format.
 
 ### Signs
 

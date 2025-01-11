@@ -144,7 +144,7 @@ where
 		}
 
 		image
-			.write_to(file, image::ImageFormat::Png)
+			.write_to(file, self.config.tile_image_format())
 			.context("Failed to save image")
 	}
 }

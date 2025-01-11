@@ -79,6 +79,8 @@ struct SingleRegionProcessor<'a> {
 	lightmap: image::GrayAlphaImage,
 	/// Processed entity intermediate data
 	entities: ProcessedEntities,
+	/// Format of generated map tiles
+	image_format: image::ImageFormat,
 	/// True if any unknown block or biome types were encountered during processing
 	has_unknown: bool,
 }
@@ -127,6 +129,7 @@ impl<'a> SingleRegionProcessor<'a> {
 			processed_region,
 			lightmap,
 			entities,
+			image_format: processor.config.tile_image_format(),
 			has_unknown: false,
 		})
 	}
@@ -179,7 +182,7 @@ impl<'a> SingleRegionProcessor<'a> {
 			self.input_timestamp,
 			|file| {
 				self.lightmap
-					.write_to(file, image::ImageFormat::Png)
+					.write_to(file, self.image_format)
 					.context("Failed to save image")
 			},
 		)

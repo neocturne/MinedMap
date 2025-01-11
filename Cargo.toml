@@ -44,7 +44,7 @@ enum-map = "2.7.3"
 fastnbt = "2.3.2"
 futures-util = "0.3.28"
 git-version = "0.3.5"
-image = { version = "0.25.1", default-features = false, features = ["png"] }
+image = { version = "0.25.1", default-features = false, features = ["png", "webp"] }
 indexmap = { version = "2.0.0", features = ["serde"] }
 lru = "0.12.0"
 minedmap-nbt = { version = "0.1.1", path = "crates/nbt", default-features = false }

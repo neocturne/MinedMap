@@ -2,6 +2,10 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Added support for rendering tiles WebP format using the `--image-format` option
+
 ## [2.3.1] - 2025-01-06
 
 ### Fixed
