@@ -61,7 +61,7 @@ updates more quickly.
 ### Image formats
 
 MinedMap renders map tiles as PNG by default. Pass `--image-format webp` to select
-WebP instead. For typical Minecraft worlds, using WebP reduces file sizes by 10-15%
+WebP instead. For typical Minecraft worlds, using WebP reduces file sizes by 20-25%
 without increasing processing time.
 
 MinedMap always uses lossless compression for tile images, regardless of the
