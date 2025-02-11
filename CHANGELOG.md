@@ -2,6 +2,12 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- Unknown biome types (from not yet supported or modded versions of Minecraft)
+  will now use plains biome colors as a fallback instead of resulting in water,
+  grass and foliage blocks to be rendered as transparent pixels
+
 ## [2.4.0] - 2025-01-11
 
 ### Added

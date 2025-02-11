@@ -97,14 +97,14 @@ impl LayerEntry<'_> {
 
 		if self.is_empty() {
 			*self.block = Some(block_type.block_color);
-			if let Some(biome) = section.biomes.biome_at(section.y, coords)? {
-				let (biome_index, _) = biome_list.insert_full(*biome);
-				*self.biome = NonZeroU16::new(
-					(biome_index + 1)
-						.try_into()
-						.expect("biome index not in range"),
-				);
-			}
+
+			let biome = section.biomes.biome_at(section.y, coords)?;
+			let (biome_index, _) = biome_list.insert_full(*biome);
+			*self.biome = NonZeroU16::new(
+				(biome_index + 1)
+					.try_into()
+					.expect("biome index not in range"),
+			);
 		}
 
 		if block_type.block_color.is(BlockFlag::Water) {
