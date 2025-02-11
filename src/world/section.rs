@@ -208,7 +208,7 @@ impl Section for SectionV0<'_> {
 /// Trait for common functions of [BiomesV1_18] and [BiomesV0]
 pub trait Biomes: Debug {
 	/// Returns the [Biome] at a coordinate tuple inside the chunk
-	fn biome_at(&self, section: SectionY, coords: SectionBlockCoords) -> Result<Option<&Biome>>;
+	fn biome_at(&self, section: SectionY, coords: SectionBlockCoords) -> Result<&Biome>;
 }
 
 /// Minecraft v1.18+ section biome data
@@ -226,7 +226,7 @@ pub struct BiomesV1_18<'a> {
 	/// to whole i64 values.
 	biomes: Option<&'a [i64]>,
 	/// Biome palette indexed by entries encoded in *biomes*
-	palette: Vec<Option<&'a Biome>>,
+	palette: Vec<&'a Biome>,
 	/// Number of bits used for each entry in *biomes*
 	bits: u8,
 }
@@ -253,12 +253,11 @@ impl<'a> BiomesV1_18<'a> {
 		let palette_types = palette
 			.iter()
 			.map(|entry| {
-				let biome_type = biome_types.get(entry);
-				if biome_type.is_none() {
+				biome_types.get(entry).unwrap_or_else(|| {
 					debug!("Unknown biome type: {}", entry);
 					has_unknown = true;
-				}
-				biome_type
+					biome_types.get_fallback()
+				})
 			})
 			.collect();
 
@@ -295,7 +294,7 @@ impl<'a> BiomesV1_18<'a> {
 }
 
 impl Biomes for BiomesV1_18<'_> {
-	fn biome_at(&self, _section: SectionY, coords: SectionBlockCoords) -> Result<Option<&Biome>> {
+	fn biome_at(&self, _section: SectionY, coords: SectionBlockCoords) -> Result<&Biome> {
 		let index = self.palette_index_at(coords);
 		Ok(*self
 			.palette
@@ -350,7 +349,7 @@ impl<'a> BiomesV0<'a> {
 }
 
 impl Biomes for BiomesV0<'_> {
-	fn biome_at(&self, section: SectionY, coords: SectionBlockCoords) -> Result<Option<&Biome>> {
+	fn biome_at(&self, section: SectionY, coords: SectionBlockCoords) -> Result<&Biome> {
 		let id = match self.data {
 			BiomesV0Data::IntArrayV15(data) => {
 				let LayerBlockCoords { x, z } = coords.xz;
@@ -370,7 +369,10 @@ impl Biomes for BiomesV0<'_> {
 			}
 			BiomesV0Data::ByteArray(data) => data[coords.xz.offset()] as u8,
 		};
-		Ok(self.biome_types.get_legacy(id))
+		Ok(self
+			.biome_types
+			.get_legacy(id)
+			.unwrap_or(self.biome_types.get_fallback()))
 	}
 }
 

@@ -27,7 +27,7 @@ jobs:
           cp -r viewer/* "$pkgdir"/
 
       - name: 'Archive'
-        uses: 'actions/upload-artifact@v3'
+        uses: 'actions/upload-artifact@v4'
         with:
           name: 'MinedMap-${{ steps.tag.outputs.tag }}-viewer'
           path: 'build/pkg'
@@ -134,7 +134,7 @@ jobs:
           cp target/${{ matrix.target }}/release/minedmap${{ matrix.ext }} "$pkgdir"/
 
       - name: 'Archive'
-        uses: 'actions/upload-artifact@v3'
+        uses: 'actions/upload-artifact@v4'
         with:
           name: 'MinedMap-${{ steps.tag.outputs.tag }}-${{ matrix.target }}'
           path: 'target/pkg'

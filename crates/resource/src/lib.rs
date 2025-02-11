@@ -247,6 +247,8 @@ pub struct BiomeTypes {
 	biome_map: HashMap<String, &'static Biome>,
 	/// Array used to look up old numeric biome IDs
 	legacy_biomes: Box<[&'static Biome; 256]>,
+	/// Fallback for unknown (new/modded) biomes
+	fallback_biome: &'static Biome,
 }
 
 impl Default for BiomeTypes {
@@ -273,9 +275,12 @@ impl Default for BiomeTypes {
 			.try_into()
 			.unwrap();
 
+		let fallback_biome = *biome_map.get("plains").expect("Plains biome undefined");
+
 		Self {
 			biome_map,
 			legacy_biomes,
+			fallback_biome,
 		}
 	}
 }
@@ -292,5 +297,11 @@ impl BiomeTypes {
 	#[inline]
 	pub fn get_legacy(&self, id: u8) -> Option<&Biome> {
 		Some(self.legacy_biomes[id as usize])
+	}
+
+	/// Returns the fallback for unknown (new/modded) biomes
+	#[inline]
+	pub fn get_fallback(&self) -> &Biome {
+		self.fallback_biome
 	}
 }
