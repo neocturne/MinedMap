@@ -47,6 +47,7 @@ git-version = "0.3.5"
 image = { version = "0.25.1", default-features = false, features = ["png", "webp"] }
 indexmap = { version = "2.0.0", features = ["serde"] }
 lru = "0.13.0"
+minedmap-default-alloc = { version = "0.1.0", path = "crates/default-alloc", optional = true }
 minedmap-nbt = { version = "0.1.1", path = "crates/nbt", default-features = false }
 minedmap-resource = { version = "0.6.0", path = "crates/resource" }
 minedmap-types = { version = "0.1.4", path = "crates/types" }
@@ -64,5 +65,7 @@ tracing-subscriber = "0.3.17"
 zstd = "0.13.0"
 
 [features]
-default = ["zlib-ng"]
+default = ["jemalloc-auto", "zlib-ng"]
+jemalloc-auto = ["dep:minedmap-default-alloc"]
+jemalloc = ["jemalloc-auto", "minedmap-default-alloc/jemalloc"]
 zlib-ng = ["minedmap-nbt/zlib-ng"]

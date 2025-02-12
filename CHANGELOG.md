@@ -2,6 +2,28 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Added jemalloc support to fix performace on musl targets
+
+  The global allocator can be switched to jemalloc by enabling the `jemalloc`
+  cargo feature now. This is not the default because it is not always faster
+  than the default system allocator; in particular, the glibc allocator has
+  slightly better performance in multithreaded mode. In addition, jemalloc
+  uses a bit more memory.
+
+  In addition, the `jemalloc-auto` feature has been introduced, which is enabled
+  by default and sets the global allocator to jemalloc on platforms where it is
+  clearly advantageous. For now, this is only done on musl-based targets, as
+  musl's default allocator is very slow in multithreaded operation (which was
+  making higher thread counts like `-j8` basically useless due to 7-8x
+  slowdowns). With the new default, performance on musl is basically identical
+  to glibc.
+
+  Note that some platforms like `msvc` are unsupported by jemalloc, and trying
+  to enable the `jemalloc` feature on these platforms may break the MinedMap
+  build or cause issues at runtime.
+
 ### Changed
 
 - Unknown biome types (from not yet supported or modded versions of Minecraft)
