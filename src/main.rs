@@ -2,6 +2,9 @@
 #![warn(missing_docs)]
 #![warn(clippy::missing_docs_in_private_items)]
 
+#[cfg(feature = "jemalloc-auto")]
+extern crate minedmap_default_alloc;
+
 mod core;
 mod io;
 mod util;

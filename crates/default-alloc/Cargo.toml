@@ -1,0 +1,17 @@
+[package]
+name = "minedmap-default-alloc"
+version = "0.1.0"
+description = "Helper crate for target-specific selection of global allocator default"
+edition.workspace = true
+license.workspace = true
+readme.workspace = true
+repository.workspace = true
+
+[dependencies]
+tikv-jemallocator = { version = "0.6.0", optional = true }
+
+[target.'cfg(target_env = "musl")'.dependencies]
+tikv-jemallocator = "*"
+
+[features]
+jemalloc = ["dep:tikv-jemallocator"]
