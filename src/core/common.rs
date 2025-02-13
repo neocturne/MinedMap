@@ -139,6 +139,8 @@ pub struct Config {
 	pub region_dir: PathBuf,
 	/// Path of input `level.dat` file
 	pub level_dat_path: PathBuf,
+	/// Path of input `level.dat_old` file
+	pub level_dat_old_path: PathBuf,
 	/// Base path for storage of rendered tile data
 	pub output_dir: PathBuf,
 	/// Path for storage of intermediate processed data files
@@ -170,6 +172,9 @@ impl Config {
 
 		let region_dir = [&args.input_dir, Path::new("region")].iter().collect();
 		let level_dat_path = [&args.input_dir, Path::new("level.dat")].iter().collect();
+		let level_dat_old_path = [&args.input_dir, Path::new("level.dat_old")]
+			.iter()
+			.collect();
 		let processed_dir: PathBuf = [&args.output_dir, Path::new("processed")].iter().collect();
 		let entities_dir: PathBuf = [&processed_dir, Path::new("entities")].iter().collect();
 		let entities_path_final = [&entities_dir, Path::new("entities.bin")].iter().collect();
@@ -186,6 +191,7 @@ impl Config {
 			num_threads,
 			region_dir,
 			level_dat_path,
+			level_dat_old_path,
 			output_dir: args.output_dir.clone(),
 			processed_dir,
 			entities_dir,
