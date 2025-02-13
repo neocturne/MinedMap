@@ -4,6 +4,22 @@
 
 ### Added
 
+- Added experimental watch mode
+
+  Passing `--watch` will cause MinedMap to run continuously instead of exiting
+  after map generation, regenerating tiles whenever they change.
+
+  `--watch-delay` can be used to configure the delay between detecting a change
+  and runing the map generation, also limiting how often the regeneration
+  happens. This defaults to `30s`; significantly smaller values probably don't
+  make sense because Minecraft writes out changes in batches anyways.
+
+  Finally, `--jobs-initial` can be used to configure the number of parallel
+  generation threads for the initial cycle separately from the value used for
+  subsequent cycles after a change is detected (`-j`/`--jobs`). Subsequent
+  cycles usually need to regenerate only a small number of tiles, so setting
+  `--jobs` to a smaller value than `--jobs-initial` may be advantageous.
+
 - Added jemalloc support to fix performace on musl targets
 
   The global allocator can be switched to jemalloc by enabling the `jemalloc`
