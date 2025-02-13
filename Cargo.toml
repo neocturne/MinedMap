@@ -44,6 +44,7 @@ enum-map = "2.7.3"
 fastnbt = "2.3.2"
 futures-util = "0.3.28"
 git-version = "0.3.5"
+humantime = "2.1.0"
 image = { version = "0.25.1", default-features = false, features = ["png", "webp"] }
 indexmap = { version = "2.0.0", features = ["serde"] }
 lru = "0.13.0"
@@ -51,6 +52,7 @@ minedmap-default-alloc = { version = "0.1.0", path = "crates/default-alloc", opt
 minedmap-nbt = { version = "0.1.1", path = "crates/nbt", default-features = false }
 minedmap-resource = { version = "0.6.0", path = "crates/resource" }
 minedmap-types = { version = "0.1.4", path = "crates/types" }
+notify = "8.0.0"
 num-integer = "0.1.45"
 num_cpus = "1.16.0"
 phf = { version = "0.11.2", features = ["macros"] }

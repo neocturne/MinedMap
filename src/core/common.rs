@@ -135,6 +135,8 @@ pub enum TileKind {
 pub struct Config {
 	/// Number of threads for parallel processing
 	pub num_threads: usize,
+	/// Number of threads for initial parallel processing
+	pub num_threads_initial: usize,
 	/// Path of input region directory
 	pub region_dir: PathBuf,
 	/// Path of input `level.dat` file
@@ -169,6 +171,7 @@ impl Config {
 			Some(threads) => threads,
 			None => 1,
 		};
+		let num_threads_initial = args.jobs_initial.unwrap_or(num_threads);
 
 		let region_dir = [&args.input_dir, Path::new("region")].iter().collect();
 		let level_dat_path = [&args.input_dir, Path::new("level.dat")].iter().collect();
@@ -189,6 +192,7 @@ impl Config {
 
 		Ok(Config {
 			num_threads,
+			num_threads_initial,
 			region_dir,
 			level_dat_path,
 			level_dat_old_path,
