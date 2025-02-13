@@ -124,7 +124,14 @@ impl<'a> MetadataWriter<'a> {
 
 	/// Reads and deserializes the `level.dat` of the Minecraft save data
 	fn read_level_dat(&self) -> Result<de::LevelDat> {
-		crate::nbt::data::from_file(&self.config.level_dat_path).context("Failed to read level.dat")
+		let res = crate::nbt::data::from_file(&self.config.level_dat_path);
+		if res.is_err() {
+			if let Ok(level_dat_old) = crate::nbt::data::from_file(&self.config.level_dat_old_path)
+			{
+				return Ok(level_dat_old);
+			}
+		}
+		res.context("Failed to read level.dat")
 	}
 
 	/// Generates [Spawn] data from a [de::LevelDat]
