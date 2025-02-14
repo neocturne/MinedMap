@@ -1,14 +1,15 @@
-FROM docker.io/library/rust:alpine AS BUILDER
+FROM docker.io/library/alpine:latest AS BUILDER
 
 WORKDIR /build
-RUN apk update && apk add cmake build-base
+RUN apk add --no-cache build-base cmake cargo
 
-COPY src /build/src
-COPY crates /build/crates
-COPY Cargo.toml Cargo.lock /build
+COPY . .
 RUN cargo build -r 
+RUN strip target/release/minedmap
 
-FROM scratch AS RUNNER
+FROM docker.io/library/alpine:latest
 
-COPY --from=BUILDER /build/target/release/minedmap /minedmap
-ENTRYPOINT [ "/minedmap" ]
+RUN apk add --no-cache libgcc tini
+
+COPY --from=BUILDER /build/target/release/minedmap /bin/minedmap
+ENTRYPOINT [ "/sbin/tini", "--", "/bin/minedmap" ]
