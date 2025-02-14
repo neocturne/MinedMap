@@ -1,3 +1,3 @@
 FROM docker.io/library/nginx:alpine
-COPY viewer /usr/share/nginx/html
+COPY . /usr/share/nginx/html
 # datadir should be mounted to: /usr/share/nginx/html/data

@@ -25,6 +25,7 @@ jobs:
           pkgdir='build/pkg/MinedMap-${{ steps.tag.outputs.tag }}-viewer'
           mkdir -p "$pkgdir"
           cp -r viewer/* "$pkgdir"/
+          rm "$pkgdir"/Dockerfile
 
       - name: 'Archive'
         uses: 'actions/upload-artifact@v4'
