@@ -7,7 +7,7 @@ env:
 
 jobs:
   viewer:
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-latest'
 
     steps:
       - name: 'Checkout'
@@ -101,7 +101,7 @@ jobs:
         - os: 'windows-2019'
           target: 'i686-pc-windows-msvc'
           ext: '.exe'
-        - os: 'ubuntu-20.04'
+        - os: 'ubuntu-22.04'
           target: 'x86_64-unknown-linux-gnu'
 
     steps:
