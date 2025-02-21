@@ -135,10 +135,14 @@ pub enum TileKind {
 pub struct Config {
 	/// Number of threads for parallel processing
 	pub num_threads: usize,
+	/// Number of threads for initial parallel processing
+	pub num_threads_initial: usize,
 	/// Path of input region directory
 	pub region_dir: PathBuf,
 	/// Path of input `level.dat` file
 	pub level_dat_path: PathBuf,
+	/// Path of input `level.dat_old` file
+	pub level_dat_old_path: PathBuf,
 	/// Base path for storage of rendered tile data
 	pub output_dir: PathBuf,
 	/// Path for storage of intermediate processed data files
@@ -167,9 +171,13 @@ impl Config {
 			Some(threads) => threads,
 			None => 1,
 		};
+		let num_threads_initial = args.jobs_initial.unwrap_or(num_threads);
 
 		let region_dir = [&args.input_dir, Path::new("region")].iter().collect();
 		let level_dat_path = [&args.input_dir, Path::new("level.dat")].iter().collect();
+		let level_dat_old_path = [&args.input_dir, Path::new("level.dat_old")]
+			.iter()
+			.collect();
 		let processed_dir: PathBuf = [&args.output_dir, Path::new("processed")].iter().collect();
 		let entities_dir: PathBuf = [&processed_dir, Path::new("entities")].iter().collect();
 		let entities_path_final = [&entities_dir, Path::new("entities.bin")].iter().collect();
@@ -184,8 +192,10 @@ impl Config {
 
 		Ok(Config {
 			num_threads,
+			num_threads_initial,
 			region_dir,
 			level_dat_path,
+			level_dat_old_path,
 			output_dir: args.output_dir.clone(),
 			processed_dir,
 			entities_dir,

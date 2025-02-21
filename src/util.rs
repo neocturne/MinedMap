@@ -39,7 +39,9 @@ pub fn to_flat_coord<const AXIS: u8>(
 	chunk: ChunkCoord<AXIS>,
 	block: BlockCoord<AXIS>,
 ) -> i32 {
-	(region as i32) << (BLOCK_BITS + CHUNK_BITS) | ((chunk.0 as i32) << BLOCK_BITS | block.0 as i32)
+	((region as i32) << (BLOCK_BITS + CHUNK_BITS))
+		| ((chunk.0 as i32) << BLOCK_BITS)
+		| (block.0 as i32)
 }
 
 /// Splits a flat (linear) coordinate into region, chunk and block numbers
