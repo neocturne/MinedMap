@@ -134,7 +134,7 @@ impl<'a> TileRenderer<'a> {
 		/// Hashing the value as a single u32 is more efficient than hashing
 		/// the tuple elements separately.
 		fn biome_key((dx, dz, index): (i8, i8, u16)) -> u32 {
-			(dx as u8 as u32) | (dz as u8 as u32) << 8 | (index as u32) << 16
+			(dx as u8 as u32) | ((dz as u8 as u32) << 8) | ((index as u32) << 16)
 		}
 
 		/// One quadrant of the kernel used to smooth biome edges
