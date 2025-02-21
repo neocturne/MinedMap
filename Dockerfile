@@ -1,4 +1,4 @@
-FROM docker.io/library/alpine:latest AS BUILDER
+FROM docker.io/library/alpine:latest AS builder
 
 WORKDIR /build
 RUN apk add --no-cache build-base cmake cargo
@@ -11,5 +11,5 @@ FROM docker.io/library/alpine:latest
 
 RUN apk add --no-cache libgcc tini
 
-COPY --from=BUILDER /build/target/release/minedmap /bin/minedmap
+COPY --from=builder /build/target/release/minedmap /bin/minedmap
 ENTRYPOINT [ "/sbin/tini", "--", "/bin/minedmap" ]
