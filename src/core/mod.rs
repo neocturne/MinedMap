@@ -33,17 +33,23 @@ use tracing::{info, warn};
 
 use self::entity_collector::EntityCollector;
 
-/// MinedMap version number
-const VERSION: &str = git_version!(
-	args = ["--abbrev=7", "--match=v*", "--dirty=-modified"],
-	cargo_prefix = "v",
-);
+/// Returns the MinedMap version number
+fn version() -> &'static str {
+	option_env!("MINEDMAP_VERSION").unwrap_or(
+		git_version!(
+			args = ["--abbrev=7", "--match=v*", "--dirty=-modified"],
+			cargo_prefix = "v",
+		)
+		.strip_prefix("v")
+		.unwrap(),
+	)
+}
 
 /// Command line arguments for minedmap CLI
 #[derive(Debug, Parser)]
 #[command(
 	about,
-	version = VERSION.strip_prefix("v").unwrap(),
+	version = version(),
 	max_term_width = 100,
 )]
 pub struct Args {
