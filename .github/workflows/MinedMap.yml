@@ -154,6 +154,16 @@ jobs:
     needs:
       - test
     steps:
+      - name: 'Checkout'
+        uses: 'actions/checkout@v4'
+
+      - name: 'Get version'
+        id: 'tag'
+        run: |
+          set -o pipefail
+          git fetch --prune --unshallow --tags -f
+          echo "tag=$(git describe --abbrev=7 --match='v*' | sed 's/^v//')" >> $GITHUB_OUTPUT
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -182,6 +192,8 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v6
         with:
+          build-args: |
+            MINEDMAP_VERSION=${{ steps.tag.outputs.tag }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
