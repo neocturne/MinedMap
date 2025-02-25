@@ -28,7 +28,7 @@ services:
       - '/input/world'
       - '/output'
     volumes:
-      - data:/input
+      - data:/input:ro
       - output:/output
       - processed:/output/processed
     network_mode: 'none'
@@ -42,7 +42,7 @@ services:
     ports:
       - '8080:80'
     volumes:
-      - output:/usr/share/nginx/html/data
+      - output:/usr/share/nginx/html/data:ro
     restart: unless-stopped
 
 volumes:
