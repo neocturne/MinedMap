@@ -49,6 +49,13 @@
 
   This should have no noticable effect on the usage of MinedMap, but avoids
   an external build dependency on CMake.
+- Small (1-block) seagrass is now visible on the map
+
+  1-block seagrass in 1-block deep water would previously result in the ground
+  to be shown instead of water, as MinedMap currently doesn't handle the
+  "waterlogged" block status. As 1-block seagrass is relatively big compared to
+  other "small" plants, just considering it opaque seems like a good enough
+  solution that avoids having to implement advanced block status flags.
 
 ## [2.4.0] - 2025-01-11
 
