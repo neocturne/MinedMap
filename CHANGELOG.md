@@ -45,6 +45,10 @@
 - Unknown biome types (from not yet supported or modded versions of Minecraft)
   will now use plains biome colors as a fallback instead of resulting in water,
   grass and foliage blocks to be rendered as transparent pixels
+- Switched from zlib-ng to zlib-rs
+
+  This should have no noticable effect on the usage of MinedMap, but avoids
+  an external build dependency on CMake.
 
 ## [2.4.0] - 2025-01-11
 
