@@ -1,7 +1,7 @@
 FROM docker.io/library/alpine:latest AS builder
 
 WORKDIR /build
-RUN apk add --no-cache build-base cmake cargo
+RUN apk add --no-cache build-base cargo
 
 ARG MINEDMAP_VERSION
 

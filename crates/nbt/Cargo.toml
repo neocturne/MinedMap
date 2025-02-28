@@ -11,12 +11,10 @@ repository.workspace = true
 anyhow = "1.0.75"
 bytemuck = "1.13.1"
 fastnbt = "2.4.4"
-flate2 = "1.0.27"
+flate2 = "1.1.0"
 minedmap-types = { version = "0.1.4", path = "../types" }
 serde = "1.0.183"
 
-[features]
-zlib-ng = ["flate2/zlib-ng"]
-
 [dev-dependencies]
 clap = { version = "4.3.23", features = ["derive"] }
+flate2 = { version = "1.1.0", features = ["zlib-rs"] }

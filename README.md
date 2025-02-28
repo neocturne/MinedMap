@@ -117,11 +117,6 @@ or newer). The following command can be used to build the current development ve
 cargo install --git 'https://github.com/neocturne/MinedMap.git'
 ```
 
-In addition, CMake is needed to build the zlib-ng library. If you do not have
-CMake installed, you can disable the zlib-ng feature by passing `--no-default-features`
-to cargo. A pure-Rust zlib implementation will be used, which is more portable,
-but slower than zlib-ng.
-
 If you are looking for the older C++ implementation of the MinedMap tile renderer,
 see the [v1.19.1](https://github.com/neocturne/MinedMap/tree/v1.19.1) tag.
 
