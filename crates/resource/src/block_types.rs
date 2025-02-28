@@ -8692,8 +8692,8 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		"seagrass",
 		ConstBlockType {
 			block_color: BlockColor {
-				flags: make_bitflags!(BlockFlag::{}),
-				color: Color([0, 0, 0]),
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([50, 126, 8]),
 			},
 			sign_material: None,
 		},
