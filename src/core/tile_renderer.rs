@@ -187,7 +187,7 @@ impl<'a> TileRenderer<'a> {
 
 		for ((region_x, region_z, index), w) in weights.into_values() {
 			let region = region_group.get(region_x, region_z)?;
-			let biome = region.biome_list.get_index(index.into())?;
+			let biome = region.biome_list.get(usize::from(index))?;
 
 			total += w;
 			color += w * block_color(block, Some(biome), depth.0 as f32);

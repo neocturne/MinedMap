@@ -8,7 +8,6 @@ use std::{
 
 use anyhow::{Context, Result};
 use clap::ValueEnum;
-use indexmap::IndexSet;
 use regex::{Regex, RegexSet};
 use serde::{Deserialize, Serialize};
 
@@ -102,7 +101,7 @@ pub struct ProcessedRegion {
 	/// List of biomes used in the region
 	///
 	/// Indexed by [ProcessedChunk] biome data
-	pub biome_list: IndexSet<Biome>,
+	pub biome_list: Vec<Biome>,
 	/// Processed chunk data
 	pub chunks: ChunkArray<Option<Box<ProcessedChunk>>>,
 }

@@ -1,9 +1,11 @@
 //! The [RegionProcessor] and related functions
 
-use std::{ffi::OsStr, path::PathBuf, sync::mpsc, time::SystemTime};
+use std::{ffi::OsStr, mem, path::PathBuf, sync::mpsc, time::SystemTime};
 
 use anyhow::{Context, Result};
 use enum_map::{Enum, EnumMap};
+use indexmap::IndexSet;
+use minedmap_resource::Biome;
 use rayon::prelude::*;
 use tracing::{debug, info, warn};
 
@@ -73,6 +75,8 @@ struct SingleRegionProcessor<'a> {
 	lightmap_needed: bool,
 	/// True if entity output file needs to be updated
 	entities_needed: bool,
+	/// [IndexSet] of biomes used by the processed region
+	biome_list: IndexSet<Biome>,
 	/// Processed region intermediate data
 	processed_region: ProcessedRegion,
 	/// Lightmap intermediate data
@@ -108,6 +112,7 @@ impl<'a> SingleRegionProcessor<'a> {
 		let entities_needed = Some(input_timestamp) > entities_timestamp;
 
 		let processed_region = ProcessedRegion::default();
+		let biome_list = IndexSet::default();
 		let lightmap = image::GrayAlphaImage::new(N, N);
 		let entities = ProcessedEntities::default();
 
@@ -127,6 +132,7 @@ impl<'a> SingleRegionProcessor<'a> {
 			lightmap_needed,
 			entities_needed,
 			processed_region,
+			biome_list,
 			lightmap,
 			entities,
 			image_format: processor.config.tile_image_format(),
@@ -220,7 +226,7 @@ impl<'a> SingleRegionProcessor<'a> {
 				biomes,
 				block_light,
 				depths,
-			}) = world::layer::top_layer(&mut self.processed_region.biome_list, &chunk)
+			}) = world::layer::top_layer(&mut self.biome_list, &chunk)
 				.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
 			{
 				if self.output_needed {
@@ -290,6 +296,8 @@ impl<'a> SingleRegionProcessor<'a> {
 				return Ok(RegionProcessorStatus::ErrorMissing);
 			}
 		}
+
+		self.processed_region.biome_list = mem::take(&mut self.biome_list).into_iter().collect();
 
 		self.save_region()?;
 		self.save_lightmap()?;
