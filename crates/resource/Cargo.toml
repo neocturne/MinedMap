@@ -8,6 +8,6 @@ readme.workspace = true
 repository.workspace = true
 
 [dependencies]
+bincode = "2.0.1"
 enumflags2 = { version = "0.7.7", features = ["serde"] }
 glam = "0.30.0"
-serde = { version = "1.0.183", features = ["derive"] }

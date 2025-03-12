@@ -2,8 +2,9 @@
 
 use std::fmt::Display;
 
+use bincode::{Decode, Encode};
 use minedmap_resource::Color;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use super::{
 	de,
@@ -104,7 +105,7 @@ impl BlockEntitySignExt for de::BlockEntitySign {
 	}
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Default, Serialize, PartialEq, Eq, PartialOrd, Ord, Encode, Decode)]
 /// Deserialized and linearized sign text
 pub struct SignText(pub Vec<FormattedTextList>);
 

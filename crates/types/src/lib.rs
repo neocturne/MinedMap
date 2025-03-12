@@ -8,8 +8,8 @@ use std::{
 	ops::{Index, IndexMut},
 };
 
+use bincode::{Decode, Encode};
 use itertools::iproduct;
-use serde::{Deserialize, Serialize};
 
 /// Const generic AXIS arguments for coordinate types
 pub mod axis {
@@ -110,7 +110,7 @@ impl LayerBlockCoords {
 /// Generic array for data stored per block of a chunk layer
 ///
 /// Includes various convenient iteration functions.
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Encode, Decode)]
 pub struct LayerBlockArray<T>(pub [[T; BLOCKS_PER_CHUNK]; BLOCKS_PER_CHUNK]);
 
 impl<T> Index<LayerBlockCoords> for LayerBlockArray<T> {
@@ -196,7 +196,7 @@ impl Debug for ChunkCoords {
 /// Generic array for data stored per chunk of a region
 ///
 /// Includes various convenient iteration functions.
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Encode, Decode)]
 pub struct ChunkArray<T>(pub [[T; CHUNKS_PER_REGION]; CHUNKS_PER_REGION]);
 
 impl<T> ChunkArray<T> {

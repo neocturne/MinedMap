@@ -168,7 +168,6 @@ impl<'a> SingleRegionProcessor<'a> {
 		storage::write_file(
 			&self.output_path,
 			&self.processed_region,
-			storage::Format::Bincode,
 			REGION_FILE_META_VERSION,
 			self.input_timestamp,
 		)
@@ -207,7 +206,6 @@ impl<'a> SingleRegionProcessor<'a> {
 		storage::write_file(
 			&self.entities_path,
 			&self.entities,
-			storage::Format::Json,
 			ENTITIES_FILE_META_VERSION,
 			self.input_timestamp,
 		)
