@@ -5,7 +5,7 @@
 
 use std::fmt::Debug;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use num_integer::div_rem;
 use tracing::debug;
 
@@ -400,10 +400,6 @@ impl<'a> BlockLight<'a> {
 		let (offset, nibble) = div_rem(coords.offset(), 2);
 		let byte = block_light[offset] as u8;
 
-		if nibble == 1 {
-			byte >> 4
-		} else {
-			byte & 0xf
-		}
+		if nibble == 1 { byte >> 4 } else { byte & 0xf }
 	}
 }

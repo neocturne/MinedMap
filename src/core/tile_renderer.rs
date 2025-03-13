@@ -16,7 +16,7 @@ use tracing::{debug, info};
 use super::{common::*, region_group::RegionGroup};
 use crate::{
 	io::{fs, storage},
-	resource::{block_color, needs_biome, Colorf},
+	resource::{Colorf, block_color, needs_biome},
 	types::*,
 	util::coord_offset,
 };

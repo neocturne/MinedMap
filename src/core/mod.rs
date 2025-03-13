@@ -205,8 +205,10 @@ pub fn cli() -> Result<()> {
 	if config.num_threads != config.num_threads_initial {
 		pool = setup_threads(config.num_threads)?;
 	}
-	pool.install(move || loop {
-		wait_watcher(&args, &watch_channel)?;
-		generate(&config, &rt)?;
+	pool.install(move || {
+		loop {
+			wait_watcher(&args, &watch_channel)?;
+			generate(&config, &rt)?;
+		}
 	})
 }

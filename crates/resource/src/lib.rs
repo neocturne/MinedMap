@@ -11,7 +11,7 @@ mod legacy_block_types;
 use std::collections::HashMap;
 
 use bincode::{BorrowDecode, Decode, Encode};
-use enumflags2::{bitflags, BitFlags};
+use enumflags2::{BitFlags, bitflags};
 
 /// Flags describing special properties of [BlockType]s
 #[bitflags]

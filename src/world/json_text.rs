@@ -185,9 +185,9 @@ mod json_color {
 
 	use minedmap_resource::Color;
 	use serde::{
+		Deserializer, Serializer,
 		de::{self, Visitor},
 		ser::Error as _,
-		Deserializer, Serializer,
 	};
 
 	/// Named JSON text colors
