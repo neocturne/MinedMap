@@ -1,7 +1,7 @@
-FROM docker.io/library/alpine:latest AS builder
+FROM docker.io/library/rust:alpine AS builder
 
 WORKDIR /build
-RUN apk add --no-cache build-base cargo
+RUN apk add --no-cache build-base tini-static
 
 ARG MINEDMAP_VERSION
 
@@ -9,14 +9,9 @@ COPY . .
 RUN cargo build -r 
 RUN strip target/release/minedmap
 
-FROM docker.io/library/alpine:latest
+FROM scratch
 
-RUN addgroup -g 1000 -S minedmap \
-    && adduser -S -D -H -u 1000 -h /output -s /sbin/nologin -G minedmap -g minedmap minedmap
+COPY --from=builder /sbin/tini-static /build/target/release/minedmap /bin/
+ENTRYPOINT [ "/bin/tini-static", "--", "/bin/minedmap" ]
 
-RUN apk add --no-cache libgcc tini
-
-COPY --from=builder /build/target/release/minedmap /bin/minedmap
-ENTRYPOINT [ "/sbin/tini", "--", "/bin/minedmap" ]
-
-USER minedmap:minedmap
+USER 1000:1000
