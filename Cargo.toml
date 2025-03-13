@@ -47,7 +47,7 @@ futures-util = "0.3.28"
 git-version = "0.3.5"
 humantime = "2.1.0"
 image = { version = "0.25.1", default-features = false, features = ["png", "webp"] }
-indexmap = { version = "2.0.0", features = ["serde"] }
+indexmap = "2.0.0"
 lru = "0.13.0"
 minedmap-default-alloc = { version = "0.1.0", path = "crates/default-alloc", optional = true }
 minedmap-nbt = { version = "0.1.1", path = "crates/nbt", default-features = false }
@@ -60,7 +60,7 @@ phf = { version = "0.11.2", features = ["macros"] }
 rayon = "1.7.0"
 regex = "1.10.2"
 rustc-hash = "2.0.0"
-serde = { version = "1.0.152", features = ["rc", "derive"] }
+serde = { version = "1.0.152", features = ["derive"] }
 serde_json = "1.0.99"
 tokio = { version = "1.31.0", features = ["rt", "parking_lot", "sync"] }
 tracing = "0.1.37"
