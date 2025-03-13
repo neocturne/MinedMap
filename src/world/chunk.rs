@@ -4,11 +4,11 @@
 //! over different data versions as much as possible.
 
 use std::{
-	collections::{btree_map, BTreeMap},
+	collections::{BTreeMap, btree_map},
 	iter::{self, FusedIterator},
 };
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 
 use super::{block_entity::BlockEntity, de, section::*};
 use crate::{

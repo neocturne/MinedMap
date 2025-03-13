@@ -10,13 +10,13 @@ mod legacy_block_types;
 
 use std::collections::HashMap;
 
-use enumflags2::{bitflags, BitFlags};
-use serde::{Deserialize, Serialize};
+use bincode::{BorrowDecode, Decode, Encode};
+use enumflags2::{BitFlags, bitflags};
 
 /// Flags describing special properties of [BlockType]s
 #[bitflags]
 #[repr(u8)]
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum BlockFlag {
 	/// The block type is opaque
 	Opaque,
@@ -38,14 +38,14 @@ pub enum BlockFlag {
 }
 
 /// An RGB color with u8 components
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Encode, Decode)]
 pub struct Color(pub [u8; 3]);
 
 /// An RGB color with f32 components
 pub type Colorf = glam::Vec3;
 
 /// A block type specification
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy)]
 pub struct BlockColor {
 	/// Bit set of [BlockFlag]s describing special properties of the block type
 	pub flags: BitFlags<BlockFlag>,
@@ -58,6 +58,43 @@ impl BlockColor {
 	#[inline]
 	pub fn is(&self, flag: BlockFlag) -> bool {
 		self.flags.contains(flag)
+	}
+}
+
+impl Encode for BlockColor {
+	fn encode<E: bincode::enc::Encoder>(
+		&self,
+		encoder: &mut E,
+	) -> Result<(), bincode::error::EncodeError> {
+		bincode::Encode::encode(&self.flags.bits(), encoder)?;
+		bincode::Encode::encode(&self.color, encoder)?;
+		Ok(())
+	}
+}
+
+impl<Context> Decode<Context> for BlockColor {
+	fn decode<D: bincode::de::Decoder<Context = Context>>(
+		decoder: &mut D,
+	) -> Result<Self, bincode::error::DecodeError> {
+		Ok(BlockColor {
+			flags: BitFlags::from_bits(bincode::Decode::decode(decoder)?).or(Err(
+				bincode::error::DecodeError::Other("invalid block flags"),
+			))?,
+			color: bincode::Decode::decode(decoder)?,
+		})
+	}
+}
+
+impl<'de, Context> BorrowDecode<'de, Context> for BlockColor {
+	fn borrow_decode<D: bincode::de::BorrowDecoder<'de, Context = Context>>(
+		decoder: &mut D,
+	) -> Result<Self, bincode::error::DecodeError> {
+		Ok(BlockColor {
+			flags: BitFlags::from_bits(bincode::BorrowDecode::borrow_decode(decoder)?).or(Err(
+				bincode::error::DecodeError::Other("invalid block flags"),
+			))?,
+			color: bincode::BorrowDecode::borrow_decode(decoder)?,
+		})
 	}
 }
 
@@ -137,7 +174,7 @@ impl BlockTypes {
 pub use block_color::{block_color, needs_biome};
 
 /// Grass color modifier used by a biome
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Encode, Decode)]
 pub enum BiomeGrassColorModifier {
 	/// Grass color modifier used by the dark forest biome
 	DarkForest,
@@ -149,7 +186,7 @@ pub enum BiomeGrassColorModifier {
 ///
 /// A Biome contains all information about a biome necessary to compute a block
 /// color given a block type and depth
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Encode, Decode)]
 pub struct Biome {
 	/// Temperature value
 	///

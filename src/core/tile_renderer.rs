@@ -16,7 +16,7 @@ use tracing::{debug, info};
 use super::{common::*, region_group::RegionGroup};
 use crate::{
 	io::{fs, storage},
-	resource::{block_color, needs_biome, Colorf},
+	resource::{Colorf, block_color, needs_biome},
 	types::*,
 	util::coord_offset,
 };
@@ -105,8 +105,7 @@ impl<'a> TileRenderer<'a> {
 
 		region_loader
 			.get_or_try_init(|| async {
-				storage::read_file(&processed_path, storage::Format::Bincode)
-					.context("Failed to load processed region data")
+				storage::read_file(&processed_path).context("Failed to load processed region data")
 			})
 			.await
 			.cloned()
@@ -187,7 +186,7 @@ impl<'a> TileRenderer<'a> {
 
 		for ((region_x, region_z, index), w) in weights.into_values() {
 			let region = region_group.get(region_x, region_z)?;
-			let biome = region.biome_list.get_index(index.into())?;
+			let biome = region.biome_list.get(usize::from(index))?;
 
 			total += w;
 			color += w * block_color(block, Some(biome), depth.0 as f32);

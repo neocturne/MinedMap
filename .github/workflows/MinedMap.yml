@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: stable
+          toolchain: '1.85'
           components: rustfmt
       - run: cargo fmt --all -- --check
 
@@ -58,7 +58,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: stable
+          toolchain: '1.85'
           components: clippy
       - uses: swatinem/rust-cache@v2
       - uses: actions-rs/clippy-check@v1
@@ -72,7 +72,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: stable
+          toolchain: '1.85'
           components: rust-docs
       - uses: swatinem/rust-cache@v2
       - run: cargo doc --workspace --no-deps --document-private-items
@@ -83,12 +83,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        rust: [stable]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: ${{ matrix.rust }}
+          toolchain: '1.85'
       - uses: swatinem/rust-cache@v2
       - run: cargo test --workspace
       - run: cargo test --workspace --no-default-features
@@ -128,7 +127,7 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: stable
+          toolchain: '1.85'
           targets: '${{ matrix.target }}'
 
       - uses: swatinem/rust-cache@v2

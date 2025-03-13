@@ -179,9 +179,8 @@ impl<'a> MetadataWriter<'a> {
 
 	/// Generates [Entities] data from collected entity lists
 	fn entities(&self) -> Result<Entities> {
-		let data: ProcessedEntities =
-			storage::read_file(&self.config.entities_path_final, storage::Format::Json)
-				.context("Failed to read entity data file")?;
+		let data: ProcessedEntities = storage::read_file(&self.config.entities_path_final)
+			.context("Failed to read entity data file")?;
 
 		let ret = Entities {
 			signs: data

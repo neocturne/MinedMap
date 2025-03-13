@@ -2,11 +2,11 @@
 
 use std::{
 	fs::File,
-	io::{prelude::*, SeekFrom},
+	io::{SeekFrom, prelude::*},
 	path::Path,
 };
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use flate2::read::ZlibDecoder;
 use serde::de::DeserializeOwned;
 

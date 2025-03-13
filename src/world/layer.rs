@@ -3,8 +3,8 @@
 use std::num::NonZeroU16;
 
 use anyhow::{Context, Result};
+use bincode::{Decode, Encode};
 use indexmap::IndexSet;
-use serde::{Deserialize, Serialize};
 
 use super::chunk::{Chunk, SectionIterItem};
 use crate::{
@@ -13,7 +13,7 @@ use crate::{
 };
 
 /// Height (Y coordinate) of a block
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Encode, Decode)]
 pub struct BlockHeight(pub i32);
 
 impl BlockHeight {

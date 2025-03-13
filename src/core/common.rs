@@ -3,14 +3,15 @@
 use std::{
 	collections::{BTreeMap, BTreeSet},
 	fmt::Debug,
+	hash::Hash,
 	path::{Path, PathBuf},
 };
 
 use anyhow::{Context, Result};
+use bincode::{Decode, Encode};
 use clap::ValueEnum;
-use indexmap::IndexSet;
 use regex::{Regex, RegexSet};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::{
 	io::fs::FileMetaVersion,
@@ -25,7 +26,7 @@ use crate::{
 ///
 /// Increase when the generation of processed regions from region data changes
 /// (usually because of updated resource data)
-pub const REGION_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(5);
+pub const REGION_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(6);
 
 /// MinedMap map tile data version number
 ///
@@ -47,7 +48,7 @@ pub const MIPMAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 /// MinedMap processed entity data version number
 ///
 /// Increase when entity collection changes bacause of code changes.
-pub const ENTITIES_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(1);
+pub const ENTITIES_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(2);
 
 /// Coordinate pair of a generated tile
 ///
@@ -86,7 +87,7 @@ impl TileCoordMap {
 }
 
 /// Data structure for storing chunk data between processing and rendering steps
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Encode, Decode)]
 pub struct ProcessedChunk {
 	/// Block type data
 	pub blocks: Box<layer::BlockArray>,
@@ -97,18 +98,18 @@ pub struct ProcessedChunk {
 }
 
 /// Data structure for storing region data between processing and rendering steps
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Encode, Decode)]
 pub struct ProcessedRegion {
 	/// List of biomes used in the region
 	///
 	/// Indexed by [ProcessedChunk] biome data
-	pub biome_list: IndexSet<Biome>,
+	pub biome_list: Vec<Biome>,
 	/// Processed chunk data
 	pub chunks: ChunkArray<Option<Box<ProcessedChunk>>>,
 }
 
 /// Data structure for storing entity data between processing and collection steps
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Encode, Decode)]
 pub struct ProcessedEntities {
 	/// List of block entities
 	pub block_entities: Vec<BlockEntity>,
