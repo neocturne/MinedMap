@@ -56,6 +56,11 @@
   "waterlogged" block status. As 1-block seagrass is relatively big compared to
   other "small" plants, just considering it opaque seems like a good enough
   solution that avoids having to implement advanced block status flags.
+- Use Bincode 2 for storage of intermediate data
+
+  The update from Bincode 1 to 2 slightly reduces the size of the `processed`
+  directory used for intermediate data. At least Rust 1.85 is now required to
+  build MinedMap.
 
 ## [2.4.0] - 2025-01-11
 
