@@ -131,6 +131,8 @@ jobs:
           targets: '${{ matrix.target }}'
 
       - uses: swatinem/rust-cache@v2
+        with:
+          key: '${{ matrix.target }}'
 
       - name: 'Build'
         shell: 'bash'
