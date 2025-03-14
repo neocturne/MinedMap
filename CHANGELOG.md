@@ -39,6 +39,11 @@
   Note that some platforms like `msvc` are unsupported by jemalloc, and trying
   to enable the `jemalloc` feature on these platforms may break the MinedMap
   build or cause issues at runtime.
+- Docker images can be downloaded from the GitHub Container registry
+
+  Two images are provided, one for the tile renderer and one with the viewer
+  and a web server. A `docker-compose.yml` example can be found in the
+  repository as a starting point.
 
 ### Changed
 
