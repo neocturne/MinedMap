@@ -50,7 +50,7 @@ image = { version = "0.25.1", default-features = false, features = ["png", "webp
 indexmap = "2.0.0"
 lru = "0.13.0"
 minedmap-default-alloc = { version = "0.1.0", path = "crates/default-alloc", optional = true }
-minedmap-nbt = { version = "0.1.1", path = "crates/nbt", default-features = false }
+minedmap-nbt = { version = "0.2.0", path = "crates/nbt", default-features = false }
 minedmap-resource = { version = "0.7.0", path = "crates/resource" }
 minedmap-types = { version = "0.2.0", path = "crates/types" }
 notify = "8.0.0"
