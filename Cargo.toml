@@ -52,7 +52,7 @@ lru = "0.13.0"
 minedmap-default-alloc = { version = "0.1.0", path = "crates/default-alloc", optional = true }
 minedmap-nbt = { version = "0.1.1", path = "crates/nbt", default-features = false }
 minedmap-resource = { version = "0.6.0", path = "crates/resource" }
-minedmap-types = { version = "0.1.4", path = "crates/types" }
+minedmap-types = { version = "0.2.0", path = "crates/types" }
 notify = "8.0.0"
 num-integer = "0.1.45"
 num_cpus = "1.16.0"

@@ -12,7 +12,7 @@ anyhow = "1.0.75"
 bytemuck = "1.13.1"
 fastnbt = "2.4.4"
 flate2 = "1.1.0"
-minedmap-types = { version = "0.1.4", path = "../types" }
+minedmap-types = { version = "0.2.0", path = "../types" }
 serde = "1.0.183"
 
 [dev-dependencies]
