@@ -2,6 +2,8 @@
 
 ## [Unreleased] - ReleaseDate
 
+## [2.5.0] - 2025-03-16
+
 ### Added
 
 - Added experimental watch mode
@@ -186,7 +188,8 @@ intermediate data.
   Full support for custom biomes datapacks might be added in a future release.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/neocturne/MinedMap/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/neocturne/MinedMap/compare/v2.5.0...HEAD
+[2.5.0]: https://github.com/neocturne/MinedMap/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/neocturne/MinedMap/compare/v2.3.1...v2.4.0
 [2.3.1]: https://github.com/neocturne/MinedMap/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/neocturne/MinedMap/compare/v2.2.0...v2.3.0
