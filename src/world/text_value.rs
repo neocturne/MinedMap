@@ -1,4 +1,4 @@
-//! Newtype and helper methods for handling Minecraft Raw JSON Text
+//! Newtype and helper methods for handling Minecraft text values
 
 use std::{collections::VecDeque, fmt::Display};
 
@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 /// A span of formatted text
 ///
-/// A [JSONText] consists of a tree of [FormattedText] nodes (canonically
+/// A [TextValue] consists of a tree of [FormattedText] nodes (canonically
 /// represented as a [FormattedTextTree], but other kinds are possible with
 /// is handled by [DeserializedText].
 ///
@@ -21,7 +21,7 @@ pub struct FormattedText {
 	/// Text content
 	pub text: String,
 	/// Text color
-	#[serde(skip_serializing_if = "Option::is_none", with = "json_color")]
+	#[serde(skip_serializing_if = "Option::is_none", with = "text_color")]
 	pub color: Option<Color>,
 	/// Bold formatting
 	#[serde(skip_serializing_if = "Option::is_none")]
@@ -107,9 +107,9 @@ impl Display for FormattedTextList {
 	}
 }
 
-/// Raw deserialized [JSONText]
+/// Raw deserialized [TextValue]
 ///
-/// A [JSONText] can contain various different JSON types.
+/// A [TextValue] can contain various different types serialized as JSON or NBT.
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 pub enum DeserializedText {
@@ -169,18 +169,18 @@ impl Default for DeserializedText {
 	}
 }
 
-/// Minecraft Raw JSON Text
+/// Minecraft raw text value
 #[derive(Debug, Deserialize)]
-pub struct JSONText(pub String);
+pub struct TextValue(pub String);
 
-impl JSONText {
-	/// Deserializes a [JSONText] into a [DeserializedText]
+impl TextValue {
+	/// Deserializes a [TextValue] into a [DeserializedText]
 	pub fn deserialize(&self) -> DeserializedText {
 		serde_json::from_str(&self.0).unwrap_or_default()
 	}
 }
 
-mod json_color {
+mod text_color {
 	//! Helpers for serializing and deserializing [FormattedText](super::FormattedText) colors
 
 	use minedmap_resource::Color;
@@ -190,7 +190,7 @@ mod json_color {
 		ser::Error as _,
 	};
 
-	/// Named JSON text colors
+	/// Named text colors
 	static COLORS: phf::Map<&'static str, Color> = phf::phf_map! {
 		"black" => Color([0x00, 0x00, 0x00]),
 		"dark_blue" => Color([0x00, 0x00, 0xAA]),

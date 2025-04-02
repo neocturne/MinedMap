@@ -8,7 +8,7 @@ use serde::Serialize;
 
 use super::{
 	de,
-	json_text::{FormattedText, FormattedTextList, JSONText},
+	text_value::{FormattedText, FormattedTextList, TextValue},
 };
 
 /// Version-independent reference to (front or back) sign text
@@ -18,7 +18,7 @@ pub struct RawSignText<'a> {
 	///
 	/// A regular sign always has 4 lines of text. The back of pre-1.20
 	/// signs is represented as a [SignText] without any `messages`.
-	pub messages: Vec<&'a JSONText>,
+	pub messages: Vec<&'a TextValue>,
 	/// Sign color
 	///
 	/// Defaults to "black".
