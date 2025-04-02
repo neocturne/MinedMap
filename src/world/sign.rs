@@ -49,7 +49,7 @@ static DYE_COLORS: phf::Map<&'static str, Color> = phf::phf_map! {
 
 impl RawSignText<'_> {
 	/// Decodes the [RawSignText] into a [SignText]
-	pub fn decode(&self) -> SignText {
+	pub fn decode(&self, data_version: u32) -> SignText {
 		let color = self
 			.color
 			.map(|c| DYE_COLORS.get(c).copied().unwrap_or(DEFAULT_COLOR));
@@ -60,7 +60,7 @@ impl RawSignText<'_> {
 		SignText(
 			self.messages
 				.iter()
-				.map(|message| message.deserialize().linearize(&parent))
+				.map(|message| message.deserialize(data_version).linearize(&parent))
 				.collect(),
 		)
 	}

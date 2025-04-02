@@ -171,12 +171,20 @@ impl Default for DeserializedText {
 
 /// Minecraft raw text value
 #[derive(Debug, Deserialize)]
-pub struct TextValue(pub String);
+pub struct TextValue(pub fastnbt::Value);
 
 impl TextValue {
 	/// Deserializes a [TextValue] into a [DeserializedText]
-	pub fn deserialize(&self) -> DeserializedText {
-		serde_json::from_str(&self.0).unwrap_or_default()
+	pub fn deserialize(&self, data_version: u32) -> DeserializedText {
+		if data_version < 4290 {
+			if let fastnbt::Value::String(json) = &self.0 {
+				if let Ok(content) = serde_json::from_str(json) {
+					return content;
+				}
+			}
+		}
+
+		fastnbt::from_value(&self.0).unwrap_or_default()
 	}
 }
 
