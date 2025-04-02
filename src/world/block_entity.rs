@@ -41,10 +41,15 @@ pub struct Sign {
 
 impl Sign {
 	/// Processes a [de::BlockEntitySign] into a [Sign]
-	fn new(sign: &de::BlockEntitySign, kind: SignKind, material: Option<String>) -> Sign {
+	fn new(
+		sign: &de::BlockEntitySign,
+		kind: SignKind,
+		material: Option<String>,
+		data_version: u32,
+	) -> Sign {
 		let (front_text, back_text) = sign.text();
-		let front_text = front_text.decode();
-		let back_text = back_text.decode();
+		let front_text = front_text.decode(data_version);
+		let back_text = back_text.decode(data_version);
 		Sign {
 			kind,
 			material,
@@ -78,7 +83,11 @@ pub struct BlockEntity {
 
 impl BlockEntity {
 	/// Processes a [de::BlockEntity] into a [BlockEntity]
-	pub fn new(entity: &de::BlockEntity, block_type: Option<&BlockType>) -> Option<Self> {
+	pub fn new(
+		entity: &de::BlockEntity,
+		block_type: Option<&BlockType>,
+		data_version: u32,
+	) -> Option<Self> {
 		let wall_sign = block_type
 			.map(|block_type| block_type.block_color.is(BlockFlag::WallSign))
 			.unwrap_or_default();
@@ -92,7 +101,7 @@ impl BlockEntity {
 		let material = block_type
 			.as_ref()
 			.and_then(|block_type| block_type.sign_material.as_ref());
-		let data = BlockEntityData::Sign(Sign::new(sign, kind, material.cloned()));
+		let data = BlockEntityData::Sign(Sign::new(sign, kind, material.cloned(), data_version));
 
 		Some(BlockEntity {
 			x: entity.x,

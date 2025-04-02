@@ -2,6 +2,12 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Added support for Minecraft 1.21.5
+
+  Added new block types and handling for changed sign text storage format.
+
 ## [2.5.0] - 2025-03-16
 
 ### Added

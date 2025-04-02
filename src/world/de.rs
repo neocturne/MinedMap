@@ -2,7 +2,7 @@
 
 use serde::Deserialize;
 
-use super::json_text::JSONText;
+use super::text_value::TextValue;
 
 /// Element of the `palette` list of 1.18+ [block states](BlockStatesV1_18)
 #[derive(Debug, Deserialize)]
@@ -110,7 +110,7 @@ pub enum BiomesV0 {
 #[derive(Debug, Deserialize)]
 pub struct BlockEntitySignV1_20Text {
 	/// Lines of sign text
-	pub messages: Vec<JSONText>,
+	pub messages: Vec<TextValue>,
 	/// Default text color
 	pub color: Option<String>,
 }
@@ -125,13 +125,13 @@ pub enum BlockEntitySign {
 	#[serde(rename_all = "PascalCase")]
 	V0 {
 		/// Line 1 of the sign text
-		text1: JSONText,
+		text1: TextValue,
 		/// Line 2 of the sign text
-		text2: JSONText,
+		text2: TextValue,
 		/// Line 3 of the sign text
-		text3: JSONText,
+		text3: TextValue,
 		/// Line 4 of the sign text
-		text4: JSONText,
+		text4: TextValue,
 		/// Default text color
 		color: Option<String>,
 	},

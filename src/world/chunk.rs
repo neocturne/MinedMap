@@ -58,6 +58,8 @@ pub struct Chunk<'a> {
 	inner: ChunkInner<'a>,
 	/// Unprocessed block entities
 	block_entities: &'a Vec<de::BlockEntity>,
+	/// Chunk data version
+	data_version: u32,
 }
 
 impl<'a> Chunk<'a> {
@@ -87,6 +89,7 @@ impl<'a> Chunk<'a> {
 			Chunk {
 				inner,
 				block_entities,
+				data_version,
 			},
 			has_unknown,
 		))
@@ -292,7 +295,11 @@ impl<'a> Chunk<'a> {
 			.iter()
 			.map(|block_entity| {
 				let block_type = self.block_type_at_block_entity(block_entity)?;
-				Ok(BlockEntity::new(block_entity, block_type))
+				Ok(BlockEntity::new(
+					block_entity,
+					block_type,
+					self.data_version,
+				))
 			})
 			.collect::<Result<_>>()?;
 		Ok(entities.into_iter().flatten().collect())
