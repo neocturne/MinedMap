@@ -316,9 +316,13 @@
 	"bubble_coral_fan": null,
 	"bubble_coral_wall_fan": null,
 	"budding_amethyst": {},
+	"bush": {
+		"grass": true
+	},
 	"cactus": {
 		"texture": "cactus_top"
 	},
+	"cactus_flower": {},
 	"cake": {
 		"texture": "cake_top"
 	},
@@ -778,6 +782,7 @@
 	"fire_coral_block": {},
 	"fire_coral_fan": null,
 	"fire_coral_wall_fan": null,
+	"firefly_bush": {},
 	"fletching_table": {
 		"texture": "fletching_table_top"
 	},
@@ -987,6 +992,7 @@
 	"lava_cauldron": {
 		"texture": "cauldron_top"
 	},
+	"leaf_litter": null,
 	"lectern": {
 		"texture": "lectern_top"
 	},
@@ -1782,6 +1788,7 @@
 	"sea_lantern": {},
 	"sea_pickle": {},
 	"seagrass": {},
+	"short_dry_grass": {},
 	"short_grass": null,
 	"shroomlight": {},
 	"shulker_box": {},
@@ -2013,6 +2020,7 @@
 	"sweet_berry_bush": {
 		"texture": "sweet_berry_bush_stage3"
 	},
+	"tall_dry_grass": {},
 	"tall_grass": {
 		"grass": true,
 		"texture": "tall_grass_top"
@@ -2024,6 +2032,8 @@
 		"texture": "target_top"
 	},
 	"terracotta": {},
+	"test_block": null,
+	"test_instance_block": null,
 	"tinted_glass": {},
 	"tnt": {
 		"texture": "tnt_top"
@@ -2288,6 +2298,7 @@
 	"white_tulip": null,
 	"white_wall_banner": null,
 	"white_wool": {},
+	"wildflowers": null,
 	"wither_rose": null,
 	"wither_skeleton_skull": null,
 	"wither_skeleton_wall_skull": null,

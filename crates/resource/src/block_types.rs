@@ -1489,11 +1489,31 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"bush",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque|Grass}),
+				color: Color([119, 120, 119]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"cactus",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([85, 127, 43]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"cactus_flower",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([209, 120, 135]),
 			},
 			sign_material: None,
 		},
@@ -3809,6 +3829,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"firefly_bush",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([87, 83, 43]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"fletching_table",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -4874,6 +4904,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([73, 72, 74]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"leaf_litter",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: None,
 		},
@@ -8699,6 +8739,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"short_dry_grass",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([187, 158, 108]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"short_grass",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -9639,6 +9689,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"tall_dry_grass",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([196, 171, 122]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"tall_grass",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -9674,6 +9734,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([152, 94, 67]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"test_block",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"test_instance_block",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: None,
 		},
@@ -10824,6 +10904,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([233, 236, 236]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"wildflowers",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
 			},
 			sign_material: None,
 		},
