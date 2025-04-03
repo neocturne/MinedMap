@@ -419,7 +419,7 @@ impl<'a> Iterator for SectionIter<'a> {
 	}
 
 	fn last(mut self) -> Option<Self::Item> {
-		self.with_iter(|iter| iter.last())
+		self.next_back()
 	}
 }
 

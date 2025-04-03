@@ -176,15 +176,20 @@ pub struct TextValue(pub fastnbt::Value);
 impl TextValue {
 	/// Deserializes a [TextValue] into a [DeserializedText]
 	pub fn deserialize(&self, data_version: u32) -> DeserializedText {
+		// TODO: Improve error handling
+		//
+		// Unfortunately, there are a number of weird ways an empty sign coould
+		// be encoded (for example a compound with an "" key), so for now we
+		// simply interpret undecodable data as empty.
 		if data_version < 4290 {
-			if let fastnbt::Value::String(json) = &self.0 {
-				if let Ok(content) = serde_json::from_str(json) {
-					return content;
-				}
-			}
-		}
+			let fastnbt::Value::String(json) = &self.0 else {
+				return DeserializedText::default();
+			};
 
-		fastnbt::from_value(&self.0).unwrap_or_default()
+			serde_json::from_str(json).unwrap_or_default()
+		} else {
+			fastnbt::from_value(&self.0).unwrap_or_default()
+		}
 	}
 }
 
