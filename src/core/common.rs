@@ -48,7 +48,7 @@ pub const MIPMAP_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(0);
 /// MinedMap processed entity data version number
 ///
 /// Increase when entity collection changes bacause of code changes.
-pub const ENTITIES_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(2);
+pub const ENTITIES_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(3);
 
 /// Coordinate pair of a generated tile
 ///
