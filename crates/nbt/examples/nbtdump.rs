@@ -20,7 +20,7 @@ fn main() -> Result<()> {
 	let args = Args::parse();
 
 	let value: fastnbt::Value = minedmap_nbt::data::from_file(args.file.as_path())?;
-	println!("{:#x?}", value);
+	println!("{value:#x?}");
 
 	Ok(())
 }

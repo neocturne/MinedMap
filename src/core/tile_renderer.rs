@@ -249,7 +249,7 @@ impl<'a> TileRenderer<'a> {
 			.filter(|entry| self.region_set.contains(entry))
 		})
 		.try_map(|entry| self.processed_source(entry))
-		.with_context(|| format!("Region {:?} from previous step must exist", coords))?;
+		.with_context(|| format!("Region {coords:?} from previous step must exist"))?;
 
 		let max_timestamp = *sources
 			.iter()
@@ -293,7 +293,7 @@ impl<'a> TileRenderer<'a> {
 		let region_group = self
 			.rt
 			.block_on(self.load_region_group(processed_paths))
-			.with_context(|| format!("Region {:?} from previous step must be loadable", coords))?;
+			.with_context(|| format!("Region {coords:?} from previous step must be loadable"))?;
 		let mut image = image::RgbaImage::new(N, N);
 		Self::render_region(&mut image, &region_group);
 
@@ -325,7 +325,7 @@ impl<'a> TileRenderer<'a> {
 			.map(|&coords| {
 				anyhow::Ok(usize::from(
 					self.render_tile(coords)
-						.with_context(|| format!("Failed to render tile {:?}", coords))?,
+						.with_context(|| format!("Failed to render tile {coords:?}"))?,
 				))
 			})
 			.try_reduce(|| 0, |a, b| Ok(a + b))?;
