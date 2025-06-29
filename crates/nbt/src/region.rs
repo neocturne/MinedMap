@@ -124,7 +124,7 @@ impl<R: Read + Seek> Region<R> {
 			let mut len_buf = [0u8; 4];
 			reader
 				.read_exact(&mut len_buf)
-				.with_context(|| format!("Failed to read length for chunk {:?}", coords))?;
+				.with_context(|| format!("Failed to read length for chunk {coords:?}"))?;
 			let byte_len = u32::from_be_bytes(len_buf) as usize;
 			if byte_len < 1 || byte_len > (len as usize) * BLOCKSIZE - 4 {
 				bail!("Invalid length for chunk {:?}", coords);
@@ -133,9 +133,9 @@ impl<R: Read + Seek> Region<R> {
 			let mut buffer = vec![0; byte_len];
 			reader
 				.read_exact(&mut buffer)
-				.with_context(|| format!("Failed to read data for chunk {:?}", coords))?;
+				.with_context(|| format!("Failed to read data for chunk {coords:?}"))?;
 			let chunk = decode_chunk(&buffer)
-				.with_context(|| format!("Failed to decode data for chunk {:?}", coords))?;
+				.with_context(|| format!("Failed to decode data for chunk {coords:?}"))?;
 
 			f(coords, chunk)?;
 		}

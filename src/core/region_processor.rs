@@ -228,7 +228,7 @@ impl<'a> SingleRegionProcessor<'a> {
 	) -> Result<()> {
 		let (chunk, has_unknown) =
 			world::chunk::Chunk::new(&chunk_data, self.block_types, self.biome_types)
-				.with_context(|| format!("Failed to decode chunk {:?}", chunk_coords))?;
+				.with_context(|| format!("Failed to decode chunk {chunk_coords:?}"))?;
 		data.has_unknown |= has_unknown;
 
 		if self.output_needed || self.lightmap_needed {
@@ -238,7 +238,7 @@ impl<'a> SingleRegionProcessor<'a> {
 				block_light,
 				depths,
 			}) = world::layer::top_layer(&mut data.biome_list, &chunk)
-				.with_context(|| format!("Failed to process chunk {:?}", chunk_coords))?
+				.with_context(|| format!("Failed to process chunk {chunk_coords:?}"))?
 			{
 				if self.output_needed {
 					data.chunks[chunk_coords] = Some(Box::new(ProcessedChunk {
@@ -257,10 +257,7 @@ impl<'a> SingleRegionProcessor<'a> {
 
 		if self.entities_needed {
 			let mut block_entities = chunk.block_entities().with_context(|| {
-				format!(
-					"Failed to process block entities for chunk {:?}",
-					chunk_coords,
-				)
+				format!("Failed to process block entities for chunk {chunk_coords:?}")
 			})?;
 			data.entities.block_entities.append(&mut block_entities);
 		}
@@ -407,7 +404,7 @@ impl<'a> RegionProcessor<'a> {
 		self.collect_regions()?.par_iter().try_for_each(|&coords| {
 			let ret = self
 				.process_region(coords)
-				.with_context(|| format!("Failed to process region {:?}", coords))?;
+				.with_context(|| format!("Failed to process region {coords:?}"))?;
 
 			if ret != Status::ErrorMissing {
 				region_send.send(coords).unwrap();

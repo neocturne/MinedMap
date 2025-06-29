@@ -237,7 +237,7 @@ impl Config {
 	fn sign_transform(splitter: &Regex, transform: &str) -> Result<(Regex, String)> {
 		let captures = splitter
 			.captures(transform)
-			.with_context(|| format!("Invalid transform pattern '{}'", transform))?;
+			.with_context(|| format!("Invalid transform pattern '{transform}'"))?;
 		let regexp = Regex::new(&captures[1])?;
 		let replacement = captures[2].to_string();
 		Ok((regexp, replacement))
@@ -275,7 +275,7 @@ impl Config {
 			TileKind::Map => "map",
 			TileKind::Lightmap => "light",
 		};
-		let dir = format!("{}/{}", prefix, level);
+		let dir = format!("{prefix}/{level}");
 		[&self.output_dir, Path::new(&dir)].iter().collect()
 	}
 
