@@ -120,3 +120,8 @@ cargo install --git 'https://github.com/neocturne/MinedMap.git'
 If you are looking for the older C++ implementation of the MinedMap tile renderer,
 see the [v1.19.1](https://github.com/neocturne/MinedMap/tree/v1.19.1) tag.
 
+## See also
+
+Other projects using MinedMap:
+
+- [minecraft\_map\_marker](https://github.com/christopher-besch/minecraft_map_marker)
