@@ -1,4 +1,4 @@
-FROM docker.io/library/rust:1.85.1-alpine AS builder
+FROM docker.io/library/rust:1.88.0-alpine AS builder
 
 WORKDIR /build
 RUN apk add --no-cache build-base tini-static
