@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added support for Minecraft 1.21.5
+- Added support for Minecraft 1.21.5 to 1.21.7
 
   Added new block types and handling for changed sign text storage format.
 
