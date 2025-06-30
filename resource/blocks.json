@@ -720,6 +720,9 @@
 	"dragon_egg": {},
 	"dragon_head": null,
 	"dragon_wall_head": null,
+	"dried_ghast": {
+		"texture": "dried_ghast_hydration_1_top"
+	},
 	"dried_kelp_block": {
 		"texture": "dried_kelp_top"
 	},

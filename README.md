@@ -2,7 +2,7 @@
 
 * Render beautiful maps of your [Minecraft](https://minecraft.net/) worlds!
 * Put them on a webserver and view them in your browser!
-* Compatible with unmodified Minecraft Java Edition 1.8 up to 1.21.4 (no mod installation required!)
+* Compatible with unmodified Minecraft Java Edition 1.8 up to 1.21.7 (no mod installation required!)
 * Illumination layer: the world at night
 * Fast: create a full map for a huge 3GB savegame in less than 5 minutes in single-threaded operation
 * Multi-threading support: pass `-j N` to the renderer to use `N` parallel threads for generation

@@ -3509,6 +3509,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"dried_ghast",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([179, 168, 168]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"dried_kelp_block",
 		ConstBlockType {
 			block_color: BlockColor {
