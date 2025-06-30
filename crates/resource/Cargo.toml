@@ -1,6 +1,6 @@
 [package]
 name = "minedmap-resource"
-version = "0.7.0"
+version = "0.8.0"
 description = "Data describing Minecraft biomes and block types"
 edition.workspace = true
 license.workspace = true
