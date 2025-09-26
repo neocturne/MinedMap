@@ -160,7 +160,7 @@ impl BlockTypes {
 	/// Resolves a Minecraft 1.13+ string block type ID
 	#[inline]
 	pub fn get(&self, id: &str) -> Option<&BlockType> {
-		let suffix = id.strip_prefix("minecraft:")?;
+		let suffix = id.strip_prefix("minecraft:").unwrap_or(id);
 		self.block_type_map.get(suffix)
 	}
 
@@ -326,7 +326,7 @@ impl BiomeTypes {
 	/// Resolves a Minecraft 1.18+ string biome type ID
 	#[inline]
 	pub fn get(&self, id: &str) -> Option<&Biome> {
-		let suffix = id.strip_prefix("minecraft:")?;
+		let suffix = id.strip_prefix("minecraft:").unwrap_or(id);
 		self.biome_map.get(suffix).copied()
 	}
 
