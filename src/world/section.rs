@@ -324,7 +324,7 @@ enum BiomesV0Data<'a> {
 #[derive(Debug)]
 pub struct BiomesV0<'a> {
 	/// Biome data from save data
-	data: BiomesV0Data<'a>,
+	data: Option<BiomesV0Data<'a>>,
 	/// Used to look up biome IDs
 	biome_types: &'a BiomeTypes,
 }
@@ -332,46 +332,59 @@ pub struct BiomesV0<'a> {
 impl<'a> BiomesV0<'a> {
 	/// Constructs a new [BiomesV0] from deserialized data structures
 	pub fn new(biomes: Option<&'a de::BiomesV0>, biome_types: &'a BiomeTypes) -> Result<Self> {
-		let data = match biomes {
-			Some(de::BiomesV0::IntArray(data)) if data.len() == BN * BN * BHEIGHT => {
-				BiomesV0Data::IntArrayV15(data)
-			}
-			Some(de::BiomesV0::IntArray(data)) if data.len() == N * N => {
-				BiomesV0Data::IntArrayV0(data)
-			}
-			Some(de::BiomesV0::ByteArray(data)) if data.len() == N * N => {
-				BiomesV0Data::ByteArray(data)
-			}
-			_ => bail!("Invalid biome data"),
-		};
+		let data = biomes
+			.map(|biomes| {
+				Ok(match biomes {
+					de::BiomesV0::IntArray(data) if data.len() == BN * BN * BHEIGHT => {
+						BiomesV0Data::IntArrayV15(data)
+					}
+					de::BiomesV0::IntArray(data) if data.len() == N * N => {
+						BiomesV0Data::IntArrayV0(data)
+					}
+					de::BiomesV0::ByteArray(data) if data.len() == N * N => {
+						BiomesV0Data::ByteArray(data)
+					}
+					_ => bail!("Invalid biome data"),
+				})
+			})
+			.transpose()?;
 		Ok(BiomesV0 { data, biome_types })
 	}
 }
 
 impl Biomes for BiomesV0<'_> {
 	fn biome_at(&self, section: SectionY, coords: SectionBlockCoords) -> Result<&Biome> {
-		let id = match self.data {
-			BiomesV0Data::IntArrayV15(data) => {
-				let LayerBlockCoords { x, z } = coords.xz;
-				let y = section
-					.0
-					.checked_mul(BLOCKS_PER_CHUNK as i32)
-					.and_then(|y| y.checked_add_unsigned(coords.y.0.into()))
-					.filter(|&height| height >= 0 && (height as usize) < HEIGHT)
-					.context("Y coordinate out of range")? as usize;
-				let offset = (y >> 2) * BN * BN + (z.0 >> 2) as usize * BN + (x.0 >> 2) as usize;
-				let id = data[offset] as u32;
-				id.try_into().context("Biome index out of range")?
-			}
-			BiomesV0Data::IntArrayV0(data) => {
-				let id = data[coords.xz.offset()] as u32;
-				id.try_into().context("Biome index out of range")?
-			}
-			BiomesV0Data::ByteArray(data) => data[coords.xz.offset()] as u8,
-		};
-		Ok(self
-			.biome_types
-			.get_legacy(id)
+		let id = self
+			.data
+			.as_ref()
+			.map(|data| match data {
+				BiomesV0Data::IntArrayV15(data) => {
+					let LayerBlockCoords { x, z } = coords.xz;
+					let y = section
+						.0
+						.checked_mul(BLOCKS_PER_CHUNK as i32)
+						.and_then(|y| y.checked_add_unsigned(coords.y.0.into()))
+						.filter(|&height| height >= 0 && (height as usize) < HEIGHT)
+						.context("Y coordinate out of range")? as usize;
+					let offset =
+						(y >> 2) * BN * BN + (z.0 >> 2) as usize * BN + (x.0 >> 2) as usize;
+					let id = data[offset] as u32;
+					let id = id.try_into().context("Biome index out of range")?;
+
+					Ok::<_, anyhow::Error>(id)
+				}
+				BiomesV0Data::IntArrayV0(data) => {
+					let id = data[coords.xz.offset()] as u32;
+					let id = id.try_into().context("Biome index out of range")?;
+
+					Ok(id)
+				}
+				BiomesV0Data::ByteArray(data) => Ok(data[coords.xz.offset()] as u8),
+			})
+			.transpose()?;
+
+		Ok(id
+			.and_then(|id| self.biome_types.get_legacy(id))
 			.unwrap_or(self.biome_types.get_fallback()))
 	}
 }

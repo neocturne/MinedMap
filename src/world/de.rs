@@ -27,6 +27,7 @@ pub struct BiomesV1_18 {
 	/// Palette of biome types, indexed by biome data
 	pub palette: Vec<String>,
 	/// Biome data
+	#[serde(default)]
 	pub data: Option<fastnbt::LongArray>,
 }
 
@@ -185,6 +186,7 @@ pub struct LevelV0 {
 	#[serde(default)]
 	pub sections: Vec<SectionV0>,
 	/// Biome data
+	#[serde(default)]
 	pub biomes: Option<BiomesV0>,
 	/// List of block entities
 	#[serde(default)]
