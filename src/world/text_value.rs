@@ -250,14 +250,14 @@ mod text_color {
 		where
 			E: de::Error,
 		{
-			if let Some(hex) = color.strip_prefix("#") {
-				if let Ok(value) = u32::from_str_radix(hex, 16) {
-					return Ok(Some(Color([
-						(value >> 16) as u8,
-						(value >> 8) as u8,
-						value as u8,
-					])));
-				}
+			if let Some(hex) = color.strip_prefix("#")
+				&& let Ok(value) = u32::from_str_radix(hex, 16)
+			{
+				return Ok(Some(Color([
+					(value >> 16) as u8,
+					(value >> 8) as u8,
+					value as u8,
+				])));
 			}
 
 			Ok(COLORS.get(color).copied())

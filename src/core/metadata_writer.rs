@@ -87,7 +87,7 @@ impl<'a> MetadataWriter<'a> {
 	}
 
 	/// Helper to construct a [Mipmap] data structure from a [TileCoordMap]
-	fn mipmap_entry(regions: &TileCoordMap) -> Mipmap {
+	fn mipmap_entry(regions: &TileCoordMap) -> Mipmap<'_> {
 		let mut min_x = i32::MAX;
 		let mut max_x = i32::MIN;
 		let mut min_z = i32::MAX;
@@ -125,12 +125,12 @@ impl<'a> MetadataWriter<'a> {
 	/// Reads and deserializes the `level.dat` of the Minecraft save data
 	fn read_level_dat(&self) -> Result<de::LevelDat> {
 		let res = crate::nbt::data::from_file(&self.config.level_dat_path);
-		if res.is_err() {
-			if let Ok(level_dat_old) = crate::nbt::data::from_file(&self.config.level_dat_old_path)
-			{
-				return Ok(level_dat_old);
-			}
+		if res.is_err()
+			&& let Ok(level_dat_old) = crate::nbt::data::from_file(&self.config.level_dat_old_path)
+		{
+			return Ok(level_dat_old);
 		}
+
 		res.context("Failed to read level.dat")
 	}
 

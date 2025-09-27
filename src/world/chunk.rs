@@ -221,7 +221,7 @@ impl<'a> Chunk<'a> {
 	}
 
 	/// Returns an interator over the chunk's sections and their Y coordinates
-	pub fn sections(&self) -> SectionIter {
+	pub fn sections(&self) -> SectionIter<'_> {
 		use SectionIterInner::*;
 		SectionIter {
 			inner: match &self.inner {

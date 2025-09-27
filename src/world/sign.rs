@@ -78,11 +78,11 @@ impl<'a> From<&'a de::BlockEntitySignV1_20Text> for RawSignText<'a> {
 /// Helper methods for [de::BlockEntitySign]
 pub trait BlockEntitySignExt {
 	/// Returns the front and back text of a sign in a version-indepentent format
-	fn text(&self) -> (RawSignText, RawSignText);
+	fn text(&self) -> (RawSignText<'_>, RawSignText<'_>);
 }
 
 impl BlockEntitySignExt for de::BlockEntitySign {
-	fn text(&self) -> (RawSignText, RawSignText) {
+	fn text(&self) -> (RawSignText<'_>, RawSignText<'_>) {
 		match self {
 			de::BlockEntitySign::V0 {
 				text1,
