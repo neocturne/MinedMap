@@ -136,7 +136,7 @@ pub struct LayerData {
 
 impl LayerData {
 	/// Builds a [LayerEntry] referencing the LayerData at a given coordinate pair
-	fn entry(&mut self, coords: LayerBlockCoords) -> LayerEntry {
+	fn entry(&mut self, coords: LayerBlockCoords) -> LayerEntry<'_> {
 		LayerEntry {
 			block: &mut self.blocks[coords],
 			biome: &mut self.biomes[coords],

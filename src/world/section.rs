@@ -383,10 +383,10 @@ pub struct BlockLight<'a>(Option<&'a [i8]>);
 impl<'a> BlockLight<'a> {
 	/// Creates a new [BlockLight], checking validity
 	pub fn new(block_light: Option<&'a [i8]>) -> Result<Self> {
-		if let Some(block_light) = block_light {
-			if block_light.len() != N * N * N / 2 {
-				bail!("Invalid section block light data");
-			}
+		if let Some(block_light) = block_light
+			&& block_light.len() != N * N * N / 2
+		{
+			bail!("Invalid section block light data");
 		}
 		Ok(BlockLight(block_light))
 	}

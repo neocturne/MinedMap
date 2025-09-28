@@ -231,27 +231,26 @@ impl<'a> SingleRegionProcessor<'a> {
 				.with_context(|| format!("Failed to decode chunk {chunk_coords:?}"))?;
 		data.has_unknown |= has_unknown;
 
-		if self.output_needed || self.lightmap_needed {
-			if let Some(layer::LayerData {
+		if (self.output_needed || self.lightmap_needed)
+			&& let Some(layer::LayerData {
 				blocks,
 				biomes,
 				block_light,
 				depths,
 			}) = world::layer::top_layer(&mut data.biome_list, &chunk)
 				.with_context(|| format!("Failed to process chunk {chunk_coords:?}"))?
-			{
-				if self.output_needed {
-					data.chunks[chunk_coords] = Some(Box::new(ProcessedChunk {
-						blocks,
-						biomes,
-						depths,
-					}));
-				}
+		{
+			if self.output_needed {
+				data.chunks[chunk_coords] = Some(Box::new(ProcessedChunk {
+					blocks,
+					biomes,
+					depths,
+				}));
+			}
 
-				if self.lightmap_needed {
-					let chunk_lightmap = Self::render_chunk_lightmap(block_light);
-					overlay_chunk(&mut data.lightmap, &chunk_lightmap, chunk_coords);
-				}
+			if self.lightmap_needed {
+				let chunk_lightmap = Self::render_chunk_lightmap(block_light);
+				overlay_chunk(&mut data.lightmap, &chunk_lightmap, chunk_coords);
 			}
 		}
 
