@@ -369,6 +369,11 @@ window.createMap = function () {
 			],
 		});
 
+		const refocus = function() {
+			map.getContainer().focus();
+		};
+		refocus();
+
 		const overlayMaps = {};
 
 		const mapLayer = new MinedMapLayer(mipmaps, 'map', tile_extension);
@@ -442,6 +447,9 @@ window.createMap = function () {
 		map.on('layerremove', refreshHash);
 
 		window.onhashchange = function () {
+			// Keep keyboard focus on map when popups open or close
+			refocus();
+
 			if (window.location.hash === makeHash())
 				return;
 
@@ -469,5 +477,11 @@ window.createMap = function () {
 			updateHash();
 		};
 
+		window.onkeydown = function (event) {
+			if (event.key === 'Escape') {
+				map.closePopup();
+				event.preventDefault();
+			}
+		};
 	})();
 }
