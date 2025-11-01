@@ -136,10 +136,20 @@ impl<'a> MetadataWriter<'a> {
 
 	/// Generates [Spawn] data from a [de::LevelDat]
 	fn spawn(level_dat: &de::LevelDat) -> Spawn {
-		Spawn {
-			x: level_dat.data.spawn_x,
-			z: level_dat.data.spawn_z,
-		}
+		let (x, z) = match &level_dat.data {
+			de::LevelDatData::V1_21_9 { spawn } => match spawn.dimension.as_str() {
+				"minecraft:overworld" | "overworld" => (
+					#[allow(clippy::get_first)]
+					spawn.pos.get(0).copied().unwrap_or_default(),
+					spawn.pos.get(2).copied().unwrap_or_default(),
+				),
+				// We only support the overworld dimension; simply center the
+				// map on 0,0 if the spawn is somewhere else
+				_ => (0, 0),
+			},
+			de::LevelDatData::V0 { spawn_x, spawn_z } => (*spawn_x, *spawn_z),
+		};
+		Spawn { x, z }
 	}
 
 	/// Filter signs according to the sign pattern configuration
