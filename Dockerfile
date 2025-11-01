@@ -1,4 +1,4 @@
-FROM docker.io/library/rust:1.90.0-alpine AS builder
+FROM docker.io/library/rust:1.91.0-alpine AS builder
 
 WORKDIR /build
 RUN apk add --no-cache build-base tini-static
@@ -6,7 +6,7 @@ RUN apk add --no-cache build-base tini-static
 ARG MINEDMAP_VERSION
 
 COPY . .
-RUN cargo build -r 
+RUN cargo build -r
 RUN strip target/release/minedmap
 
 FROM scratch
