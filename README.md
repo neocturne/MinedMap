@@ -20,6 +20,8 @@ based on [Leaflet](https://leafletjs.com/). The map renderer is heavily inspired
 [MapRend](https://github.com/YSelfTool/MapRend), but has been reimplemented from scratch
 (first in C++, now in Rust) for highest performance.
 
+Demo: https://neocturne.github.io/MinedMap/
+
 ## How to use
 
 Download the binary release that matches your platform from the Github release
