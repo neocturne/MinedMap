@@ -224,14 +224,32 @@ pub struct Chunk {
 	pub chunk: ChunkVariant,
 }
 
+/// 1.21.9+ `spawn` compound element of level.dat
+#[derive(Debug, Deserialize)]
+pub struct LevelDatSpawnV1_21_9 {
+	/// X/Y/Z coordinate of spawn point for new players
+	pub pos: fastnbt::IntArray,
+	/// Dimension of the spawn point for new players (for example "minecraft:overworld")
+	pub dimension: String,
+}
+
 /// `Data` compound element of level.dat
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct LevelDatData {
-	/// X coordinate of spawn point for new players
-	pub spawn_x: i32,
-	/// Z coordinate of spawn point for new players
-	pub spawn_z: i32,
+#[serde(untagged)]
+pub enum LevelDatData {
+	/// 1.21.9+ `Data` element
+	V1_21_9 {
+		/// Spawn point for new players
+		spawn: LevelDatSpawnV1_21_9,
+	},
+	/// Pre-1.21.9 `Data` element
+	#[serde(rename_all = "PascalCase")]
+	V0 {
+		/// X coordinate of spawn point for new players
+		spawn_x: i32,
+		/// Z coordinate of spawn point for new players
+		spawn_z: i32,
+	},
 }
 
 /// Toplevel compound element of level.dat

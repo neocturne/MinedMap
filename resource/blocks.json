@@ -24,6 +24,7 @@
 		"texture": "acacia_planks"
 	},
 	"acacia_sapling": {},
+	"acacia_shelf": null,
 	"acacia_sign": {
 		"sign_material": "acacia",
 		"texture": null
@@ -112,6 +113,7 @@
 		"texture": "bamboo_planks"
 	},
 	"bamboo_sapling": null,
+	"bamboo_shelf": null,
 	"bamboo_sign": {
 		"sign_material": "bamboo",
 		"texture": null
@@ -183,6 +185,7 @@
 		"texture": "birch_planks"
 	},
 	"birch_sapling": {},
+	"birch_shelf": null,
 	"birch_sign": {
 		"sign_material": "birch",
 		"texture": null
@@ -379,6 +382,7 @@
 		"texture": "cherry_planks"
 	},
 	"cherry_sapling": null,
+	"cherry_shelf": null,
 	"cherry_sign": {
 		"sign_material": "cherry",
 		"texture": null
@@ -468,14 +472,25 @@
 		"texture": "composter_compost"
 	},
 	"conduit": {},
+	"copper_bars": null,
 	"copper_block": {},
 	"copper_bulb": {},
+	"copper_chain": null,
+	"copper_chest": {
+		"texture": "copper_block"
+	},
 	"copper_door": {
 		"texture": "copper_door_top"
 	},
+	"copper_golem_statue": {
+		"texture": "copper_block"
+	},
 	"copper_grate": {},
+	"copper_lantern": {},
 	"copper_ore": {},
+	"copper_torch": null,
 	"copper_trapdoor": {},
+	"copper_wall_torch": null,
 	"cornflower": null,
 	"cracked_deepslate_bricks": {},
 	"cracked_deepslate_tiles": {},
@@ -517,6 +532,7 @@
 		"texture": "crimson_planks"
 	},
 	"crimson_roots": {},
+	"crimson_shelf": null,
 	"crimson_sign": {
 		"sign_material": "crimson",
 		"texture": null
@@ -610,6 +626,7 @@
 		"texture": "dark_oak_planks"
 	},
 	"dark_oak_sapling": {},
+	"dark_oak_shelf": null,
 	"dark_oak_sign": {
 		"sign_material": "dark_oak",
 		"texture": null
@@ -761,11 +778,20 @@
 	},
 	"exposed_chiseled_copper": {},
 	"exposed_copper": {},
+	"exposed_copper_bars": null,
 	"exposed_copper_bulb": {},
+	"exposed_copper_chain": null,
+	"exposed_copper_chest": {
+		"texture": "exposed_copper"
+	},
 	"exposed_copper_door": {
 		"texture": "exposed_copper_door_top"
 	},
+	"exposed_copper_golem_statue": {
+		"texture": "exposed_copper"
+	},
 	"exposed_copper_grate": {},
+	"exposed_copper_lantern": {},
 	"exposed_copper_trapdoor": {},
 	"exposed_cut_copper": {},
 	"exposed_cut_copper_slab": {
@@ -774,6 +800,7 @@
 	"exposed_cut_copper_stairs": {
 		"texture": "exposed_cut_copper"
 	},
+	"exposed_lightning_rod": null,
 	"farmland": {
 		"texture": "farmland_moist"
 	},
@@ -916,6 +943,7 @@
 	},
 	"iron_bars": {},
 	"iron_block": {},
+	"iron_chain": null,
 	"iron_door": {
 		"texture": "iron_door_top"
 	},
@@ -954,6 +982,7 @@
 		"texture": "jungle_planks"
 	},
 	"jungle_sapling": {},
+	"jungle_shelf": null,
 	"jungle_sign": {
 		"sign_material": "jungle",
 		"texture": null
@@ -1129,6 +1158,7 @@
 	"mangrove_roots": {
 		"texture": "mangrove_roots_top"
 	},
+	"mangrove_shelf": null,
 	"mangrove_sign": {
 		"sign_material": "mangrove",
 		"texture": null
@@ -1252,6 +1282,7 @@
 		"texture": "oak_planks"
 	},
 	"oak_sapling": {},
+	"oak_shelf": null,
 	"oak_sign": {
 		"sign_material": "oak",
 		"texture": null
@@ -1308,11 +1339,20 @@
 	"oxeye_daisy": null,
 	"oxidized_chiseled_copper": {},
 	"oxidized_copper": {},
+	"oxidized_copper_bars": null,
 	"oxidized_copper_bulb": {},
+	"oxidized_copper_chain": null,
+	"oxidized_copper_chest": {
+		"texture": "oxidized_copper"
+	},
 	"oxidized_copper_door": {
 		"texture": "oxidized_copper_door_top"
 	},
+	"oxidized_copper_golem_statue": {
+		"texture": "oxidized_copper"
+	},
 	"oxidized_copper_grate": {},
+	"oxidized_copper_lantern": {},
 	"oxidized_copper_trapdoor": {},
 	"oxidized_cut_copper": {},
 	"oxidized_cut_copper_slab": {
@@ -1321,6 +1361,7 @@
 	"oxidized_cut_copper_stairs": {
 		"texture": "oxidized_cut_copper"
 	},
+	"oxidized_lightning_rod": null,
 	"packed_ice": {},
 	"packed_mud": {},
 	"pale_hanging_moss": null,
@@ -1349,6 +1390,7 @@
 		"texture": "pale_oak_planks"
 	},
 	"pale_oak_sapling": {},
+	"pale_oak_shelf": null,
 	"pale_oak_sign": {
 		"sign_material": "pale_oak",
 		"texture": null
@@ -1888,6 +1930,7 @@
 		"texture": "spruce_planks"
 	},
 	"spruce_sapling": {},
+	"spruce_shelf": null,
 	"spruce_sign": {
 		"sign_material": "spruce",
 		"texture": null
@@ -2119,6 +2162,7 @@
 		"texture": "warped_planks"
 	},
 	"warped_roots": {},
+	"warped_shelf": null,
 	"warped_sign": {
 		"sign_material": "warped",
 		"texture": null
@@ -2154,17 +2198,28 @@
 	"waxed_chiseled_copper": {
 		"texture": "chiseled_copper"
 	},
+	"waxed_copper_bars": null,
 	"waxed_copper_block": {
 		"texture": "copper_block"
 	},
 	"waxed_copper_bulb": {
 		"texture": "copper_bulb"
 	},
+	"waxed_copper_chain": null,
+	"waxed_copper_chest": {
+		"texture": "copper_block"
+	},
 	"waxed_copper_door": {
 		"texture": "copper_door_top"
 	},
+	"waxed_copper_golem_statue": {
+		"texture": "copper_block"
+	},
 	"waxed_copper_grate": {
 		"texture": "copper_grate"
+	},
+	"waxed_copper_lantern": {
+		"texture": "copper_lantern"
 	},
 	"waxed_copper_trapdoor": {
 		"texture": "copper_trapdoor"
@@ -2184,14 +2239,25 @@
 	"waxed_exposed_copper": {
 		"texture": "exposed_copper"
 	},
+	"waxed_exposed_copper_bars": null,
 	"waxed_exposed_copper_bulb": {
 		"texture": "exposed_copper_bulb"
+	},
+	"waxed_exposed_copper_chain": null,
+	"waxed_exposed_copper_chest": {
+		"texture": "exposed_copper"
 	},
 	"waxed_exposed_copper_door": {
 		"texture": "exposed_copper_door_top"
 	},
+	"waxed_exposed_copper_golem_statue": {
+		"texture": "exposed_copper"
+	},
 	"waxed_exposed_copper_grate": {
 		"texture": "exposed_copper_grate"
+	},
+	"waxed_exposed_copper_lantern": {
+		"texture": "exposed_copper_lantern"
 	},
 	"waxed_exposed_copper_trapdoor": {
 		"texture": "exposed_copper_trapdoor"
@@ -2205,20 +2271,33 @@
 	"waxed_exposed_cut_copper_stairs": {
 		"texture": "exposed_cut_copper"
 	},
+	"waxed_exposed_lightning_rod": null,
+	"waxed_lightning_rod": null,
 	"waxed_oxidized_chiseled_copper": {
 		"texture": "oxidized_chiseled_copper"
 	},
 	"waxed_oxidized_copper": {
 		"texture": "oxidized_copper"
 	},
+	"waxed_oxidized_copper_bars": null,
 	"waxed_oxidized_copper_bulb": {
 		"texture": "oxidized_copper_bulb"
+	},
+	"waxed_oxidized_copper_chain": null,
+	"waxed_oxidized_copper_chest": {
+		"texture": "oxidized_copper"
 	},
 	"waxed_oxidized_copper_door": {
 		"texture": "oxidized_copper_door_top"
 	},
+	"waxed_oxidized_copper_golem_statue": {
+		"texture": "oxidized_copper"
+	},
 	"waxed_oxidized_copper_grate": {
 		"texture": "oxidized_copper_grate"
+	},
+	"waxed_oxidized_copper_lantern": {
+		"texture": "oxidized_copper_lantern"
 	},
 	"waxed_oxidized_copper_trapdoor": {
 		"texture": "oxidized_copper_trapdoor"
@@ -2232,20 +2311,32 @@
 	"waxed_oxidized_cut_copper_stairs": {
 		"texture": "oxidized_cut_copper"
 	},
+	"waxed_oxidized_lightning_rod": null,
 	"waxed_weathered_chiseled_copper": {
 		"texture": "weathered_chiseled_copper"
 	},
 	"waxed_weathered_copper": {
 		"texture": "weathered_copper"
 	},
+	"waxed_weathered_copper_bars": null,
 	"waxed_weathered_copper_bulb": {
 		"texture": "weathered_copper_bulb"
+	},
+	"waxed_weathered_copper_chain": null,
+	"waxed_weathered_copper_chest": {
+		"texture": "weathered_copper"
 	},
 	"waxed_weathered_copper_door": {
 		"texture": "weathered_copper_door_top"
 	},
+	"waxed_weathered_copper_golem_statue": {
+		"texture": "weathered_copper"
+	},
 	"waxed_weathered_copper_grate": {
 		"texture": "weathered_copper_grate"
+	},
+	"waxed_weathered_copper_lantern": {
+		"texture": "weathered_copper_lantern"
 	},
 	"waxed_weathered_copper_trapdoor": {
 		"texture": "weathered_copper_trapdoor"
@@ -2259,13 +2350,23 @@
 	"waxed_weathered_cut_copper_stairs": {
 		"texture": "weathered_cut_copper"
 	},
+	"waxed_weathered_lightning_rod": null,
 	"weathered_chiseled_copper": {},
 	"weathered_copper": {},
+	"weathered_copper_bars": null,
 	"weathered_copper_bulb": {},
+	"weathered_copper_chain": null,
+	"weathered_copper_chest": {
+		"texture": "weathered_copper"
+	},
 	"weathered_copper_door": {
 		"texture": "weathered_copper_door_top"
 	},
+	"weathered_copper_golem_statue": {
+		"texture": "weathered_copper"
+	},
 	"weathered_copper_grate": {},
+	"weathered_copper_lantern": {},
 	"weathered_copper_trapdoor": {},
 	"weathered_cut_copper": {},
 	"weathered_cut_copper_slab": {
@@ -2274,6 +2375,7 @@
 	"weathered_cut_copper_stairs": {
 		"texture": "weathered_cut_copper"
 	},
+	"weathered_lightning_rod": null,
 	"weeping_vines": {},
 	"weeping_vines_plant": {},
 	"wet_sponge": {},
