@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>MinedMap</title>
+    <link rel="stylesheet" href="leaflet-1.9.4/leaflet.css" />
+    <script src="leaflet-1.9.4/leaflet.js"></script>
+    <script src="MinedMap.js"></script>
+
+    <style type="text/css">
+      body {
+        padding: 0;
+        margin: 0;
+      }
+
+      html, body, #map {
+        height: 100%;
+      }
+
+      body, .leaflet-container {
+        background: #333;
+      }
+
+      .leaflet-container a.leaflet-popup-close-button {
+        color: #ccc;
+      }
+
+      .leaflet-container a.leaflet-popup-close-button:hover {
+        color: #fff;
+      }
+
+      .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+        background: rgba(64, 64, 64, 0.5);
+      }
+
+      .overzoomed {
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -o-crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        image-rendering: pixelated;
+        -ms-interpolation-mode: nearest-neighbor;
+      }
+
+      .sign-wrapper {
+        padding: 0;
+        padding-left: 4px;
+        margin-bottom: 2em;
+      }
+
+      .sign-wrapper:last-child {
+        margin-bottom: 0;
+      }
+
+      .sign-title {
+        color: #fff;
+        font-weight: bold;
+        margin-bottom: 0.5em;
+      }
+
+      .sign-container {
+        padding: 0;
+        background-size: cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .sign-content {
+        padding: 0;
+        font-size: 18px;
+        line-height: 1.5;
+        text-align: center;
+        font-family: sans;
+      }
+
+      span.obfuscated:hover {
+        background-color: transparent !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script type="text/javascript">
+      createMap();
+    </script>
+  </body>
+</html>
