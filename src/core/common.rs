@@ -24,7 +24,7 @@ use crate::{
 ///
 /// Increase when the generation of processed regions from region data changes
 /// (usually because of updated resource data)
-pub const REGION_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(9);
+pub const REGION_FILE_META_VERSION: FileMetaVersion = FileMetaVersion(10);
 
 /// MinedMap map tile data version number
 ///

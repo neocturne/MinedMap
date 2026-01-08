@@ -14,17 +14,14 @@ use serde::{Serialize, de::DeserializeOwned};
 
 use super::fs;
 
-/// Bincode configuration
-const BINCODE_CONFIG: bincode::config::Configuration = bincode::config::standard();
-
 /// Storage format
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Format {
-	/// Encode as Bincode
+	/// Encode as Postcard
 	///
-	/// Bincode is more efficient than JSON, but cannot handle many of
+	/// Postcard is more efficient than JSON, but cannot handle many of
 	/// serde's features like flatten, conditional skipping, ...
-	Bincode,
+	Postcard,
 	/// Encode as JSON
 	Json,
 }
@@ -32,7 +29,7 @@ pub enum Format {
 /// Serializes data and writes it to a writer
 pub fn write<W: Write, T: Serialize>(writer: &mut W, value: &T, format: Format) -> Result<()> {
 	let data = match format {
-		Format::Bincode => bincode::encode_to_vec(bincode::serde::Compat(value), BINCODE_CONFIG)?,
+		Format::Postcard => postcard::to_stdvec(value)?,
 		Format::Json => serde_json::to_vec(value)?,
 	};
 	let len = u32::try_from(data.len())?;
@@ -70,10 +67,7 @@ pub fn read<R: Read, T: DeserializeOwned>(reader: &mut R, format: Format) -> Res
 	drop(compressed);
 
 	let value = match format {
-		Format::Bincode => {
-			let bincode::serde::Compat(v) = bincode::decode_from_slice(&data, BINCODE_CONFIG)?.0;
-			v
-		}
+		Format::Postcard => postcard::from_bytes(&data)?,
 		Format::Json => serde_json::from_slice(&data)?,
 	};
 	Ok(value)

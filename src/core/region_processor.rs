@@ -176,7 +176,7 @@ impl<'a> SingleRegionProcessor<'a> {
 		storage::write_file(
 			&self.output_path,
 			processed_region,
-			storage::Format::Bincode,
+			storage::Format::Postcard,
 			REGION_FILE_META_VERSION,
 			self.input_timestamp,
 		)
