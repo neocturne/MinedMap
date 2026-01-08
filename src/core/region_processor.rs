@@ -176,6 +176,7 @@ impl<'a> SingleRegionProcessor<'a> {
 		storage::write_file(
 			&self.output_path,
 			processed_region,
+			storage::Format::Postcard,
 			REGION_FILE_META_VERSION,
 			self.input_timestamp,
 		)
@@ -214,6 +215,7 @@ impl<'a> SingleRegionProcessor<'a> {
 		storage::write_file(
 			&self.entities_path,
 			entities,
+			storage::Format::Json,
 			ENTITIES_FILE_META_VERSION,
 			self.input_timestamp,
 		)

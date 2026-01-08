@@ -1,8 +1,7 @@
 //! Processing of block entity data
 
-use bincode::{Decode, Encode};
 use minedmap_resource::{BlockFlag, BlockType};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use super::{
 	de,
@@ -10,7 +9,7 @@ use super::{
 };
 
 /// Kind of sign block
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Encode, Decode, Serialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(rename_all = "snake_case")]
 pub enum SignKind {
 	/// Standing sign
@@ -24,7 +23,7 @@ pub enum SignKind {
 }
 
 /// Processed sign data
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Encode, Decode, Serialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Sign {
 	/// The kind of the sign
 	pub kind: SignKind,
@@ -60,7 +59,7 @@ impl Sign {
 }
 
 /// Data for different kinds of [BlockEntity]
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Encode, Decode, Serialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum BlockEntityData {
 	/// A sign block
@@ -68,7 +67,7 @@ pub enum BlockEntityData {
 }
 
 /// A processed block entity
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Encode, Decode, Serialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct BlockEntity {
 	/// Global X coordinate
 	pub x: i32,
