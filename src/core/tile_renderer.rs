@@ -105,7 +105,10 @@ impl<'a> TileRenderer<'a> {
 
 		region_loader
 			.get_or_try_init(|| async {
-				storage::read_file(&processed_path).context("Failed to load processed region data")
+				Ok(Arc::new(
+					storage::read_file(&processed_path, storage::Format::Bincode)
+						.context("Failed to load processed region data")?,
+				))
 			})
 			.await
 			.cloned()

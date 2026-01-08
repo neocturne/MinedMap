@@ -2,7 +2,6 @@
 
 use std::{collections::VecDeque, fmt::Display};
 
-use bincode::{Decode, Encode};
 use minedmap_resource::Color;
 use serde::{Deserialize, Serialize};
 
@@ -13,9 +12,7 @@ use serde::{Deserialize, Serialize};
 /// is handled by [DeserializedText].
 ///
 /// Formatting that is not set in a node is inherited from the parent.
-#[derive(
-	Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Encode, Decode,
-)]
+#[derive(Debug, Serialize, Deserialize, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FormattedText {
 	#[serde(default)]
 	/// Text content
@@ -87,7 +84,7 @@ impl From<String> for FormattedTextTree {
 }
 
 /// List of [FormattedText]
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Encode, Decode)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FormattedTextList(pub Vec<FormattedText>);
 
 impl FormattedTextList {

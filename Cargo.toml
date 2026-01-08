@@ -38,7 +38,7 @@ pre-release-replacements = [
 
 [dependencies]
 anyhow = "1.0.68"
-bincode = "2.0.1"
+bincode = { version = "2.0.1", features = ["serde"] }
 clap = { version = "4.1.4", features = ["derive", "wrap_help"] }
 enum-map = "2.7.3"
 fastnbt = "2.3.2"

@@ -78,22 +78,23 @@ impl<'a> EntityCollector<'a> {
 		let mut output = ProcessedEntities::default();
 
 		for source_path in sources {
-			let mut source: ProcessedEntities = match storage::read_file(source_path.as_ref()) {
-				Ok(source) => source,
-				Err(err) => {
-					warn!(
-						"Failed to read entity data file {}: {:?}",
-						source_path.as_ref().display(),
-						err,
-					);
-					continue;
-				}
-			};
+			let mut source: ProcessedEntities =
+				match storage::read_file(source_path.as_ref(), storage::Format::Json) {
+					Ok(source) => source,
+					Err(err) => {
+						warn!(
+							"Failed to read entity data file {}: {:?}",
+							source_path.as_ref().display(),
+							err,
+						);
+						continue;
+					}
+				};
 
 			output.block_entities.append(&mut source.block_entities);
 		}
 
-		storage::write(file, &output).context("Failed to write entity data")
+		storage::write(file, &output, storage::Format::Json).context("Failed to write entity data")
 	}
 
 	/// Runs the mipmap generation
