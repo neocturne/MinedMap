@@ -2,6 +2,10 @@
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- viewer: Added images for poplar signs
+
 ## [2.8.0] - 2026-05-29
 
 ### Added
