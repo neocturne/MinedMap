@@ -909,6 +909,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"black_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([8, 10, 15]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"black_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([8, 10, 15]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"black_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -970,6 +990,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"black_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([20, 21, 25]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"black_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([20, 21, 25]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"black_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -1099,6 +1139,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"blue_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([44, 46, 143]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"blue_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([44, 46, 143]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"blue_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -1180,6 +1240,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"blue_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([53, 57, 157]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"blue_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([53, 57, 157]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"blue_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -1369,6 +1449,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"brown_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([96, 59, 31]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"brown_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([96, 59, 31]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"brown_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -1450,6 +1550,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"brown_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([114, 71, 40]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"brown_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([114, 71, 40]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"brown_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -1909,6 +2029,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"chiseled_cinnabar",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([146, 55, 54]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"chiseled_copper",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -1999,6 +2129,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"chiseled_sulfur",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([187, 169, 91]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"chiseled_tuff",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -2034,6 +2174,86 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([93, 57, 93]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"cinnabar",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([151, 82, 78]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"cinnabar_brick_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([148, 55, 53]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"cinnabar_brick_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([148, 55, 53]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"cinnabar_brick_wall",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([148, 55, 53]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"cinnabar_bricks",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([148, 55, 53]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"cinnabar_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([151, 82, 78]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"cinnabar_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([151, 82, 78]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"cinnabar_wall",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([151, 82, 78]),
 			},
 			sign_material: None,
 		},
@@ -2809,6 +3029,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"cyan_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([21, 119, 136]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"cyan_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([21, 119, 136]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"cyan_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -2870,6 +3110,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"cyan_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([21, 137, 145]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"cyan_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([21, 137, 145]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"cyan_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -4349,6 +4609,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"gray_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([54, 57, 61]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"gray_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([54, 57, 61]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"gray_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -4410,6 +4690,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"gray_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([62, 68, 71]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"gray_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([62, 68, 71]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"gray_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -4489,6 +4789,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"green_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([73, 91, 36]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"green_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([73, 91, 36]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"green_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -4550,6 +4870,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"green_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([84, 109, 27]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"green_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([84, 109, 27]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"green_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -5249,6 +5589,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"light_blue_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([35, 137, 198]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"light_blue_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([35, 137, 198]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"light_blue_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -5310,6 +5670,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"light_blue_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([58, 175, 217]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"light_blue_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([58, 175, 217]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"light_blue_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -5389,6 +5769,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"light_gray_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([125, 125, 115]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"light_gray_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([125, 125, 115]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"light_gray_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -5450,6 +5850,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"light_gray_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([142, 142, 134]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"light_gray_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([142, 142, 134]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"light_gray_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -5579,6 +5999,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"lime_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([94, 168, 24]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"lime_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([94, 168, 24]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"lime_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -5640,6 +6080,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"lime_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([112, 185, 25]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"lime_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([112, 185, 25]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"lime_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -5739,6 +6199,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"magenta_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([169, 48, 159]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"magenta_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([169, 48, 159]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"magenta_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -5800,6 +6280,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"magenta_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([189, 68, 179]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"magenta_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([189, 68, 179]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"magenta_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -6669,11 +7169,41 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"orange_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([224, 97, 0]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"orange_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([224, 97, 0]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"orange_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([154, 147, 91]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"orange_poplar_leaves",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([188, 86, 23]),
 			},
 			sign_material: None,
 		},
@@ -6740,6 +7270,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"orange_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([240, 118, 19]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"orange_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([240, 118, 19]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"orange_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -7259,6 +7809,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"pink_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([213, 101, 142]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pink_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([213, 101, 142]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"pink_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -7340,6 +7910,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"pink_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([237, 141, 172]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pink_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([237, 141, 172]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"pink_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -7569,6 +8159,46 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"polished_cinnabar",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([152, 57, 55]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"polished_cinnabar_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([152, 57, 55]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"polished_cinnabar_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([152, 57, 55]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"polished_cinnabar_wall",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([152, 57, 55]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"polished_deepslate",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -7669,6 +8299,46 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"polished_sulfur",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([188, 170, 91]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"polished_sulfur_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([188, 170, 91]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"polished_sulfur_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([188, 170, 91]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"polished_sulfur_wall",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([188, 170, 91]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"polished_tuff",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -7709,6 +8379,176 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"poplar_button",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"poplar_door",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([151, 139, 128]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"poplar_fence",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([149, 137, 127]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"poplar_fence_gate",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([149, 137, 127]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"poplar_hanging_sign",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: Some("poplar"),
+		},
+	),
+	(
+		"poplar_log",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([136, 122, 110]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"poplar_planks",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([149, 137, 127]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"poplar_pressure_plate",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([149, 137, 127]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"poplar_sapling",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([143, 79, 37]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"poplar_shelf",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"poplar_sign",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: Some("poplar"),
+		},
+	),
+	(
+		"poplar_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([149, 137, 127]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"poplar_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([149, 137, 127]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"poplar_trapdoor",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([148, 136, 126]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"poplar_wall_hanging_sign",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{WallSign}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: Some("poplar"),
+		},
+	),
+	(
+		"poplar_wall_sign",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{WallSign}),
+				color: Color([0, 0, 0]),
+			},
+			sign_material: Some("poplar"),
+		},
+	),
+	(
+		"poplar_wood",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([79, 60, 42]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"poppy",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -7734,6 +8574,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([84, 135, 47]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"potent_sulfur",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([211, 208, 97]),
 			},
 			sign_material: None,
 		},
@@ -8029,6 +8879,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"potted_poplar_sapling",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([143, 79, 37]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"potted_poppy",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -8309,6 +9169,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"purple_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([100, 31, 156]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"purple_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([100, 31, 156]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"purple_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -8379,6 +9259,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"purple_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([121, 42, 172]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"purple_wool_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([121, 42, 172]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"purpur_block",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -8393,7 +9293,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([171, 129, 171]),
+				color: Color([171, 128, 171]),
 			},
 			sign_material: None,
 		},
@@ -8443,7 +9343,7 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
-				color: Color([235, 230, 224]),
+				color: Color([235, 229, 222]),
 			},
 			sign_material: None,
 		},
@@ -8579,6 +9479,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"red_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([142, 32, 32]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"red_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([142, 32, 32]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"red_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -8649,6 +9569,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"red_poplar_leaves",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([153, 44, 39]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"red_sand",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -8694,6 +9624,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([181, 97, 31]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"red_shrub",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([121, 35, 21]),
 			},
 			sign_material: None,
 		},
@@ -8760,6 +9700,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"red_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([160, 39, 34]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"red_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([160, 39, 34]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"red_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -9084,6 +10044,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([50, 126, 8]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"shelf_mushroom",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([179, 119, 70]),
 			},
 			sign_material: None,
 		},
@@ -9749,6 +10719,16 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"straw_bed",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([154, 128, 26]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"stripped_acacia_log",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -9939,6 +10919,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"stripped_poplar_log",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([151, 139, 129]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"stripped_poplar_wood",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([164, 152, 139]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"stripped_spruce_log",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -10004,6 +11004,96 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([148, 192, 101]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"sulfur",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([189, 175, 101]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"sulfur_brick_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([186, 167, 91]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"sulfur_brick_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([186, 167, 91]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"sulfur_brick_wall",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([186, 167, 91]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"sulfur_bricks",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([186, 167, 91]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"sulfur_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([189, 175, 101]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"sulfur_spike",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([187, 174, 97]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"sulfur_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([189, 175, 101]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"sulfur_wall",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([189, 175, 101]),
 			},
 			sign_material: None,
 		},
@@ -11499,6 +12589,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"white_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([207, 213, 214]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"white_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([207, 213, 214]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"white_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
@@ -11570,6 +12680,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"white_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([233, 236, 236]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"white_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([233, 236, 236]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"white_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
@@ -11689,11 +12819,41 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 		},
 	),
 	(
+		"yellow_concrete_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([240, 175, 21]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"yellow_concrete_stairs",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([240, 175, 21]),
+			},
+			sign_material: None,
+		},
+	),
+	(
 		"yellow_glazed_terracotta",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),
 				color: Color([234, 192, 88]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"yellow_poplar_leaves",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([214, 133, 40]),
 			},
 			sign_material: None,
 		},
@@ -11750,6 +12910,26 @@ pub const BLOCK_TYPES: &[(&str, ConstBlockType)] = &[
 	),
 	(
 		"yellow_wool",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([248, 197, 39]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"yellow_wool_slab",
+		ConstBlockType {
+			block_color: BlockColor {
+				flags: make_bitflags!(BlockFlag::{Opaque}),
+				color: Color([248, 197, 39]),
+			},
+			sign_material: None,
+		},
+	),
+	(
+		"yellow_wool_stairs",
 		ConstBlockType {
 			block_color: BlockColor {
 				flags: make_bitflags!(BlockFlag::{Opaque}),

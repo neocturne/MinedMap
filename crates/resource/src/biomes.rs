@@ -26,6 +26,13 @@ pub const BIOMES: &[(&str, Biome)] = &[
 	),
 	("cold_ocean", Biome::new(50, 50).water([61, 87, 214])),
 	("crimson_forest", Biome::new(200, 0)),
+	(
+		"dappled_forest",
+		Biome::new(60, 60)
+			.foliage([230, 142, 48])
+			.grass([223, 104, 39])
+			.water([55, 81, 84]),
+	),
 	("dark_forest", Biome::new(70, 80).modify(DarkForest)),
 	("deep_cold_ocean", Biome::new(50, 50).water([61, 87, 214])),
 	("deep_dark", Biome::new(80, 40)),
@@ -91,6 +98,12 @@ pub const BIOMES: &[(&str, Biome)] = &[
 	("sparse_jungle", Biome::new(95, 80)),
 	("stony_peaks", Biome::new(100, 30)),
 	("stony_shore", Biome::new(20, 30)),
+	(
+		"sulfur_caves",
+		Biome::new(80, 40)
+			.grass([171, 166, 79])
+			.water([52, 191, 137]),
+	),
 	("sunflower_plains", Biome::new(80, 40)),
 	(
 		"swamp",

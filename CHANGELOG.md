@@ -4,6 +4,9 @@
 
 ### Added
 
+- Added support for Minecraft versions up to 26.3
+
+  Added new data structures, blocks and biomes.
 - viewer: Added images for poplar signs
 
 ## [2.8.0] - 2026-05-29
