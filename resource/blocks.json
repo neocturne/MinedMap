@@ -221,6 +221,12 @@
 	},
 	"black_concrete": {},
 	"black_concrete_powder": {},
+	"black_concrete_slab": {
+		"texture": "black_concrete"
+	},
+	"black_concrete_stairs": {
+		"texture": "black_concrete"
+	},
 	"black_glazed_terracotta": {},
 	"black_shulker_box": {},
 	"black_stained_glass": {},
@@ -230,6 +236,12 @@
 	"black_terracotta": {},
 	"black_wall_banner": null,
 	"black_wool": {},
+	"black_wool_slab": {
+		"texture": "black_wool"
+	},
+	"black_wool_stairs": {
+		"texture": "black_wool"
+	},
 	"blackstone": {
 		"texture": "blackstone_top"
 	},
@@ -256,6 +268,12 @@
 	},
 	"blue_concrete": {},
 	"blue_concrete_powder": {},
+	"blue_concrete_slab": {
+		"texture": "blue_concrete"
+	},
+	"blue_concrete_stairs": {
+		"texture": "blue_concrete"
+	},
 	"blue_glazed_terracotta": {},
 	"blue_ice": {},
 	"blue_orchid": null,
@@ -267,6 +285,12 @@
 	"blue_terracotta": {},
 	"blue_wall_banner": null,
 	"blue_wool": {},
+	"blue_wool_slab": {
+		"texture": "blue_wool"
+	},
+	"blue_wool_stairs": {
+		"texture": "blue_wool"
+	},
 	"bone_block": {
 		"texture": "bone_block_top"
 	},
@@ -299,6 +323,12 @@
 	},
 	"brown_concrete": {},
 	"brown_concrete_powder": {},
+	"brown_concrete_slab": {
+		"texture": "brown_concrete"
+	},
+	"brown_concrete_stairs": {
+		"texture": "brown_concrete"
+	},
 	"brown_glazed_terracotta": {},
 	"brown_mushroom": null,
 	"brown_mushroom_block": {},
@@ -310,6 +340,12 @@
 	"brown_terracotta": {},
 	"brown_wall_banner": null,
 	"brown_wool": {},
+	"brown_wool_slab": {
+		"texture": "brown_wool"
+	},
+	"brown_wool_stairs": {
+		"texture": "brown_wool"
+	},
 	"bubble_column": {
 		"texture": "water_still",
 		"water": true
@@ -416,6 +452,7 @@
 	"chiseled_bookshelf": {
 		"texture": "chiseled_bookshelf_top"
 	},
+	"chiseled_cinnabar": {},
 	"chiseled_copper": {},
 	"chiseled_deepslate": {},
 	"chiseled_nether_bricks": {},
@@ -429,12 +466,33 @@
 		"texture": "sandstone_top"
 	},
 	"chiseled_stone_bricks": {},
+	"chiseled_sulfur": {},
 	"chiseled_tuff": {},
 	"chiseled_tuff_bricks": {
 		"texture": "chiseled_tuff_bricks_top"
 	},
 	"chorus_flower": {},
 	"chorus_plant": {},
+	"cinnabar": {},
+	"cinnabar_brick_slab": {
+		"texture": "cinnabar_bricks"
+	},
+	"cinnabar_brick_stairs": {
+		"texture": "cinnabar_bricks"
+	},
+	"cinnabar_brick_wall": {
+		"texture": "cinnabar_bricks"
+	},
+	"cinnabar_bricks": {},
+	"cinnabar_slab": {
+		"texture": "cinnabar"
+	},
+	"cinnabar_stairs": {
+		"texture": "cinnabar"
+	},
+	"cinnabar_wall": {
+		"texture": "cinnabar"
+	},
 	"clay": {},
 	"closed_eyeblossom": null,
 	"coal_block": {},
@@ -588,6 +646,12 @@
 	},
 	"cyan_concrete": {},
 	"cyan_concrete_powder": {},
+	"cyan_concrete_slab": {
+		"texture": "cyan_concrete"
+	},
+	"cyan_concrete_stairs": {
+		"texture": "cyan_concrete"
+	},
 	"cyan_glazed_terracotta": {},
 	"cyan_shulker_box": {},
 	"cyan_stained_glass": {},
@@ -597,6 +661,12 @@
 	"cyan_terracotta": {},
 	"cyan_wall_banner": null,
 	"cyan_wool": {},
+	"cyan_wool_slab": {
+		"texture": "cyan_wool"
+	},
+	"cyan_wool_stairs": {
+		"texture": "cyan_wool"
+	},
 	"damaged_anvil": {
 		"texture": "damaged_anvil_top"
 	},
@@ -869,6 +939,12 @@
 	},
 	"gray_concrete": {},
 	"gray_concrete_powder": {},
+	"gray_concrete_slab": {
+		"texture": "gray_concrete"
+	},
+	"gray_concrete_stairs": {
+		"texture": "gray_concrete"
+	},
 	"gray_glazed_terracotta": {},
 	"gray_shulker_box": {},
 	"gray_stained_glass": {},
@@ -878,6 +954,12 @@
 	"gray_terracotta": {},
 	"gray_wall_banner": null,
 	"gray_wool": {},
+	"gray_wool_slab": {
+		"texture": "gray_wool"
+	},
+	"gray_wool_stairs": {
+		"texture": "gray_wool"
+	},
 	"green_banner": null,
 	"green_bed": null,
 	"green_candle": null,
@@ -889,6 +971,12 @@
 	},
 	"green_concrete": {},
 	"green_concrete_powder": {},
+	"green_concrete_slab": {
+		"texture": "green_concrete"
+	},
+	"green_concrete_stairs": {
+		"texture": "green_concrete"
+	},
 	"green_glazed_terracotta": {},
 	"green_shulker_box": {},
 	"green_stained_glass": {},
@@ -898,6 +986,12 @@
 	"green_terracotta": {},
 	"green_wall_banner": null,
 	"green_wool": {},
+	"green_wool_slab": {
+		"texture": "green_wool"
+	},
+	"green_wool_stairs": {
+		"texture": "green_wool"
+	},
 	"grindstone": {
 		"texture": "grindstone_round"
 	},
@@ -1042,6 +1136,12 @@
 	},
 	"light_blue_concrete": {},
 	"light_blue_concrete_powder": {},
+	"light_blue_concrete_slab": {
+		"texture": "light_blue_concrete"
+	},
+	"light_blue_concrete_stairs": {
+		"texture": "light_blue_concrete"
+	},
 	"light_blue_glazed_terracotta": {},
 	"light_blue_shulker_box": {},
 	"light_blue_stained_glass": {},
@@ -1051,6 +1151,12 @@
 	"light_blue_terracotta": {},
 	"light_blue_wall_banner": null,
 	"light_blue_wool": {},
+	"light_blue_wool_slab": {
+		"texture": "light_blue_wool"
+	},
+	"light_blue_wool_stairs": {
+		"texture": "light_blue_wool"
+	},
 	"light_gray_banner": null,
 	"light_gray_bed": null,
 	"light_gray_candle": null,
@@ -1062,6 +1168,12 @@
 	},
 	"light_gray_concrete": {},
 	"light_gray_concrete_powder": {},
+	"light_gray_concrete_slab": {
+		"texture": "light_gray_concrete"
+	},
+	"light_gray_concrete_stairs": {
+		"texture": "light_gray_concrete"
+	},
 	"light_gray_glazed_terracotta": {},
 	"light_gray_shulker_box": {},
 	"light_gray_stained_glass": {},
@@ -1071,6 +1183,12 @@
 	"light_gray_terracotta": {},
 	"light_gray_wall_banner": null,
 	"light_gray_wool": {},
+	"light_gray_wool_slab": {
+		"texture": "light_gray_wool"
+	},
+	"light_gray_wool_stairs": {
+		"texture": "light_gray_wool"
+	},
 	"light_weighted_pressure_plate": {
 		"texture": "gold_block"
 	},
@@ -1093,6 +1211,12 @@
 	},
 	"lime_concrete": {},
 	"lime_concrete_powder": {},
+	"lime_concrete_slab": {
+		"texture": "lime_concrete"
+	},
+	"lime_concrete_stairs": {
+		"texture": "lime_concrete"
+	},
 	"lime_glazed_terracotta": {},
 	"lime_shulker_box": {},
 	"lime_stained_glass": {},
@@ -1102,6 +1226,12 @@
 	"lime_terracotta": {},
 	"lime_wall_banner": null,
 	"lime_wool": {},
+	"lime_wool_slab": {
+		"texture": "lime_wool"
+	},
+	"lime_wool_stairs": {
+		"texture": "lime_wool"
+	},
 	"lodestone": {
 		"texture": "lodestone_top"
 	},
@@ -1119,6 +1249,12 @@
 	},
 	"magenta_concrete": {},
 	"magenta_concrete_powder": {},
+	"magenta_concrete_slab": {
+		"texture": "magenta_concrete"
+	},
+	"magenta_concrete_stairs": {
+		"texture": "magenta_concrete"
+	},
 	"magenta_glazed_terracotta": {},
 	"magenta_shulker_box": {},
 	"magenta_stained_glass": {},
@@ -1128,6 +1264,12 @@
 	"magenta_terracotta": {},
 	"magenta_wall_banner": null,
 	"magenta_wool": {},
+	"magenta_wool_slab": {
+		"texture": "magenta_wool"
+	},
+	"magenta_wool_stairs": {
+		"texture": "magenta_wool"
+	},
 	"magma_block": {
 		"texture": "magma"
 	},
@@ -1330,7 +1472,14 @@
 	},
 	"orange_concrete": {},
 	"orange_concrete_powder": {},
+	"orange_concrete_slab": {
+		"texture": "orange_concrete"
+	},
+	"orange_concrete_stairs": {
+		"texture": "orange_concrete"
+	},
 	"orange_glazed_terracotta": {},
+	"orange_poplar_leaves": {},
 	"orange_shulker_box": {},
 	"orange_stained_glass": {},
 	"orange_stained_glass_pane": {
@@ -1340,6 +1489,12 @@
 	"orange_tulip": null,
 	"orange_wall_banner": null,
 	"orange_wool": {},
+	"orange_wool_slab": {
+		"texture": "orange_wool"
+	},
+	"orange_wool_stairs": {
+		"texture": "orange_wool"
+	},
 	"oxeye_daisy": null,
 	"oxidized_chiseled_copper": {},
 	"oxidized_copper": {},
@@ -1441,6 +1596,12 @@
 	},
 	"pink_concrete": {},
 	"pink_concrete_powder": {},
+	"pink_concrete_slab": {
+		"texture": "pink_concrete"
+	},
+	"pink_concrete_stairs": {
+		"texture": "pink_concrete"
+	},
 	"pink_glazed_terracotta": {},
 	"pink_petals": null,
 	"pink_shulker_box": {},
@@ -1452,6 +1613,12 @@
 	"pink_tulip": null,
 	"pink_wall_banner": null,
 	"pink_wool": {},
+	"pink_wool_slab": {
+		"texture": "pink_wool"
+	},
+	"pink_wool_stairs": {
+		"texture": "pink_wool"
+	},
 	"piston": {
 		"texture": "piston_side"
 	},
@@ -1506,6 +1673,16 @@
 	"polished_blackstone_wall": {
 		"texture": "polished_blackstone"
 	},
+	"polished_cinnabar": {},
+	"polished_cinnabar_slab": {
+		"texture": "polished_cinnabar"
+	},
+	"polished_cinnabar_stairs": {
+		"texture": "polished_cinnabar"
+	},
+	"polished_cinnabar_wall": {
+		"texture": "polished_cinnabar"
+	},
 	"polished_deepslate": {},
 	"polished_deepslate_slab": {
 		"texture": "polished_deepslate"
@@ -1530,6 +1707,16 @@
 	"polished_granite_stairs": {
 		"texture": "polished_granite"
 	},
+	"polished_sulfur": {},
+	"polished_sulfur_slab": {
+		"texture": "polished_sulfur"
+	},
+	"polished_sulfur_stairs": {
+		"texture": "polished_sulfur"
+	},
+	"polished_sulfur_wall": {
+		"texture": "polished_sulfur"
+	},
 	"polished_tuff": {},
 	"polished_tuff_slab": {
 		"texture": "polished_tuff"
@@ -1540,6 +1727,53 @@
 	"polished_tuff_wall": {
 		"texture": "polished_tuff"
 	},
+	"poplar_button": null,
+	"poplar_door": {
+		"texture": "poplar_door_top"
+	},
+	"poplar_fence": {
+		"texture": "poplar_planks"
+	},
+	"poplar_fence_gate": {
+		"texture": "poplar_planks"
+	},
+	"poplar_hanging_sign": {
+		"sign_material": "poplar",
+		"texture": null
+	},
+	"poplar_log": {
+		"texture": "poplar_log_top"
+	},
+	"poplar_planks": {},
+	"poplar_pressure_plate": {
+		"texture": "poplar_planks"
+	},
+	"poplar_sapling": {},
+	"poplar_shelf": null,
+	"poplar_sign": {
+		"sign_material": "poplar",
+		"texture": null
+	},
+	"poplar_slab": {
+		"texture": "poplar_planks"
+	},
+	"poplar_stairs": {
+		"texture": "poplar_planks"
+	},
+	"poplar_trapdoor": {},
+	"poplar_wall_hanging_sign": {
+		"sign_material": "poplar",
+		"texture": null,
+		"wall_sign": true
+	},
+	"poplar_wall_sign": {
+		"sign_material": "poplar",
+		"texture": null,
+		"wall_sign": true
+	},
+	"poplar_wood": {
+		"texture": "poplar_log"
+	},
 	"poppy": null,
 	"portal": {
 		"texture": "nether_portal"
@@ -1547,6 +1781,7 @@
 	"potatoes": {
 		"texture": "potatoes_stage3"
 	},
+	"potent_sulfur": {},
 	"potted_acacia_sapling": {
 		"texture": "acacia_sapling"
 	},
@@ -1635,6 +1870,9 @@
 	"potted_pink_tulip": {
 		"texture": "pink_tulip"
 	},
+	"potted_poplar_sapling": {
+		"texture": "poplar_sapling"
+	},
 	"potted_poppy": {
 		"texture": "poppy"
 	},
@@ -1701,6 +1939,12 @@
 	},
 	"purple_concrete": {},
 	"purple_concrete_powder": {},
+	"purple_concrete_slab": {
+		"texture": "purple_concrete"
+	},
+	"purple_concrete_stairs": {
+		"texture": "purple_concrete"
+	},
 	"purple_glazed_terracotta": {},
 	"purple_shulker_box": {},
 	"purple_stained_glass": {},
@@ -1710,8 +1954,16 @@
 	"purple_terracotta": {},
 	"purple_wall_banner": null,
 	"purple_wool": {},
+	"purple_wool_slab": {
+		"texture": "purple_wool"
+	},
+	"purple_wool_stairs": {
+		"texture": "purple_wool"
+	},
 	"purpur_block": {},
-	"purpur_pillar": {},
+	"purpur_pillar": {
+		"texture": "purpur_pillar_top"
+	},
 	"purpur_slab": {
 		"texture": "purpur_block"
 	},
@@ -1722,7 +1974,9 @@
 		"texture": "quartz_block_top"
 	},
 	"quartz_bricks": {},
-	"quartz_pillar": {},
+	"quartz_pillar": {
+		"texture": "quartz_pillar_top"
+	},
 	"quartz_slab": {
 		"texture": "quartz_block_top"
 	},
@@ -1744,6 +1998,12 @@
 	},
 	"red_concrete": {},
 	"red_concrete_powder": {},
+	"red_concrete_slab": {
+		"texture": "red_concrete"
+	},
+	"red_concrete_stairs": {
+		"texture": "red_concrete"
+	},
 	"red_glazed_terracotta": {},
 	"red_mushroom": null,
 	"red_mushroom_block": {},
@@ -1757,6 +2017,7 @@
 		"texture": "red_nether_bricks"
 	},
 	"red_nether_bricks": {},
+	"red_poplar_leaves": {},
 	"red_sand": {},
 	"red_sandstone": {
 		"texture": "red_sandstone_top"
@@ -1770,6 +2031,7 @@
 	"red_sandstone_wall": {
 		"texture": "red_sandstone_top"
 	},
+	"red_shrub": {},
 	"red_shulker_box": {},
 	"red_stained_glass": {},
 	"red_stained_glass_pane": {
@@ -1779,6 +2041,12 @@
 	"red_tulip": null,
 	"red_wall_banner": null,
 	"red_wool": {},
+	"red_wool_slab": {
+		"texture": "red_wool"
+	},
+	"red_wool_stairs": {
+		"texture": "red_wool"
+	},
 	"redstone_block": {},
 	"redstone_lamp": {},
 	"redstone_ore": {},
@@ -1843,6 +2111,9 @@
 	"sea_lantern": {},
 	"sea_pickle": {},
 	"seagrass": {},
+	"shelf_mushroom": {
+		"texture": "shelf_mushroom_stage1"
+	},
 	"short_dry_grass": {},
 	"short_grass": null,
 	"shroomlight": {},
@@ -1992,6 +2263,7 @@
 	"stonecutter": {
 		"texture": "stonecutter_top"
 	},
+	"straw_bed": {},
 	"stripped_acacia_log": {
 		"texture": "stripped_acacia_log_top"
 	},
@@ -2049,6 +2321,12 @@
 	"stripped_pale_oak_wood": {
 		"texture": "stripped_pale_oak_log"
 	},
+	"stripped_poplar_log": {
+		"texture": "stripped_poplar_log_top"
+	},
+	"stripped_poplar_wood": {
+		"texture": "stripped_poplar_log"
+	},
 	"stripped_spruce_log": {
 		"texture": "stripped_spruce_log_top"
 	},
@@ -2064,6 +2342,29 @@
 	"structure_block": {},
 	"structure_void": null,
 	"sugar_cane": {},
+	"sulfur": {},
+	"sulfur_brick_slab": {
+		"texture": "sulfur_bricks"
+	},
+	"sulfur_brick_stairs": {
+		"texture": "sulfur_bricks"
+	},
+	"sulfur_brick_wall": {
+		"texture": "sulfur_bricks"
+	},
+	"sulfur_bricks": {},
+	"sulfur_slab": {
+		"texture": "sulfur"
+	},
+	"sulfur_spike": {
+		"texture": "sulfur_spike_up_tip"
+	},
+	"sulfur_stairs": {
+		"texture": "sulfur"
+	},
+	"sulfur_wall": {
+		"texture": "sulfur"
+	},
 	"sunflower": {
 		"texture": "sunflower_front"
 	},
@@ -2403,6 +2704,12 @@
 	},
 	"white_concrete": {},
 	"white_concrete_powder": {},
+	"white_concrete_slab": {
+		"texture": "white_concrete"
+	},
+	"white_concrete_stairs": {
+		"texture": "white_concrete"
+	},
 	"white_glazed_terracotta": {},
 	"white_shulker_box": {},
 	"white_stained_glass": {},
@@ -2413,6 +2720,12 @@
 	"white_tulip": null,
 	"white_wall_banner": null,
 	"white_wool": {},
+	"white_wool_slab": {
+		"texture": "white_wool"
+	},
+	"white_wool_stairs": {
+		"texture": "white_wool"
+	},
 	"wildflowers": null,
 	"wither_rose": null,
 	"wither_skeleton_skull": null,
@@ -2428,7 +2741,14 @@
 	},
 	"yellow_concrete": {},
 	"yellow_concrete_powder": {},
+	"yellow_concrete_slab": {
+		"texture": "yellow_concrete"
+	},
+	"yellow_concrete_stairs": {
+		"texture": "yellow_concrete"
+	},
 	"yellow_glazed_terracotta": {},
+	"yellow_poplar_leaves": {},
 	"yellow_shulker_box": {},
 	"yellow_stained_glass": {},
 	"yellow_stained_glass_pane": {
@@ -2437,6 +2757,12 @@
 	"yellow_terracotta": {},
 	"yellow_wall_banner": null,
 	"yellow_wool": {},
+	"yellow_wool_slab": {
+		"texture": "yellow_wool"
+	},
+	"yellow_wool_stairs": {
+		"texture": "yellow_wool"
+	},
 	"zombie_head": null,
 	"zombie_wall_head": null
 }

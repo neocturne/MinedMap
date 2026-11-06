@@ -6,10 +6,25 @@ use super::text_value::TextValue;
 
 /// Element of the `palette` list of 1.18+ [block states](BlockStatesV1_18)
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct BlockStatePaletteEntry {
-	/// Block type ID
-	pub name: String,
+#[serde(untagged)]
+pub enum BlockStatePaletteEntry {
+	/// Plain string
+	String(String),
+	/// Compound with "id", "" or "Name" field
+	Compound {
+		/// Block type ID
+		#[serde(alias = "", alias = "Name")]
+		id: String,
+	},
+}
+
+impl AsRef<str> for BlockStatePaletteEntry {
+	fn as_ref(&self) -> &str {
+		match self {
+			BlockStatePaletteEntry::String(name) => name,
+			BlockStatePaletteEntry::Compound { id } => id,
+		}
+	}
 }
 
 /// 1.18+ `block_states` element found in a [section](SectionV1_18)

@@ -16,6 +16,7 @@ MATERIALS = [
 	'mangrove',
 	'oak',
 	'pale_oak',
+	'poplar',
 	'spruce',
 	'warped',
 ]
@@ -24,19 +25,16 @@ in_dir = sys.argv[1]
 out_dir = sys.argv[2]
 
 def sign_bg_image(material):
-	in_path = f'{in_dir}/assets/minecraft/textures/entity/signs/{material}.png'
+	in_path = f'{in_dir}/assets/minecraft/textures/gui/signs/{material}.png'
 	out_path = f'{out_dir}/bg/{material}_sign.png'
 	out_path_wall = f'{out_dir}/bg/{material}_wall_sign.png'
 
 	in_image = Image.open(in_path)
 
-	out_image = Image.new('RGBA', (24, 26))
-	out_image.paste(in_image.crop((2, 2, 26, 14)), (0, 0))
-	out_image.paste(in_image.crop((2, 16, 4, 30)), (11, 12))
-	out_image.save(out_path)
+	shutil.copyfile(in_path, out_path)
 
 	out_image = Image.new('RGBA', (24, 12))
-	out_image.paste(in_image.crop((2, 2, 26, 14)), (0, 0))
+	out_image.paste(in_image.crop((0, 0, 24, 12)), (0, 0))
 	out_image.save(out_path_wall)
 
 def hanging_sign_bg_image(material):
