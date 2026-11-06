@@ -95,9 +95,9 @@ impl<'a> SectionV1_13<'a> {
 		let palette_types = palette
 			.iter()
 			.map(|entry| {
-				let block_type = block_types.get(&entry.name);
+				let block_type = block_types.get(entry.as_ref());
 				if block_type.is_none() {
-					debug!("Unknown block type: {}", entry.name);
+					debug!("Unknown block type: {}", entry.as_ref());
 					has_unknown = true;
 				}
 				block_type
