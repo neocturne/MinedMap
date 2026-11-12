@@ -9,7 +9,8 @@ use crate::{
 	io::{fs, storage},
 	world::{
 		block_entity::{self, BlockEntity, BlockEntityData},
-		de, sign,
+		de,
+		sign::{self, SignText},
 	},
 };
 
@@ -152,17 +153,15 @@ impl<'a> MetadataWriter<'a> {
 		Spawn { x, z }
 	}
 
-	/// Filter signs according to the sign pattern configuration
+	/// Checks whether a [SignText] matches the configured filter
+	fn sign_text_filter(&self, text: &SignText) -> bool {
+		let s = text.to_string();
+		self.config.sign_patterns.is_match(s.trim())
+	}
+
+	/// Checks whether the front or back text of a sign matches the configured filter
 	fn sign_filter(&self, sign: &block_entity::Sign) -> bool {
-		let front_text = sign.front_text.to_string();
-		if self.config.sign_patterns.is_match(front_text.trim()) {
-			return true;
-		}
-		let back_text = sign.back_text.to_string();
-		if self.config.sign_patterns.is_match(back_text.trim()) {
-			return true;
-		}
-		false
+		self.sign_text_filter(&sign.front_text) || self.sign_text_filter(&sign.back_text)
 	}
 
 	/// Applies a single transform to a [sign::SignText]
